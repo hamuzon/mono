@@ -75,8 +75,23 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.2rem;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .copyright-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: nowrap;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .license {
+      font-size: 0.7rem;
+      color: #ccc;
+      margin-top: 0.3rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     }
 
     footer a {
@@ -86,19 +101,12 @@
       transition: color 0.2s ease, text-decoration 0.2s ease;
     }
 
-    footer a:hover { text-decoration: underline; }
-
-    .license {
-      font-size: 0.7rem;
-      color: #ccc;
-      margin-top: 0.3rem;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    }
-
     .license a {
       color: #ccc;
       text-decoration: underline;
     }
+
+    footer a:hover { text-decoration: underline; }
 
     @media (max-width: 600px) {
       h1 { font-size: 2.2rem; }
@@ -125,8 +133,10 @@
     <p>This page is under construction.</p>
 
     <footer>
-      &copy; <span id="year"></span>
-      <a href="https://hamusata.f5.si" target="_blank">@hamusata</a>
+      <div class="copyright-row">
+        &copy; <span id="year"></span>
+        <a href="https://hamusata.f5.si" target="_blank">@hamusata</a>
+      </div>
       <div class="license">
         Font: <a href="https://fonts.google.com/specimen/Potta+One" target="_blank">Potta One</a>  
         — Licensed under <a href="https://scripts.sil.org/OFL" target="_blank">SIL Open Font License 1.1</a>
