@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>準備中 / Coming Soon - mono.hamusata.f5.si</title>
-  <meta name="description" content="ただいまサイトを準備しています。This site is currently under construction.">
-  <meta name="keywords" content="準備中, Coming Soon, under construction, mono, hamusata">
+
+  <title>Code Storage Site - mono.hamusata.f5.si</title>
+
+  <meta name="description" content="A site that hosts random and experimental code.">
   <meta name="author" content="hamusata">
+
   <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
 
   <style>
@@ -18,89 +20,126 @@
 
     body {
       font-family: 'Potta One', cursive;
+      min-height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      text-align: center;
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
       color: #ffffff;
+      overflow-x: hidden;
     }
 
     .aurora-background {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 0;
+      z-index: -1;
       background:
-        radial-gradient(ellipse 80% 60% at 70% 20%, rgba(175, 109, 255, 0.85), transparent 68%),
-        radial-gradient(ellipse 70% 60% at 20% 80%, rgba(255, 100, 180, 0.75), transparent 68%),
-        radial-gradient(ellipse 60% 50% at 60% 65%, rgba(255, 235, 170, 0.98), transparent 68%),
-        radial-gradient(ellipse 65% 40% at 50% 60%, rgba(120, 190, 255, 0.3), transparent 68%),
+        radial-gradient(ellipse 80% 60% at 70% 20%, rgba(175,109,255,0.85), transparent 68%),
+        radial-gradient(ellipse 70% 60% at 20% 80%, rgba(255,100,180,0.75), transparent 68%),
+        radial-gradient(ellipse 60% 50% at 60% 65%, rgba(255,235,170,0.98), transparent 68%),
         linear-gradient(180deg, #f7eaff 0%, #fde2ea 100%);
       animation: auroraMove 20s linear infinite alternate;
     }
 
     @keyframes auroraMove {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-10px, 10px) scale(1.04); }
-      100% { transform: translate(0, 0) scale(1); }
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
     }
 
-    .content {
-      position: relative;
-      z-index: 1;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      padding: 80px 20px 120px;
+      text-align: center;
     }
 
     h1 {
       font-size: 3rem;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.4rem;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
     }
 
     .subtitle {
-      font-size: 1.4rem;
-      margin-bottom: 1.2rem;
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
       opacity: 0.95;
     }
 
-    p {
-      font-size: 1.15rem;
-      margin: 0.4rem 0;
-      line-height: 1.6;
+    .desc {
+      font-size: 1.1rem;
+      margin-bottom: 48px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      justify-items: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 360px;
+      background: rgba(255,255,255,0.22);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .card a {
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.25);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .card a:hover {
+      background: rgba(0,0,0,0.4);
     }
 
     footer {
-      margin-top: 2rem;
-      font-size: 0.95rem;
+      margin-top: 80px;
+      width: 100%;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 0.3rem;
-      opacity: 0.9;
+      gap: 6px;
+      font-size: 0.85rem;
+      opacity: 0.95;
     }
 
     footer a {
-      color: #ffd1dc;
+      color: #ffffff;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
 
     footer a:hover {
       text-decoration: underline;
     }
 
-    .license {
-      font-size: 0.7rem;
-      color: #ccc;
-    }
-
     @media (max-width: 600px) {
       h1 { font-size: 2.2rem; }
       .subtitle { font-size: 1.1rem; }
-      p { font-size: 1rem; }
+      .desc { font-size: 1rem; }
     }
   </style>
 </head>
@@ -108,33 +147,46 @@
 
   <div class="aurora-background"></div>
 
-  <div class="content">
-    <h1>準備中</h1>
-    <div class="subtitle">Coming Soon</div>
+  <div class="wrapper">
+    <h1 id="title-ja"></h1>
+    <div class="subtitle" id="title-en"></div>
+    <div class="desc" id="desc-ja"></div>
 
-    <p>mono.hamusata.f5.si は現在準備中です。</p>
-    <p>公開まで今しばらくお待ちください。</p>
-
-    <p>This site is currently under construction.</p>
-    <p>Please wait a little longer until it is ready.</p>
+    <section class="cards" id="cards"></section>
 
     <footer>
-      <div>
-        &copy; <span id="year"></span>
-        <a href="https://hamusata.f5.si" target="_blank">@hamusata</a>
-      </div>
-      <div class="license">
-        Font: <a href="https://fonts.google.com/specimen/Potta+One" target="_blank">Potta One</a>
-        — Licensed under <a href="https://scripts.sil.org/OFL" target="_blank">SIL Open Font License 1.1</a>
-      </div>
+      Copyright <span id="year"></span>
+      <a href="https://hamusata.f5.si" target="_blank">hamusata</a>
     </footer>
   </div>
 
   <script>
-    const baseYear = 2025;
-    const currentYear = new Date().getFullYear();
+    const BASE_YEAR = 2025;
+
+    fetch("./data.json")
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById("title-ja").textContent = data.site.title_ja;
+        document.getElementById("title-en").textContent = data.site.title_en;
+        document.getElementById("desc-ja").textContent = data.site.description_ja;
+
+        const cards = document.getElementById("cards");
+
+        data.cards.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <h2>${item.title}</h2>
+            <p>${item.text}</p>
+            <a href="${item.url}">Open</a>
+          `;
+          cards.appendChild(card);
+        });
+      });
+
+    const year = new Date().getFullYear();
     document.getElementById("year").textContent =
-      currentYear > baseYear ? `${baseYear}~${currentYear}` : `${baseYear}`;
+      year > BASE_YEAR ? `${BASE_YEAR}-${year}` : BASE_YEAR;
   </script>
 
 </body>
