@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>準備中 - mono.hamusata.f5.si</title>
-  <meta name="description" content="ただいま準備中です。This page is under construction.">
-  <meta name="keywords" content="準備中, Coming Soon, mono, hamusata, HTML, CSS, Potta One">
+  <title>準備中 / Coming Soon - mono.hamusata.f5.si</title>
+  <meta name="description" content="ただいまサイトを準備しています。This site is currently under construction.">
+  <meta name="keywords" content="準備中, Coming Soon, under construction, mono, hamusata">
   <meta name="author" content="hamusata">
   <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'Potta One', cursive;
@@ -41,9 +45,7 @@
 
     @keyframes auroraMove {
       0% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(10px, -10px) scale(1.05); }
-      50% { transform: translate(-10px, 10px) scale(1.02); }
-      75% { transform: translate(5px, -5px) scale(1.03); }
+      50% { transform: translate(-10px, 10px) scale(1.04); }
       100% { transform: translate(0, 0) scale(1); }
     }
 
@@ -55,71 +57,50 @@
 
     h1 {
       font-size: 3rem;
-      color: #ffffff;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .subtitle {
+      font-size: 1.4rem;
+      margin-bottom: 1.2rem;
+      opacity: 0.95;
     }
 
     p {
-      font-size: 1.2rem;
-      color: #ffffff;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
-      margin: 0.5rem 0;
-      line-height: 1.5;
+      font-size: 1.15rem;
+      margin: 0.4rem 0;
+      line-height: 1.6;
     }
 
     footer {
       margin-top: 2rem;
-      font-size: 1rem;
-      color: #f0f0f0;
+      font-size: 0.95rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.2rem;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
-
-    .copyright-row {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: nowrap;
-      justify-content: center;
-      white-space: nowrap;
-    }
-
-    .license {
-      font-size: 0.7rem;
-      color: #ccc;
-      margin-top: 0.3rem;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      gap: 0.3rem;
+      opacity: 0.9;
     }
 
     footer a {
       color: #ffd1dc;
       text-decoration: none;
       font-weight: bold;
-      transition: color 0.2s ease, text-decoration 0.2s ease;
     }
 
-    .license a {
-      color: #ccc;
+    footer a:hover {
       text-decoration: underline;
     }
 
-    footer a:hover { text-decoration: underline; }
+    .license {
+      font-size: 0.7rem;
+      color: #ccc;
+    }
 
     @media (max-width: 600px) {
       h1 { font-size: 2.2rem; }
+      .subtitle { font-size: 1.1rem; }
       p { font-size: 1rem; }
-      footer { font-size: 0.9rem; }
-    }
-
-    @media (prefers-color-scheme: dark) {
-      body { color: #ffffff; }
-      h1 { color: #ffffff; }
-      p { color: #ffffff; }
-      footer { color: #f0f0f0; }
-      footer a { color: #ffd1dc; }
     }
   </style>
 </head>
@@ -129,16 +110,21 @@
 
   <div class="content">
     <h1>準備中</h1>
-    <p>mono.hamusata.f5.si はただいま準備中です。</p>
-    <p>This page is under construction.</p>
+    <div class="subtitle">Coming Soon</div>
+
+    <p>mono.hamusata.f5.si は現在準備中です。</p>
+    <p>公開まで今しばらくお待ちください。</p>
+
+    <p>This site is currently under construction.</p>
+    <p>Please wait a little longer until it is ready.</p>
 
     <footer>
-      <div class="copyright-row">
+      <div>
         &copy; <span id="year"></span>
         <a href="https://hamusata.f5.si" target="_blank">@hamusata</a>
       </div>
       <div class="license">
-        Font: <a href="https://fonts.google.com/specimen/Potta+One" target="_blank">Potta One</a>  
+        Font: <a href="https://fonts.google.com/specimen/Potta+One" target="_blank">Potta One</a>
         — Licensed under <a href="https://scripts.sil.org/OFL" target="_blank">SIL Open Font License 1.1</a>
       </div>
     </footer>
