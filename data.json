@@ -1,14 +1,14 @@
 {
   "cards": [
     {
-      "title": "バッテリー情報（Battery API）",
-      "text": "Battery API を使った情報取得・表示ページ / Battery status viewer using the Battery API",
+      "title": "Battery API",
+      "text": "Battery API を使った情報取得・表示ページ",
       "url": "/battery/"
     },
     {
       "title": "画像ジェネレーター",
       "text": "グラデーション & 単色画像ジェネレーター / Gradient & Solid Color Image Generator",
-      "url": "/image-generator/",
+      "url": "/image-generator/"
     }
   ]
 }
