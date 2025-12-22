@@ -2,7 +2,7 @@
   "cards": [
     {
       "title": "Battery API",
-      "text": "Battery API を使った情報取得・表示ページ",
+      "text": "Battery API を使った情報取得・表示ページ / Battery status viewer using the Battery API",
       "url": "/battery/"
     },
     {
