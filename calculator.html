@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
     <title>計算 / Calculator</title>
 
     <script>
         (function() {
-            const config = JSON.parse(localStorage.getItem('calc_cfg') || '{"theme":"system"}');
-            const isDark = config.theme === 'dark' || (config.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) document.documentElement.classList.add('dark-mode');
+            const cfg = JSON.parse(localStorage.getItem('p10_cfg') || '{"theme":"system"}');
+            const isDark = cfg.theme === 'dark' || (cfg.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) document.documentElement.classList.add('dark');
         })();
     </script>
 
@@ -24,35 +21,33 @@
             --on-bg: #1B1C17;
             --surface: #EFF1E0;
             --on-surface: #44483D;
+            --primary: #4C662B;
+            --on-primary: #FFFFFF;
             --primary-cont: #D7E8B7;
             --on-primary-cont: #121F00;
             --sec-cont: #E3E4D3;
             --on-sec-cont: #1B1C17;
-            --accent: #4C662B;
+            --accent: #B1D18A;
             --radius: 32px;
         }
 
-        .dark-mode {
+        .dark {
             --bg: #1B1C17;
             --on-bg: #E3E4D3;
             --surface: #2F3126;
             --on-surface: #C7C8B8;
+            --primary: #B1D18A;
+            --on-primary: #1F3701;
             --primary-cont: #3E4A2B;
             --on-primary-cont: #D7E8B7;
             --sec-cont: #45483C;
             --on-sec-cont: #E3E4D3;
-            --accent: #B1D18A;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
         body {
             margin: 0;
-            padding: 0;
             height: 100dvh;
             background: var(--bg);
             color: var(--on-bg);
@@ -64,92 +59,59 @@
 
         .overlay {
             position: fixed;
-            top: -100%;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -100%; left: 0; width: 100%; height: 100%;
             background: var(--bg);
             z-index: 2000;
             transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding: calc(24px + env(safe-area-inset-top)) 24px 24px;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
 
-        .overlay.open {
-            top: 0;
-        }
+        .overlay.open { top: 0; }
 
-        .display-area {
+        .display-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-end;
-            padding: 24px 32px;
-            min-height: 150px;
+            padding: 32px;
         }
 
-        #sub-text {
+        #history-display {
             font-size: 1.5rem;
             color: var(--on-surface);
             opacity: 0.7;
             min-height: 2rem;
             text-align: right;
-            word-break: break-all;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
-        #main-input {
+        #main-display {
             width: 100%;
             font-size: clamp(2.5rem, 12vw, 5rem);
             text-align: right;
             border: none;
             background: transparent;
             color: var(--on-bg);
-            font-family: inherit;
-            outline: none;
-            padding: 0;
         }
 
-        .pad-container {
+        .pad-card {
             background: var(--surface);
             border-radius: 40px 40px 0 0;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
-            transition: all 0.3s ease;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
         }
 
-        .top-bar {
+        .toolbar {
             display: flex;
             justify-content: space-between;
             padding: 16px 32px 8px;
-            color: var(--accent);
+            color: var(--primary);
         }
 
-        .top-bar span {
-            cursor: pointer;
-            padding: 12px;
-            font-size: 1.8rem;
-        }
+        .toolbar span { cursor: pointer; padding: 10px; font-size: 1.8rem; }
 
-        .advanced-pad {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            padding: 0 24px;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .advanced-pad.show {
-            max-height: 220px;
-            opacity: 1;
-            padding: 16px 24px 8px;
-        }
-
-        .main-pad {
+        .grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
@@ -157,12 +119,11 @@
         }
 
         button {
-            height: 68px;
+            height: 72px;
             border: none;
             border-radius: var(--radius);
             font-size: 1.6rem;
             font-weight: 500;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -171,75 +132,41 @@
             transition: transform 0.1s;
         }
 
-        button:active {
-            transform: scale(0.92);
-            filter: brightness(0.9);
-        }
+        button:active { transform: scale(0.92); filter: brightness(0.9); }
 
-        .btn-operator {
-            background: var(--primary-cont);
-            color: var(--on-primary-cont);
-        }
+        .btn-op { background: var(--primary-cont); color: var(--on-primary-cont); }
+        .btn-fn { background: var(--sec-cont); color: var(--on-sec-cont); }
+        .btn-eq { background: var(--primary); color: var(--on-primary); font-size: 2.2rem; }
 
-        .btn-functional {
-            background: var(--sec-cont);
-            color: var(--on-sec-cont);
-        }
-
-        .btn-equal {
-            background: var(--accent);
-            color: var(--bg);
-            font-size: 2.2rem;
-        }
-
-        .btn-adv {
-            background: transparent;
-            font-size: 1.1rem;
-            height: 48px;
-            color: var(--on-surface);
-        }
-
-        .setting-item {
+        .item-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 24px 0;
-            border-bottom: 1px solid var(--surface);
+            border-bottom: 1px solid var(--sec-cont);
         }
 
-        select, input[type="range"] {
-            accent-color: var(--accent);
-            font-family: inherit;
-        }
-
-        .history-item {
-            text-align: right;
-            margin-bottom: 40px;
-        }
+        .hist-item { text-align: right; margin-bottom: 32px; cursor: pointer; }
     </style>
 </head>
-
 <body>
 
     <div id="settings-panel" class="overlay">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
             <span style="font-size:1.6rem; font-weight:500;">設定 / Settings</span>
-            <span class="material-symbols-outlined" onclick="ui('settings')">close</span>
+            <span class="material-symbols-outlined" onclick="toggleUI('settings')">close</span>
         </div>
-        <div class="setting-item">
+        <div class="item-row">
             <span>テーマ / Theme</span>
-            <select id="theme-select" onchange="updateCfg()">
-                <option value="system">システム / System</option>
-                <option value="light">ライト / Light</option>
-                <option value="dark">ダーク / Dark</option>
+            <select id="theme-sel" onchange="saveCfg()" style="padding:8px; border-radius:8px;">
+                <option value="system">システム</option>
+                <option value="light">ライト</option>
+                <option value="dark">ダーク</option>
             </select>
         </div>
-        <div class="setting-item">
-            <span>振動 / Vibration</span>
-            <div style="display:flex; align-items:center; gap:16px;">
-                <input type="range" id="vibe-slider" min="0" max="100" step="10" onchange="updateCfg()">
-                <span id="vibe-label" style="width:40px;">30%</span>
-            </div>
+        <div class="item-row">
+            <span>振動強度 / Vibration</span>
+            <input type="range" id="vibe-slide" min="0" max="100" step="10" onchange="saveCfg()">
         </div>
     </div>
 
@@ -247,135 +174,131 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
             <span style="font-size:1.6rem; font-weight:500;">履歴 / History</span>
             <div style="display:flex; gap:20px;">
-                <span class="material-symbols-outlined" onclick="clearH()">delete</span>
-                <span class="material-symbols-outlined" onclick="ui('history')">close</span>
+                <span class="material-symbols-outlined" onclick="clearHist()">delete</span>
+                <span class="material-symbols-outlined" onclick="toggleUI('history')">close</span>
             </div>
         </div>
-        <div id="history-content" style="overflow-y:auto; flex:1;"></div>
+        <div id="hist-list" style="overflow-y:auto; flex:1;"></div>
     </div>
 
-    <div class="display-area">
-        <div id="sub-text"></div>
-        <input type="text" id="main-input" readonly value="0">
+    <div class="display-section">
+        <div id="history-display"></div>
+        <input type="text" id="main-display" readonly value="0">
     </div>
 
-    <div class="pad-container">
-        <div class="top-bar">
-            <span class="material-symbols-outlined" onclick="ui('settings')">settings</span>
-            <span class="material-symbols-outlined" onclick="ui('history')">history</span>
-            <span class="material-symbols-outlined" id="adv-icon" onclick="toggleA()">keyboard_arrow_down</span>
+    <div class="pad-card">
+        <div class="toolbar">
+            <span class="material-symbols-outlined" onclick="toggleUI('settings')">settings</span>
+            <span class="material-symbols-outlined" onclick="toggleUI('history')">history</span>
+            <span class="material-symbols-outlined">expand_more</span>
         </div>
 
-        <div class="advanced-pad" id="adv-pad">
-            <button class="btn-adv" onclick="add('sin(')">sin</button>
-            <button class="btn-adv" onclick="add('cos(')">cos</button>
-            <button class="btn-adv" onclick="add('tan(')">tan</button>
-            <button class="btn-adv" onclick="add('π')">π</button>
-            <button class="btn-adv" onclick="add('ln(')">ln</button>
-            <button class="btn-adv" onclick="add('log(')">log</button>
-            <button class="btn-adv" onclick="add('^')">^</button>
-            <button class="btn-adv" onclick="add('√(')">√</button>
-        </div>
+        <div class="grid">
+            <button class="btn-fn" onclick="push('AC')">AC</button>
+            <button class="btn-fn" onclick="push('()')">( )</button>
+            <button class="btn-fn" onclick="push('%')">%</button>
+            <button class="btn-op" onclick="push('÷')">÷</button>
 
-        <div class="main-pad">
-            <button class="btn-functional" onclick="add('AC')">AC</button>
-            <button class="btn-functional" onclick="add('()')">( )</button>
-            <button class="btn-functional" onclick="add('%')">%</button>
-            <button class="btn-operator" onclick="add('÷')">÷</button>
-            <button onclick="add('7')">7</button>
-            <button onclick="add('8')">8</button>
-            <button onclick="add('9')">9</button>
-            <button class="btn-operator" onclick="add('×')">×</button>
-            <button onclick="add('4')">4</button>
-            <button onclick="add('5')">5</button>
-            <button onclick="add('6')">6</button>
-            <button class="btn-operator" onclick="add('−')">−</button>
-            <button onclick="add('1')">1</button>
-            <button onclick="add('2')">2</button>
-            <button onclick="add('3')">3</button>
-            <button class="btn-operator" onclick="add('+')">+</button>
-            <button onclick="add('0')">0</button>
-            <button onclick="add('.')">.</button>
-            <button class="btn-functional" onclick="add('DEL')"><span class="material-symbols-outlined">backspace</span></button>
-            <button class="btn-equal" onclick="add('=')">=</button>
+            <button onclick="push('7')">7</button>
+            <button onclick="push('8')">8</button>
+            <button onclick="push('9')">9</button>
+            <button class="btn-op" onclick="push('×')">×</button>
+
+            <button onclick="push('4')">4</button>
+            <button onclick="push('5')">5</button>
+            <button onclick="push('6')">6</button>
+            <button class="btn-op" onclick="push('−')">−</button>
+
+            <button onclick="push('1')">1</button>
+            <button onclick="push('2')">2</button>
+            <button onclick="push('3')">3</button>
+            <button class="btn-op" onclick="push('+')">+</button>
+
+            <button onclick="push('0')">0</button>
+            <button onclick="push('.')">.</button>
+            <button class="btn-fn" onclick="push('DEL')"><span class="material-symbols-outlined">backspace</span></button>
+            <button class="btn-eq" onclick="push('=')">=</button>
         </div>
     </div>
 
     <script>
-        let expr = localStorage.getItem('calc_expr') || '';
-        let hist = JSON.parse(localStorage.getItem('calc_h') || '[]');
-        let cfg = JSON.parse(localStorage.getItem('calc_cfg') || '{"theme":"system","vibe":30}');
+        let expr = localStorage.getItem('p10_expr') || '';
+        let hist = JSON.parse(localStorage.getItem('p10_hist') || '[]');
+        let cfg = JSON.parse(localStorage.getItem('p10_cfg') || '{"theme":"system","vibe":30}');
+        let lastRes = false;
 
-        function hapt() {
-            if (cfg.vibe > 0 && navigator.vibrate) navigator.vibrate(cfg.vibe / 2);
-        }
+        function vib() { if(cfg.vibe > 0 && navigator.vibrate) navigator.vibrate(cfg.vibe/2); }
 
-        function updateCfg() {
-            cfg.theme = document.getElementById('theme-select').value;
-            cfg.vibe = document.getElementById('vibe-slider').value;
-            document.getElementById('vibe-label').innerText = cfg.vibe + '%';
-            localStorage.setItem('calc_cfg', JSON.stringify(cfg));
+        function toggleUI(id) { vib(); document.getElementById(id+'-panel').classList.toggle('open'); if(id==='history') renderHist(); }
+
+        function saveCfg() {
+            cfg.theme = document.getElementById('theme-sel').value;
+            cfg.vibe = document.getElementById('vibe-slide').value;
+            localStorage.setItem('p10_cfg', JSON.stringify(cfg));
             const isDark = cfg.theme === 'dark' || (cfg.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            document.documentElement.classList.toggle('dark-mode', isDark);
-            hapt();
+            document.documentElement.classList.toggle('dark', isDark);
+            vib();
         }
 
-        function ui(type) {
-            hapt();
-            const el = document.getElementById(type + '-panel');
-            el.classList.toggle('open');
-            if(type === 'history') renderH();
+        function renderHist() {
+            const l = document.getElementById('hist-list');
+            l.innerHTML = hist.length ? '' : '<p style="text-align:center;opacity:0.5;">No History</p>';
+            hist.forEach((h, i) => {
+                const d = document.createElement('div');
+                d.className = 'hist-item';
+                d.innerHTML = `<div style="opacity:0.6;">${h.q}</div><div style="font-size:1.8rem;font-weight:500;">${h.a}</div>`;
+                d.onclick = () => { expr = h.a.replace(/-/g, '−'); update(); toggleUI('history'); };
+                l.appendChild(d);
+            });
         }
 
-        function toggleA() {
-            hapt();
-            const p = document.getElementById('adv-pad'), i = document.getElementById('adv-icon');
-            p.classList.toggle('show');
-            i.innerText = p.classList.contains('show') ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
+        function clearHist() { vib(); hist = []; localStorage.setItem('p10_hist', '[]'); renderHist(); }
+
+        function update() {
+            document.getElementById('main-display').value = expr || '0';
+            localStorage.setItem('p10_expr', expr);
         }
 
-        function add(v) {
-            hapt();
-            const m = document.getElementById('main-input'), s = document.getElementById('sub-text');
-            if (v === 'AC') { expr = ''; s.innerText = ''; }
+        function push(v) {
+            vib();
+            const main = document.getElementById('main-display');
+            const sub = document.getElementById('history-display');
+
+            if (v === 'AC') { expr = ''; sub.innerText = ''; lastRes = false; }
             else if (v === 'DEL') { expr = expr.slice(0, -1); }
             else if (v === '=') {
                 if(!expr) return;
                 try {
-                    let raw = expr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/%/g, '/100').replace(/π/g, 'Math.PI').replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(').replace(/tan\(/g, 'Math.tan(').replace(/ln\(/g, 'Math.log(').replace(/log\(/g, 'Math.log10(').replace(/\^/g, '**').replace(/√\(/g, 'Math.sqrt(');
-                    let res = eval(raw);
-                    let out = Number(parseFloat(res.toPrecision(15)).toString()).toString();
-                    hist.unshift({ q: expr, a: out });
-                    localStorage.setItem('calc_h', JSON.stringify(hist.slice(0, 50)));
-                    s.innerText = expr + ' =';
-                    expr = out.replace(/-/g, '−');
-                } catch { m.value = 'Error'; setTimeout(() => { expr = ''; m.value = '0'; }, 800); return; }
+                    let proc = expr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-')
+                                   .replace(/(\d)\(/g, '$1*(').replace(/\)(\d)/g, ')*$1').replace(/\)\(/g, ')*(');
+                    const diff = (proc.match(/\(/g) || []).length - (proc.match(/\)/g) || []).length;
+                    if(diff > 0) proc += ')'.repeat(diff);
+                    
+                    let res = eval(proc);
+                    let final = Number(Math.round(res + 'e12') + 'e-12').toString();
+                    
+                    hist.unshift({q: expr, a: final});
+                    localStorage.setItem('p10_hist', JSON.stringify(hist.slice(0, 20)));
+                    sub.innerText = expr + ' =';
+                    expr = final.replace(/-/g, '−');
+                    lastRes = true;
+                } catch { main.value = 'Error'; setTimeout(()=>update(), 800); return; }
             } else if (v === '()') {
-                const o = (expr.match(/\(/g) || []).length, c = (expr.match(/\)/g) || []).length;
-                expr += (o > c && /[0-9π)]$/.test(expr.slice(-1))) ? ')' : '(';
-            } else { expr += v; }
-            m.value = expr || '0';
-            localStorage.setItem('calc_expr', expr);
+                const open = (expr.match(/\(/g) || []).length, close = (expr.match(/\)/g) || []).length;
+                if (expr === '' || /[+−×÷(]$/.test(expr)) expr += '(';
+                else if (open > close) expr += ')';
+                else expr += '×(';
+            } else {
+                if (lastRes && /[0-9.]/.test(v)) expr = '';
+                expr += v;
+                lastRes = false;
+            }
+            update();
         }
 
-        function renderH() {
-            const c = document.getElementById('history-content');
-            c.innerHTML = hist.length ? '' : '<p style="text-align:center; opacity:0.5; margin-top:50px;">No History</p>';
-            hist.forEach(item => {
-                const d = document.createElement('div');
-                d.className = 'history-item';
-                d.innerHTML = `<div style="opacity:0.6;font-size:1.2rem;">${item.q}</div><div style="font-size:2.2rem;font-weight:500;">${item.a}</div>`;
-                d.onclick = () => { expr = item.a.replace(/-/g, '−'); document.getElementById('main-input').value = expr; ui('history'); };
-                c.appendChild(d);
-            });
-        }
-
-        function clearH() { hapt(); hist = []; localStorage.removeItem('calc_h'); renderH(); }
-
-        document.getElementById('theme-select').value = cfg.theme;
-        document.getElementById('vibe-slider').value = cfg.vibe;
-        document.getElementById('vibe-label').innerText = cfg.vibe + '%';
-        document.getElementById('main-input').value = expr || '0';
+        document.getElementById('theme-sel').value = cfg.theme;
+        document.getElementById('vibe-slide').value = cfg.vibe;
+        update();
     </script>
 </body>
 </html>
