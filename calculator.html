@@ -3,340 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    
-    <title>計算 / Calculator</title>
+    <title>Advanced Calculator</title>
+
 
     <script>
         (function() {
-            const cfg = JSON.parse(localStorage.getItem('calc_cfg') || '{"theme":"system"}');
-            const isDark = cfg.theme === 'dark' || (cfg.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) document.documentElement.classList.add('dark');
+            const config = JSON.parse(localStorage.getItem('app_prefs') || '{"mode":"system"}');
+            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const isDark = config.mode === 'dark' || (config.mode === 'system' && darkQuery.matches);
+            document.documentElement.classList.toggle('dark', isDark);
         })();
     </script>
 
+
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+
 
     <style>
         :root {
             --bg: #FDFCF4;
             --on-bg: #1B1C17;
             --surface: #EFF1E0;
-            --on-surface: #44483D;
-            --primary: #4C662B;
-            --on-primary: #FFFFFF;
-            --primary-cont: #D7E8B7;
-            --on-primary-cont: #121F00;
-            --sec-cont: #E3E4D3;
-            --on-sec-cont: #1B1C17;
-            --radius: 36px;
+            --on-surf: #44483D;
+            --pri: #4C662B;
+            --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7;
+            --on-pri-c: #121F00;
+            --sec-c: #E3E4D3;
+            --on-sec-c: #1B1C17;
+            --tint: rgba(76, 102, 43, 0.08);
+            --sb: rgba(0, 0, 0, 0.1);
         }
 
         .dark {
             --bg: #1B1C17;
             --on-bg: #E3E4D3;
             --surface: #2F3126;
-            --on-surface: #C7C8B8;
-            --primary: #B1D18A;
-            --on-primary: #1F3701;
-            --primary-cont: #3E4A2B;
-            --on-primary-cont: #D7E8B7;
-            --sec-cont: #45483C;
-            --on-sec-cont: #E3E4D3;
+            --on-surf: #C7C8B8;
+            --pri: #B1D18A;
+            --on-pri: #1F3701;
+            --pri-c: #3E4A2B;
+            --on-pri-c: #D7E8B7;
+            --sec-c: #45483C;
+            --on-sec-c: #E3E4D3;
+            --tint: rgba(177, 209, 138, 0.08);
+            --sb: rgba(255, 255, 255, 0.15);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Google Sans', sans-serif;
+        }
 
         body {
             margin: 0;
             height: 100dvh;
             background: var(--bg);
             color: var(--on-bg);
-            font-family: 'Google Sans', sans-serif;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
-            overflow-y: auto; /* 拡大時のスクロールを許可 */
+            overflow: hidden;
         }
 
-        .overlay {
-            position: fixed;
-            top: -100%; left: 0; width: 100%; height: 100%;
-            background: var(--bg);
-            z-index: 2000;
-            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: calc(24px + env(safe-area-inset-top)) 24px 24px;
-            display: flex; flex-direction: column;
-        }
-
-        .overlay.open { top: 0; }
-
-        .display-area {
+        .output-layer {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            align-items: flex-end;
             padding: 24px 32px;
-            min-height: 200px;
+            overflow: hidden;
         }
 
-        #sub-display {
-            font-size: 1.5rem;
-            color: var(--on-surface);
-            opacity: 0.7;
+        #log-view {
+            font-size: 1.4rem;
+            color: var(--on-surf);
             min-height: 2rem;
             text-align: right;
+            white-space: nowrap;
+            overflow-x: auto;
             margin-bottom: 8px;
-            word-break: break-all;
+            opacity: 0.8;
         }
 
-        #main-input {
-            width: 100%;
+        #log-view::-webkit-scrollbar {
+            display: none;
+        }
+
+        #main-view {
             font-size: clamp(2.5rem, 12vw, 4.5rem);
             text-align: right;
-            border: none;
-            background: transparent;
-            color: var(--on-bg);
-            outline: none;
-            font-family: inherit;
+            white-space: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 8px 0;
         }
 
-        .pad-container {
+        #main-view::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        #main-view::-webkit-scrollbar-thumb {
+            background: var(--sb);
+            border-radius: 10px;
+        }
+
+        .input-layer {
             background: var(--surface);
-            border-radius: 40px 40px 0 0;
+            border-radius: 32px 32px 0 0;
             padding-bottom: calc(12px + env(safe-area-inset-bottom));
-            transition: all 0.3s ease;
         }
 
-        .toolbar {
+        .action-bar {
             display: flex;
             justify-content: space-between;
-            padding: 12px 32px 4px;
-            color: var(--primary);
+            padding: 8px 24px;
+            color: var(--pri);
         }
 
-        .toolbar span { cursor: pointer; padding: 10px; font-size: 1.8rem; }
+        .action-bar span {
+            cursor: pointer;
+            padding: 12px;
+            font-size: 1.6rem;
+            border-radius: 50%;
+        }
 
-        .adv-pad {
+        .action-bar span:active {
+            background: var(--tint);
+        }
+
+        .key-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            padding: 0 24px;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .adv-pad.show {
-            max-height: 200px;
-            opacity: 1;
-            padding: 16px 24px 8px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            padding: 8px 24px 16px;
+            padding: 8px 20px 16px;
         }
 
         button {
-            height: 68px;
+            height: 72px;
             border: none;
-            border-radius: var(--radius);
-            font-size: 1.6rem;
+            border-radius: 36px;
+            font-size: 1.5rem;
             font-weight: 500;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--bg);
             color: var(--on-bg);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.1s, background 0.2s;
         }
 
-        .adv-pad.show ~ .main-grid button {
-            height: 54px;
-            font-size: 1.4rem;
+        button:active {
+            transform: scale(0.9);
+            background: var(--pri-c);
         }
 
-        button:active { transform: scale(0.92); filter: brightness(0.9); }
+        .k-op {
+            background: var(--pri-c);
+            color: var(--on-pri-c);
+        }
 
-        .btn-op { background: var(--primary-cont); color: var(--on-primary-cont); }
-        .btn-fn { background: var(--sec-cont); color: var(--on-sec-cont); }
-        .btn-eq { background: var(--primary); color: var(--on-primary); font-size: 2.2rem; }
-        .btn-adv { background: transparent; font-size: 1.1rem; height: 44px; color: var(--on-surface); }
+        .k-fn {
+            background: var(--sec-c);
+            color: var(--on-sec-c);
+        }
 
-        .setting-row {
+        .k-eq {
+            background: var(--pri);
+            color: var(--on-pri);
+            font-size: 2rem;
+        }
+
+        .sheet {
+            position: fixed;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: calc(24px + env(safe-area-inset-top)) 24px;
+        }
+
+        .sheet.active {
+            transform: translateY(-100%);
+        }
+
+        .row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px 0;
-            border-bottom: 1px solid var(--sec-cont);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--sec-c);
         }
 
-        .hist-card { text-align: right; margin-bottom: 32px; cursor: pointer; }
+        select {
+            background: var(--sec-c);
+            color: var(--on-bg);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="range"] {
+            accent-color: var(--pri);
+            flex: 1;
+            margin: 0 16px;
+        }
+
+        .h-item {
+            text-align: right;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .h-item:active {
+            background: var(--sec-c);
+        }
     </style>
 </head>
+
+
 <body>
 
-    <div id="settings-ui" class="overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-            <span style="font-size:1.6rem; font-weight:500;">設定 / Settings</span>
-            <span class="material-symbols-outlined" onclick="ui('settings')">close</span>
+    <div id="pref-sheet" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <span style="font-size:1.4rem; font-weight:500;">Preferences</span>
+            <span class="material-symbols-outlined" onclick="toggle('pref')">close</span>
         </div>
-        <div class="setting-row">
-            <span>テーマ / Theme</span>
-            <select id="theme-select" onchange="saveConfig()" style="padding:8px; border-radius:8px; font-family:inherit;">
-                <option value="system">システム / System</option>
-                <option value="light">ライト / Light</option>
-                <option value="dark">ダーク / Dark</option>
+
+        <div class="row">
+            <span>Theme Mode</span>
+            <select id="mode-sel" onchange="apply()">
+                <option value="system">System Default</option>
+                <option value="light">Light Mode</option>
+                <option value="dark">Dark Mode</option>
             </select>
         </div>
-        <div class="setting-row">
-            <span>振動 / Vibration</span>
-            <input type="range" id="vibe-control" min="0" max="100" step="10" onchange="saveConfig()">
-        </div>
-    </div>
 
-    <div id="history-ui" class="overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-            <span style="font-size:1.6rem; font-weight:500;">履歴 / History</span>
-            <div style="display:flex; gap:20px;">
-                <span class="material-symbols-outlined" onclick="clearH()">delete</span>
-                <span class="material-symbols-outlined" onclick="ui('history')">close</span>
+        <div class="row">
+            <span>Tactile</span>
+            <div style="display:flex; align-items:center; flex:1; justify-content:flex-end;">
+                <input type="range" id="v-range" min="0" max="100" step="10" oninput="v_upd()" onchange="apply()">
+                <span id="v-val" style="width:40px; text-align:right;">30%</span>
             </div>
         </div>
-        <div id="history-list" style="overflow-y:auto; flex:1;"></div>
     </div>
 
-    <div class="display-area">
-        <div id="sub-display"></div>
-        <input type="text" id="main-input" readonly value="0">
+
+    <div id="log-sheet" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <span style="font-size:1.4rem; font-weight:500;">History</span>
+            <div style="display:flex; gap:16px;">
+                <span class="material-symbols-outlined" onclick="clearLog()">delete</span>
+                <span class="material-symbols-outlined" onclick="toggle('log')">close</span>
+            </div>
+        </div>
+        <div id="log-list" style="overflow-y:auto; height:calc(100% - 100px);"></div>
     </div>
 
-    <div class="pad-container">
-        <div class="toolbar">
-            <span class="material-symbols-outlined" onclick="ui('settings')">settings</span>
-            <span class="material-symbols-outlined" onclick="ui('history')">history</span>
-            <span class="material-symbols-outlined" id="adv-toggle" onclick="toggleAdv()">keyboard_arrow_down</span>
+
+    <div class="output-layer">
+        <div id="log-view"></div>
+        <div id="main-view">0</div>
+    </div>
+
+
+    <div class="input-layer">
+        <div class="action-bar">
+            <span class="material-symbols-outlined" onclick="toggle('pref')">settings</span>
+            <span class="material-symbols-outlined" onclick="toggle('log')">history</span>
+            <span class="material-symbols-outlined">more_vert</span>
         </div>
 
-        <div class="adv-pad" id="adv-pad">
-            <button class="btn-adv" onclick="push('sin(')">sin</button>
-            <button class="btn-adv" onclick="push('cos(')">cos</button>
-            <button class="btn-adv" onclick="push('tan(')">tan</button>
-            <button class="btn-adv" onclick="push('π')">π</button>
-            <button class="btn-adv" onclick="push('ln(')">ln</button>
-            <button class="btn-adv" onclick="push('log(')">log</button>
-            <button class="btn-adv" onclick="push('^')">^</button>
-            <button class="btn-adv" onclick="push('√(')">√</button>
-        </div>
-
-        <div class="main-grid">
-            <button class="btn-fn" onclick="push('AC')">AC</button>
-            <button class="btn-fn" onclick="push('()')">( )</button>
-            <button class="btn-fn" onclick="push('%')">%</button>
-            <button class="btn-op" onclick="push('÷')">÷</button>
-            <button onclick="push('7')">7</button>
-            <button onclick="push('8')">8</button>
-            <button onclick="push('9')">9</button>
-            <button class="btn-op" onclick="push('×')">×</button>
-            <button onclick="push('4')">4</button>
-            <button onclick="push('5')">5</button>
-            <button onclick="push('6')">6</button>
-            <button class="btn-op" onclick="push('−')">−</button>
-            <button onclick="push('1')">1</button>
-            <button onclick="push('2')">2</button>
-            <button onclick="push('3')">3</button>
-            <button class="btn-op" onclick="push('+')">+</button>
-            <button onclick="push('0')">0</button>
-            <button onclick="push('.')">.</button>
-            <button class="btn-fn" onclick="push('DEL')"><span class="material-symbols-outlined">backspace</span></button>
-            <button class="btn-eq" onclick="push('=')">=</button>
+        <div class="key-grid">
+            <button class="k-fn" onclick="cmd('C')">AC</button>
+            <button class="k-fn" onclick="cmd('()')">( )</button>
+            <button class="k-fn" onclick="cmd('%')">%</button>
+            <button class="k-op" onclick="cmd('÷')">÷</button>
+            
+            <button onclick="cmd('7')">7</button>
+            <button onclick="cmd('8')">8</button>
+            <button onclick="cmd('9')">9</button>
+            <button class="k-op" onclick="cmd('×')">×</button>
+            
+            <button onclick="cmd('4')">4</button>
+            <button onclick="cmd('5')">5</button>
+            <button onclick="cmd('6')">6</button>
+            <button class="k-op" onclick="cmd('−')">−</button>
+            
+            <button onclick="cmd('1')">1</button>
+            <button onclick="cmd('2')">2</button>
+            <button onclick="cmd('3')">3</button>
+            <button class="k-op" onclick="cmd('+')">+</button>
+            
+            <button onclick="cmd('0')">0</button>
+            <button onclick="cmd('.')">.</button>
+            <button class="k-fn" onclick="cmd('B')"><span class="material-symbols-outlined">backspace</span></button>
+            <button class="k-eq" onclick="cmd('=')">=</button>
         </div>
     </div>
+
 
     <script>
-        let expr = localStorage.getItem('calc_expr') || '';
-        let hist = JSON.parse(localStorage.getItem('calc_hist') || '[]');
-        let cfg = JSON.parse(localStorage.getItem('calc_cfg') || '{"theme":"system","vibe":30}');
-        let isRes = false;
+        let buffer = localStorage.getItem('app_buf') || '';
+        let history = JSON.parse(localStorage.getItem('app_log') || '[]');
+        let prefs = JSON.parse(localStorage.getItem('app_prefs') || '{"mode":"system","vibe":30}');
+        let solved = false;
 
-        function haptic() { if(cfg.vibe > 0 && navigator.vibrate) navigator.vibrate(cfg.vibe/2); }
 
-        function saveConfig() {
-            cfg.theme = document.getElementById('theme-select').value;
-            cfg.vibe = document.getElementById('vibe-control').value;
-            localStorage.setItem('calc_cfg', JSON.stringify(cfg));
-            const isDark = cfg.theme === 'dark' || (cfg.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            document.documentElement.classList.toggle('dark', isDark);
-            haptic();
-        }
-
-        function ui(type) { haptic(); document.getElementById(type + '-ui').classList.toggle('open'); if(type==='history') renderH(); }
-
-        function toggleAdv() {
-            haptic();
-            const p = document.getElementById('adv-pad'), i = document.getElementById('adv-toggle');
-            p.classList.toggle('show');
-            i.innerText = p.classList.contains('show') ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
-        }
-
-        function push(v) {
-            haptic();
-            const m = document.getElementById('main-input'), s = document.getElementById('sub-display');
-            if(v === 'AC') { expr = ''; s.innerText = ''; isRes = false; }
-            else if(v === 'DEL') { expr = expr.slice(0, -1); }
-            else if(v === '=') {
-                if(!expr) return;
-                try {
-                    let proc = expr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/π/g, 'Math.PI').replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(').replace(/tan\(/g, 'Math.tan(').replace(/ln\(/g, 'Math.log(').replace(/log\(/g, 'Math.log10(').replace(/\^/g, '**').replace(/√\(/g, 'Math.sqrt(');
-                    proc = proc.replace(/(\d)\(/g, '$1*(').replace(/\)(\d)/g, ')*$1');
-                    const diff = (proc.match(/\(/g) || []).length - (proc.match(/\)/g) || []).length;
-                    if(diff > 0) proc += ')'.repeat(diff);
-                    let res = eval(proc);
-                    let final = Number(parseFloat(res.toPrecision(15)).toString()).toString();
-                    hist.unshift({q: expr, a: final});
-                    localStorage.setItem('calc_hist', JSON.stringify(hist.slice(0, 30)));
-                    s.innerText = expr + ' =';
-                    expr = final.replace(/-/g, '−');
-                    isRes = true;
-                } catch { m.value = 'Error'; setTimeout(()=>render(), 800); return; }
-            } else if(v === '()') {
-                const o = (expr.match(/\(/g) || []).length, c = (expr.match(/\)/g) || []).length;
-                expr += (o > c && /[0-9π)]$/.test(expr.slice(-1))) ? ')' : (expr === '' || /[+−×÷(]$/.test(expr) ? '(' : '×(');
-            } else {
-                if(isRes && /[0-9π]/.test(v)) { expr = ''; isRes = false; }
-                expr += v;
+        function hapt() {
+            if(prefs.vibe > 0 && navigator.vibrate) {
+                navigator.vibrate(prefs.vibe/3);
             }
-            render();
         }
 
-        function render() {
-            document.getElementById('main-input').value = expr || '0';
-            localStorage.setItem('calc_expr', expr);
+
+        function toggle(id) {
+            hapt();
+            document.getElementById(id+'-sheet').classList.toggle('active');
+            if(id==='log') renderLog();
         }
 
-        function renderH() {
-            const l = document.getElementById('history-list');
-            l.innerHTML = hist.length ? '' : '<p style="text-align:center; opacity:0.5;">No History</p>';
-            hist.forEach(h => {
+
+        function v_upd() {
+            document.getElementById('v-val').innerText = document.getElementById('v-range').value + '%';
+        }
+
+
+        function apply() {
+            prefs.mode = document.getElementById('mode-sel').value;
+            prefs.vibe = document.getElementById('v-range').value;
+            localStorage.setItem('app_prefs', JSON.stringify(prefs));
+
+            const dark = prefs.mode === 'dark' || (prefs.mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
+            hapt();
+        }
+
+
+        function cmd(v) {
+            hapt();
+            const mv = document.getElementById('main-view');
+            const lv = document.getElementById('log-view');
+
+            if(v === 'C') {
+                buffer = '';
+                lv.innerText = '';
+                solved = false;
+            } else if(v === 'B') {
+                buffer = buffer.slice(0, -1);
+            } else if(v === '=') {
+                if(!buffer) return;
+                try {
+                    let raw = buffer.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-');
+                    const open = (raw.match(/\(/g) || []).length;
+                    const close = (raw.match(/\)/g) || []).length;
+                    if(open > close) raw += ')'.repeat(open-close);
+                    
+                    let res = eval(raw);
+                    let out = Number(Math.round(res + 'e12') + 'e-12').toString();
+                    
+                    history.unshift({q: buffer, a: out});
+                    localStorage.setItem('app_log', JSON.stringify(history.slice(0, 30)));
+                    lv.innerText = buffer + ' =';
+                    buffer = out.replace(/-/g, '−');
+                    solved = true;
+                } catch {
+                    mv.innerText = 'Format Error';
+                    setTimeout(() => draw(), 800);
+                    return;
+                }
+            } else if(v === '()') {
+                const o = (buffer.match(/\(/g) || []).length;
+                const c = (buffer.match(/\)/g) || []).length;
+                buffer += (o > c && /[0-9)]$/.test(buffer.slice(-1))) ? ')' : (buffer === '' || /[+−×÷(]$/.test(buffer.slice(-1)) ? '(' : '×(');
+            } else {
+                if(solved && /[0-9]/.test(v)) buffer = '';
+                solved = false;
+                buffer += v;
+            }
+            draw();
+        }
+
+
+        function draw() {
+            const mv = document.getElementById('main-view');
+            mv.innerText = buffer || '0';
+            localStorage.setItem('app_buf', buffer);
+            mv.scrollLeft = mv.scrollWidth;
+        }
+
+
+        function renderLog() {
+            const container = document.getElementById('log-list');
+            container.innerHTML = history.length ? '' : '<div style="text-align:center; opacity:0.5; margin-top:40px;">No History</div>';
+            
+            history.forEach(i => {
                 const d = document.createElement('div');
-                d.className = 'hist-card';
-                d.innerHTML = `<div style="opacity:0.6;">${h.q}</div><div style="font-size:1.8rem; font-weight:500;">${h.a}</div>`;
-                d.onclick = () => { expr = h.a.replace(/-/g, '−'); render(); ui('history'); };
-                l.appendChild(d);
+                d.className = 'h-item';
+                d.innerHTML = `<div style="opacity:0.6;font-size:0.9rem">${i.q}</div><div style="font-size:1.6rem;font-weight:500">${i.a}</div>`;
+                d.onclick = () => {
+                    buffer = i.a.replace(/-/g, '−');
+                    draw();
+                    toggle('log');
+                };
+                container.appendChild(d);
             });
         }
 
-        function clearH() { haptic(); hist = []; localStorage.setItem('calc_hist', '[]'); renderH(); }
+
+        function clearLog() {
+            hapt();
+            history = [];
+            localStorage.setItem('app_log', '[]');
+            renderLog();
+        }
+
 
         window.onload = () => {
-            document.getElementById('theme-select').value = cfg.theme;
-            document.getElementById('vibe-control').value = cfg.vibe;
-            render();
+            document.getElementById('mode-sel').value = prefs.mode;
+            document.getElementById('v-range').value = prefs.vibe;
+            v_upd();
+            draw();
         };
     </script>
 </body>
