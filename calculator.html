@@ -5,218 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Advanced Calculator</title>
 
-
     <script>
         (function() {
-            const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"auto"}');
-            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const isDark = prefs.mode === 'dark' || (prefs.mode === 'system' && darkQuery.matches);
-            
+            const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system"}');
+            const isDark = prefs.mode === 'dark' || (prefs.mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.className = isDark ? 'dark' : 'light';
             document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
         })();
     </script>
 
-
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #FDFCF4;
-            --on-bg: #1B1C17;
-            --surface: #EFF1E0;
-            --on-surf: #44483D;
-            --pri: #4C662B;
-            --on-pri: #FFFFFF;
-            --pri-c: #D7E8B7;
-            --on-pri-c: #121F00;
-            --sec-c: #E3E4D3;
-            --on-sec-c: #1B1C17;
+            --bg: #FDFCF4; --on-bg: #1B1C17;
+            --surf: #EFF1E0; --on-surf: #44483D;
+            --pri: #4C662B; --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7; --on-pri-c: #121F00;
+            --sec-c: #E3E4D3; --sci-bg: #D7E8B7;
         }
-
         .dark {
-            --bg: #1B1C17;
-            --on-bg: #E3E4D3;
-            --surface: #2F3126;
-            --on-surf: #C7C8B8;
-            --pri: #B1D18A;
-            --on-pri: #1F3701;
-            --pri-c: #3E4A2B;
-            --on-pri-c: #D7E8B7;
-            --sec-c: #45483C;
-            --on-sec-c: #E3E4D3;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            --bg: #1B1C17; --on-bg: #E3E4D3;
+            --surf: #2F3126; --on-surf: #C7C8B8;
+            --pri: #B1D18A; --on-pri: #1F3701;
+            --pri-c: #3E4A2B; --on-pri-c: #D7E8B7;
+            --sec-c: #45483C; --sci-bg: #3E4A2B;
         }
 
         body {
-            margin: 0;
-            height: 100dvh;
-            background: var(--bg);
-            color: var(--on-bg);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            margin: 0; height: 100dvh; display: flex; flex-direction: column;
+            background: var(--bg); color: var(--on-bg); overflow: hidden;
             font-family: 'Google Sans', sans-serif;
         }
 
-        /* 出力エリア */
-        .output-layer {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 24px 32px;
-            text-align: right;
+        /* 表示エリア */
+        .display {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 24px 32px; text-align: right;
+        }
+        #log { font-size: 1.4rem; opacity: 0.6; min-height: 2rem; overflow-x: auto; white-space: nowrap; }
+        #main { font-size: clamp(3rem, 15vw, 5rem); padding: 8px 0; overflow-x: auto; white-space: nowrap; }
+
+        /* 操作パネル */
+        .controls {
+            background: var(--surf); border-radius: 32px 32px 0 0;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .tool-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px; color: var(--pri);
         }
 
-        #log-view {
-            font-size: 1.4rem;
-            color: var(--on-surf);
-            min-height: 2.2rem;
-            opacity: 0.7;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow-x: auto;
+        /* 関数パネル（スライド式） */
+        .sci-panel {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            padding: 0 20px; height: 0; overflow: hidden;
+            transition: height 0.3s ease, padding 0.3s ease;
         }
+        .sci-panel.open { height: 160px; padding: 10px 20px; }
 
-        #main-view {
-            font-family: 'Potta One', cursive;
-            font-size: clamp(2.5rem, 12vw, 4.5rem);
-            white-space: nowrap;
-            overflow-x: auto;
-            padding: 8px 0;
-        }
-
-        /* 入力エリア */
-        .input-layer {
-            background: var(--surface);
-            border-radius: 32px 32px 0 0;
-            padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
-        }
-
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 0 12px 16px;
-            color: var(--pri);
-        }
-
-        .action-bar span {
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-        }
-
+        /* キーパッド */
         .key-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; padding: 12px 20px 24px;
         }
 
         button {
-            height: 72px;
-            border: none;
-            border-radius: 24px;
-            font-size: 1.6rem;
-            font-weight: 500;
-            background: var(--bg);
-            color: var(--on-bg);
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 72px; border: none; border-radius: 36px;
+            font-size: 1.5rem; background: var(--bg); color: var(--on-bg);
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.1s; cursor: pointer;
         }
-
-        button:active { transform: scale(0.92); opacity: 0.8; }
+        button:active { transform: scale(0.9); background: var(--pri-c); }
         .k-op { background: var(--pri-c); color: var(--on-pri-c); }
+        .k-sci { background: var(--sci-bg); font-size: 1.1rem; height: 48px; }
         .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2rem; }
 
-        /* オーバーレイシート */
-        .sheet {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 100;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            padding: calc(40px + env(safe-area-inset-top)) 24px 24px;
+        /* メニュー */
+        #menu {
+            position: absolute; right: 20px; bottom: 80px;
+            background: var(--bg); border-radius: 16px; display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 100;
         }
-
-        .sheet.active { transform: translateY(0); }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--sec-c);
-        }
-
-        .h-item {
-            padding: 16px;
-            border-radius: 20px;
-            background: var(--surface);
-            margin-bottom: 12px;
-            text-align: right;
-        }
+        #menu div { padding: 16px 24px; border-bottom: 1px solid var(--surf); }
     </style>
 </head>
 
-
 <body>
 
-    <div id="settings" class="sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
-            <h2 id="t-pref" style="margin:0;">Preferences</h2>
-            <span class="material-symbols-outlined" onclick="location.hash='#home'">close</span>
-        </div>
-
-        <div class="row">
-            <span id="t-mode">Theme Mode</span>
-            <button class="k-op" onclick="toggleTheme()" id="mode-label" style="height:44px; width:120px; font-size:1rem;">Dark/Light</button>
-        </div>
-
-        <div class="row">
-            <span id="t-lang">Language</span>
-            <button class="k-op" onclick="toggleLang()" id="lang-label" style="height:44px; width:120px; font-size:1rem;">JP/EN</button>
-        </div>
+    <div class="display">
+        <div id="log"></div>
+        <div id="main">0</div>
     </div>
 
-
-    <div id="history" class="sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
-            <h2 id="t-hist" style="margin:0;">History</h2>
-            <div style="display:flex; gap:20px;">
-                <span class="material-symbols-outlined" onclick="clearLog()">delete</span>
-                <span class="material-symbols-outlined" onclick="location.hash='#home'">close</span>
+    <div class="controls">
+        <div class="tool-bar">
+            <div style="display:flex; gap:16px;">
+                <span class="material-symbols-outlined" onclick="toggleSci()">science</span>
+                <span class="material-symbols-outlined" onclick="location.reload()">history</span>
+            </div>
+            <div style="position:relative;">
+                <span class="material-symbols-outlined" onclick="toggleMenu()">more_vert</span>
+                <div id="menu">
+                    <div onclick="setTheme('light')">Light Mode</div>
+                    <div onclick="setTheme('dark')">Dark Mode</div>
+                    <div onclick="alert('Unit Converter Coming Soon!')">Unit Converter</div>
+                </div>
             </div>
         </div>
-        <div id="log-list" style="overflow-y:auto; height:calc(100% - 120px);"></div>
-    </div>
 
-
-    <div class="output-layer">
-        <div id="log-view"></div>
-        <div id="main-view">0</div>
-    </div>
-
-
-    <div class="input-layer">
-        <div class="action-bar">
-            <div style="display:flex; gap:12px;">
-                <span class="material-symbols-outlined" onclick="location.hash='#settings'">settings</span>
-                <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
-            </div>
-            <span class="material-symbols-outlined">more_vert</span>
+        <div id="sci-panel" class="sci-panel">
+            <button class="k-sci" onclick="cmd('sin(')">sin</button>
+            <button class="k-sci" onclick="cmd('cos(')">cos</button>
+            <button class="k-sci" onclick="cmd('tan(')">tan</button>
+            <button class="k-sci" onclick="cmd('π')">π</button>
+            <button class="k-sci" onclick="cmd('e')">e</button>
+            <button class="k-sci" onclick="cmd('log(')">log</button>
+            <button class="k-sci" onclick="cmd('ln(')">ln</button>
+            <button class="k-sci" onclick="cmd('^')">xʸ</button>
+            <button class="k-sci" onclick="cmd('sqrt(')">√</button>
+            <button class="k-sci" onclick="cmd('!')">n!</button>
         </div>
 
         <div class="key-grid">
-            <button class="k-op" onclick="cmd('C')">AC</button>
+            <button class="k-op" onclick="cmd('AC')">AC</button>
             <button class="k-op" onclick="cmd('()')">( )</button>
             <button class="k-op" onclick="cmd('%')">%</button>
             <button class="k-op" onclick="cmd('÷')">÷</button>
@@ -238,106 +150,59 @@
             
             <button onclick="cmd('0')">0</button>
             <button onclick="cmd('.')">.</button>
-            <button onclick="cmd('B')"><span class="material-symbols-outlined">backspace</span></button>
+            <button onclick="cmd('DEL')"><span class="material-symbols-outlined">backspace</span></button>
             <button class="k-eq" onclick="cmd('=')">=</button>
         </div>
     </div>
 
-
     <script>
-        let buffer = localStorage.getItem('calc-buf') || '';
-        let historyData = JSON.parse(localStorage.getItem('calc-log') || '[]');
-        let prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"auto"}');
+        let buf = "";
         let solved = false;
 
-        const i18n = {
-            ja: { pref: "設定", mode: "テーマ", lang: "言語", hist: "履歴", empty: "履歴はありません", err: "エラー" },
-            en: { pref: "Settings", mode: "Theme", lang: "Language", hist: "History", empty: "No History", err: "Error" }
-        };
-
-        function getLang() {
-            if (prefs.lang !== 'auto') return prefs.lang;
-            return navigator.language.startsWith('ja') ? 'ja' : 'en';
-        }
-
-        function syncUI() {
-            const h = window.location.hash;
-            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
-            if (h === '#settings') document.getElementById('settings').classList.add('active');
-            else if (h === '#history') { document.getElementById('history').classList.add('active'); renderLog(); }
-            
-            const lang = getLang();
-            const t = i18n[lang];
-            document.getElementById('t-pref').innerText = t.pref;
-            document.getElementById('t-mode').innerText = t.mode;
-            document.getElementById('t-lang').innerText = t.lang;
-            document.getElementById('t-hist').innerText = t.hist;
-            document.getElementById('lang-label').innerText = lang === 'ja' ? "日本語" : "English";
-            document.getElementById('mode-label').innerText = document.documentElement.classList.contains('dark') ? "Dark" : "Light";
-        }
+        function toggleSci() { document.getElementById('sci-panel').classList.toggle('open'); }
+        function toggleMenu() { const m = document.getElementById('menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
 
         function cmd(v) {
-            const mv = document.getElementById('main-view');
-            const lv = document.getElementById('log-view');
-
-            if(v === 'C') { buffer = ''; lv.innerText = ''; solved = false; }
-            else if(v === 'B') { buffer = buffer.slice(0, -1); }
+            const m = document.getElementById('main');
+            const l = document.getElementById('log');
+            if(v === 'AC') { buf = ""; l.innerText = ""; solved = false; }
+            else if(v === 'DEL') { buf = buf.slice(0, -1); }
             else if(v === '=') {
-                if(!buffer) return;
                 try {
-                    let raw = buffer.replace(/÷/g, '/').replace(/×/g, '*');
-                    const res = eval(raw);
-                    const out = Number(Math.round(res + 'e12') + 'e-12').toString();
-                    historyData.unshift({q: buffer, a: out});
-                    localStorage.setItem('calc-log', JSON.stringify(historyData.slice(0, 20)));
-                    lv.innerText = buffer + ' =';
-                    buffer = out;
+                    let exp = buf.replace(/÷/g, '/').replace(/×/g, '*')
+                                 .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
+                                 .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
+                                 .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
+                                 .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
+                                 .replace(/\^/g, '**');
+                    
+                    // 括弧の自動補完
+                    const o = (exp.match(/\(/g) || []).length;
+                    const c = (exp.match(/\)/g) || []).length;
+                    if(o > c) exp += ')'.repeat(o - c);
+
+                    let res = eval(exp);
+                    l.innerText = buf + " =";
+                    buf = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(8)).toString();
                     solved = true;
-                } catch { mv.innerText = i18n[getLang()].err; setTimeout(() => draw(), 800); return; }
+                } catch { m.innerText = "Error"; setTimeout(() => m.innerText = buf || "0", 800); return; }
+            } else if(v === '()') {
+                const o = (buf.match(/\(/g) || []).length, c = (buf.match(/\)/g) || []).length;
+                buf += (o > c && /[0-9)]$/.test(buf.slice(-1))) ? ")" : "(";
             } else {
-                if(solved && /[0-9]/.test(v)) buffer = '';
-                solved = false; buffer += v;
+                if(solved && /[0-9]/.test(v)) buf = "";
+                solved = false; buf += v;
             }
-            draw();
+            m.innerText = buf || "0";
+            m.scrollLeft = m.scrollWidth;
         }
 
-        function draw() {
-            const mv = document.getElementById('main-view');
-            mv.innerText = buffer || '0';
-            localStorage.setItem('calc-buf', buffer);
-            mv.scrollLeft = mv.scrollWidth;
+        function setTheme(t) {
+            localStorage.setItem('calc-prefs', JSON.stringify({mode: t}));
+            location.reload();
         }
 
-        function renderLog() {
-            const container = document.getElementById('log-list');
-            container.innerHTML = historyData.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:60px;">${i18n[getLang()].empty}</div>`;
-            historyData.forEach(i => {
-                const d = document.createElement('div');
-                d.className = 'h-item';
-                d.innerHTML = `<div style="opacity:0.6;font-size:0.9rem">${i.q}</div><div style="font-size:1.6rem;font-weight:500;">${i.a}</div>`;
-                d.onclick = () => { buffer = i.a; draw(); location.hash='#home'; };
-                container.appendChild(d);
-            });
-        }
-
-        function toggleTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
-            prefs.mode = isDark ? 'light' : 'dark';
-            document.documentElement.className = prefs.mode;
-            localStorage.setItem('calc-prefs', JSON.stringify(prefs));
-            syncUI();
-        }
-
-        function toggleLang() {
-            prefs.lang = getLang() === 'ja' ? 'en' : 'ja';
-            localStorage.setItem('calc-prefs', JSON.stringify(prefs));
-            syncUI();
-        }
-
-        function clearLog() { historyData = []; localStorage.setItem('calc-log', '[]'); renderLog(); }
-
-        window.onload = () => { draw(); syncUI(); };
-        window.onhashchange = syncUI;
+        window.onclick = (e) => { if(!e.target.innerText.includes('more_vert')) document.getElementById('menu').style.display = 'none'; };
     </script>
 </body>
 </html>
