@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Google Calculator Clone</title>
+    <title>計算機 / Calculator</title>
 
     <script>
         (function() {
             const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
-            
+
             const upd = (isD) => {
                 document.documentElement.className = isD ? 'dark' : 'light';
                 document.documentElement.style.backgroundColor = isD ? '#1B1C17' : '#FDFCF4';
@@ -60,7 +60,7 @@
             background: var(--bg);
             font-family: 'Google Sans', sans-serif;
         }
-        
+
         body {
             display: flex;
             flex-direction: column;
@@ -79,7 +79,7 @@
             font-size: 1.6rem;
             color: var(--on-surf);
             opacity: 0.7;
-            min-height: 2rem;
+            min-height: 2.2rem;
             margin-bottom: 8px;
             white-space: nowrap;
             overflow-x: auto;
@@ -87,7 +87,7 @@
         }
 
         #main-display {
-            font-size: clamp(3.5rem, 18vw, 7rem);
+            font-size: clamp(3.5rem, 18vw, 7.2rem);
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
@@ -96,13 +96,13 @@
         .panel {
             background: var(--surf);
             border-radius: 40px 40px 0 0;
-            padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
+            padding: 8px 24px calc(24px + env(safe-area-inset-bottom));
             transition: background 0.4s;
         }
 
         .handle-bar {
             width: 100%;
-            height: 24px;
+            height: 32px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -111,7 +111,7 @@
 
         .handle-bar::after {
             content: '';
-            width: 36px;
+            width: 40px;
             height: 4px;
             background: var(--hdl);
             border-radius: 2px;
@@ -122,23 +122,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 16px 12px;
+            padding: 0 16px 16px;
         }
 
         #unit-toggle {
             font-size: 0.9rem;
             font-weight: 700;
             color: var(--pri);
-            padding: 6px 16px;
-            border-radius: 16px;
+            padding: 6px 18px;
+            border-radius: 18px;
             background: var(--pri-c);
             text-transform: uppercase;
-        }
-
-        .menu-trigger {
-            color: var(--pri);
-            cursor: pointer;
-            padding: 8px;
         }
 
         .layout-engine {
@@ -146,12 +140,12 @@
             flex-direction: column;
             gap: 12px;
         }
-        
+
         .sci-cluster {
             display: flex;
             overflow-x: auto;
             gap: 10px;
-            padding-bottom: 8px;
+            padding-bottom: 12px;
             scrollbar-width: none;
         }
 
@@ -167,7 +161,7 @@
             height: clamp(64px, 11vh, 88px);
             border: none;
             border-radius: 44px;
-            font-size: 1.7rem;
+            font-size: 1.8rem;
             font-weight: 500;
             background: var(--bg);
             color: var(--on-bg);
@@ -180,23 +174,23 @@
         button:active { transform: scale(0.92); }
 
         .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.6rem; }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.8rem; }
 
-        .k-sci { 
-            background: var(--sci-bg); 
-            font-size: 1.1rem; 
-            min-width: 84px; 
-            height: 48px; 
-            border-radius: 24px;
+        .k-sci {
+            background: var(--sci-bg);
+            font-size: 1.15rem;
+            min-width: 88px;
+            height: 52px;
+            border-radius: 26px;
             flex-shrink: 0;
         }
 
         @media (min-width: 850px) or (orientation: landscape) {
             .layout-engine { flex-direction: row; }
-            .sci-cluster { 
-                display: grid; 
-                grid-template-columns: repeat(3, 1fr); 
-                width: 42%; 
+            .sci-cluster {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                width: 42%;
                 overflow-x: visible;
                 height: auto;
             }
@@ -220,16 +214,16 @@
         }
 
         .overlay-menu div {
-            padding: 20px 24px;
+            padding: 22px 28px;
             border-bottom: 1px solid var(--surf);
             cursor: pointer;
         }
 
         .vibe-box {
-            padding: 16px 24px;
+            padding: 20px 28px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         input[type="range"] { accent-color: var(--pri); cursor: pointer; }
@@ -248,13 +242,14 @@
         <div class="utility-bar">
             <div id="unit-toggle" onclick="ui('unit')">deg</div>
             <div style="position:relative;">
-                <span class="material-symbols-outlined menu-trigger" id="menu-btn" onclick="ui('menu')">more_vert</span>
+                <span class="material-symbols-outlined" style="color:var(--pri); cursor:pointer; padding:8px;" onclick="ui('menu')">more_vert</span>
                 <div id="settings-menu" class="overlay-menu">
                     <div onclick="sys('light')">ライトモード</div>
                     <div onclick="sys('dark')">ダークモード</div>
+                    <div onclick="sys('system')">システム同期</div>
                     <div onclick="sys('copy')">結果をコピー</div>
                     <div class="vibe-box">
-                        <span style="font-size:0.85rem">振動強度: <span id="v-val">50</span>%</span>
+                        <span style="font-size:0.9rem">振動: <span id="v-val">50</span>%</span>
                         <input type="range" id="v-range" min="0" max="100" value="50" oninput="sys('vibe', this.value)">
                     </div>
                 </div>
@@ -269,10 +264,12 @@
                 <button class="k-sci" onclick="run('log(')">log</button>
                 <button class="k-sci" onclick="run('ln(')">ln</button>
                 <button class="k-sci" onclick="run('sqrt(')">√</button>
-                <button class="k-sci" onclick="run('^')">^</button>
+                <button class="k-sci" onclick="run('^')">xʸ</button>
                 <button class="k-sci" onclick="run('π')">π</button>
                 <button class="k-sci" onclick="run('e')">e</button>
-                <button class="k-sci" onclick="run('!')">!</button>
+                <button class="k-sci" onclick="run('!')">n!</button>
+                <button class="k-sci" onclick="run('inv(')">1/x</button>
+                <button class="k-sci" onclick="run('abs(')">|x|</button>
             </div>
 
             <div class="num-cluster">
@@ -318,8 +315,7 @@
                 p.unit = p.unit === 'deg' ? 'rad' : 'deg';
                 document.getElementById('unit-toggle').innerText = p.unit;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
-            }
-            if (type === 'menu') {
+            } else if (type === 'menu') {
                 const m = document.getElementById('settings-menu');
                 m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
             }
@@ -331,7 +327,7 @@
                 p.vibe = val;
                 document.getElementById('v-val').innerText = val;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
-            } else if (cmd === 'light' || cmd === 'dark') {
+            } else if (['light', 'dark', 'system'].includes(cmd)) {
                 p.mode = cmd;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
                 location.reload();
@@ -357,7 +353,8 @@
                                .replace(/cos\(/g, p.unit === 'deg' ? 'Math.cos(Math.PI/180*' : 'Math.cos(')
                                .replace(/tan\(/g, p.unit === 'deg' ? 'Math.tan(Math.PI/180*' : 'Math.tan(')
                                .replace(/log\(/g, 'Math.log10(').replace(/ln\(/g, 'Math.log(')
-                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/π/g, 'Math.PI')
+                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/inv\(/g, '1/(')
+                               .replace(/abs\(/g, 'Math.abs(').replace(/π/g, 'Math.PI')
                                .replace(/e/g, 'Math.E').replace(/\^/g, '**');
 
                     const o = (f.match(/\(/g) || []).length;
@@ -375,7 +372,8 @@
                 }
             } else {
                 if (solved && /[0-9]/.test(key)) exp = "";
-                solved = false; exp += key;
+                solved = false;
+                exp += key;
             }
 
             m.innerText = exp || "0";
@@ -384,19 +382,16 @@
         }
 
         window.addEventListener('keydown', (e) => {
-            if (e.key >= '0' && e.key <= '9') run(e.key);
-            if (e.key === '.') run('.');
-            if (e.key === '+') run('+');
-            if (e.key === '-') run('-');
-            if (e.key === '*') run('×');
-            if (e.key === '/') { e.preventDefault(); run('÷'); }
-            if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); run('='); }
-            if (e.key === 'Backspace') run('DEL');
-            if (e.key === 'Escape') run('AC');
+            const keys = {'*':'×', '/':'÷', 'Enter':'=', 'Backspace':'DEL', 'Escape':'AC'};
+            const val = keys[e.key] || e.key;
+            if (/[0-9]/.test(val) || ['+','-','×','÷','=','DEL','AC','.', '(', ')'].includes(val)) {
+                if(val === '÷' || val === '=') e.preventDefault();
+                run(val);
+            }
         });
 
         document.addEventListener('click', e => {
-            if (!e.target.closest('#menu-btn') && !e.target.closest('#settings-menu')) {
+            if (!e.target.closest('#settings-menu') && !e.target.classList.contains('material-symbols-outlined')) {
                 document.getElementById('settings-menu').style.display = 'none';
             }
         });
