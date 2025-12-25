@@ -48,6 +48,7 @@
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
             user-select: none;
             outline: none;
         }
@@ -97,7 +98,6 @@
             background: var(--surf);
             border-radius: 40px 40px 0 0;
             padding: 8px 24px calc(24px + env(safe-area-inset-bottom));
-            transition: background 0.4s;
         }
 
         .handle-bar {
@@ -106,7 +106,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
         }
 
         .handle-bar::after {
@@ -115,7 +114,7 @@
             height: 4px;
             background: var(--hdl);
             border-radius: 2px;
-            opacity: 0.4;
+            opacity: 0.3;
         }
 
         .utility-bar {
@@ -133,6 +132,7 @@
             border-radius: 18px;
             background: var(--pri-c);
             text-transform: uppercase;
+            cursor: pointer;
         }
 
         .layout-engine {
@@ -169,6 +169,7 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.1s;
+            cursor: pointer;
         }
 
         button:active { transform: scale(0.92); }
