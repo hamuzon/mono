@@ -73,6 +73,7 @@
             flex-direction: column;
         }
 
+
         .display-area {
             flex: 1;
             display: flex;
@@ -102,13 +103,14 @@
             line-height: 1.1;
         }
 
+
         .pad-layer {
             background: var(--surf);
             border-radius: 40px 40px 0 0;
             padding: 10px 24px calc(20px + env(safe-area-inset-bottom));
             box-shadow: 0 -10px 40px rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
         }
 
@@ -144,6 +146,7 @@
             padding: 8px;
         }
 
+
         .sci-box {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -159,6 +162,7 @@
             opacity: 1;
             margin-bottom: 16px;
         }
+
 
         .main-grid {
             display: grid;
@@ -184,11 +188,23 @@
             transform: scale(0.9);
         }
 
-        .k-op { background: var(--pri-c); color: var(--on-pri-c); }
+        .k-op { 
+            background: var(--pri-c); 
+            color: var(--on-pri-c); 
+        }
         
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.8rem; }
+        .k-eq { 
+            background: var(--pri); 
+            color: var(--on-pri); 
+            font-size: 2.8rem; 
+        }
         
-        .k-sci { background: var(--pri-c); font-size: 1.1rem; height: 54px; }
+        .k-sci { 
+            background: var(--pri-c); 
+            font-size: 1.1rem; 
+            height: 54px; 
+        }
+
 
         .sheet {
             position: fixed;
@@ -200,25 +216,29 @@
             padding: calc(50px + env(safe-area-inset-top)) 32px 32px;
         }
 
-        .sheet.active { transform: translateY(0); }
+        .sheet.active { 
+            transform: translateY(0); 
+        }
 
-        .history-item {
+        .history-card {
             padding: 24px;
             border-radius: 28px;
             background: var(--surf);
             margin-bottom: 16px;
             text-align: right;
+            cursor: pointer;
         }
     </style>
 </head>
+
 <body>
 
     <div id="history-panel" class="sheet">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
             <h1 style="margin:0; font-size:2.2rem; font-weight:400;">履歴</h1>
-            <span class="material-symbols-outlined" style="font-size:2.2rem;" onclick="location.hash='#home'">close</span>
+            <span class="material-symbols-outlined" style="font-size:2.2rem; cursor:pointer;" onclick="location.hash='#home'">close</span>
         </div>
-        <div id="history-list" style="overflow-y:auto; height:80%;"></div>
+        <div id="history-list" style="overflow-y:auto; height:80%; scrollbar-width:none;"></div>
     </div>
 
     <section class="display-area">
@@ -279,18 +299,31 @@
         let solved = false;
         let logs = JSON.parse(localStorage.getItem('calc-log') || '[]');
 
+
         function sync() {
             const h = window.location.hash;
             document.getElementById('history-panel').classList.toggle('active', h === '#history');
+            
             if (h === '#history') {
                 const list = document.getElementById('history-list');
-                list.innerHTML = logs.map(i => `<div class="history-item"><div style="opacity:0.6">${i.q}</div><div style="font-size:1.8rem">${i.a}</div></div>`).join('');
+                list.innerHTML = logs.length ? 
+                    logs.map(i => `<div class="history-card" onclick="reuse('${i.a}')"><div style="opacity:0.6;font-size:1rem;margin-bottom:4px;">${i.q}</div><div style="font-size:1.8rem;font-weight:500;">${i.a}</div></div>`).join('') :
+                    '<div style="text-align:center;opacity:0.5;margin-top:40px;">履歴はありません</div>';
             }
         }
+
+
+        function reuse(val) {
+            exp = val;
+            render();
+            location.hash = '#home';
+        }
+
 
         function toggleSci() {
             document.getElementById('sci-box').classList.toggle('open');
         }
+
 
         function cycleTheme() {
             const cfg = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system"}');
@@ -299,6 +332,7 @@
             localStorage.setItem('calc-prefs', JSON.stringify(cfg));
             location.reload();
         }
+
 
         function press(v) {
             const mv = document.getElementById('main-text');
@@ -317,7 +351,7 @@
                                .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
                                .replace(/π/g, 'Math.PI').replace(/\^/g, '**');
 
-                    if (f === "0/0") { mv.innerText = "結果なし"; exp = ""; return; }
+                    if (f.includes('/0')) { mv.innerText = "エラー"; exp = ""; return; }
                     
                     let res = eval(f);
                     let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
@@ -330,7 +364,7 @@
                     solved = true;
                 } catch {
                     mv.innerText = "エラー";
-                    setTimeout(() => mv.innerText = exp || "0", 800);
+                    setTimeout(render, 800);
                     return;
                 }
             } else {
@@ -338,9 +372,16 @@
                 solved = false;
                 exp += v;
             }
+            render();
+        }
+
+
+        function render() {
+            const mv = document.getElementById('main-text');
             mv.innerText = exp || "0";
             mv.scrollLeft = mv.scrollWidth;
         }
+
 
         window.addEventListener('keydown', (e) => {
             const map = {'Enter': '=', 'Backspace': 'DEL', 'Escape': 'AC', '*': '×', '/': '÷'};
@@ -351,7 +392,8 @@
             }
         });
 
-        window.onload = sync;
+
+        window.onload = () => { render(); sync(); };
         window.onhashchange = sync;
     </script>
 </body>
