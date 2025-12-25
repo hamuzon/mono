@@ -10,7 +10,7 @@
 
     <script>
         (function() {
-            const config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":"on"}');
+            const config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":30}');
             const isDark = config.theme === 'dark' || (config.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (isDark) document.documentElement.classList.add('dark-mode');
         })();
@@ -88,17 +88,18 @@
         }
 
         #sub {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--on-surface);
             opacity: 0.7;
-            min-height: 1.8rem;
+            min-height: 1.6rem;
             width: 100%;
             text-align: right;
+            margin-bottom: 8px;
         }
 
         #main {
             width: 100%;
-            font-size: clamp(3rem, 15vw, 5.5rem);
+            font-size: clamp(2.5rem, 12vw, 5rem);
             text-align: right;
             border: none;
             background: transparent;
@@ -109,12 +110,15 @@
         .pad-container {
             background: var(--surface);
             border-radius: 40px 40px 0 0;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            display: flex;
+            flex-direction: column;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .toolbar {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 12px 32px 4px;
             color: var(--accent);
         }
@@ -125,10 +129,11 @@
             font-size: 1.8rem;
         }
 
-        .grid-wrapper {
+        .grid-area {
             display: flex;
             flex-direction: column;
             width: 100%;
+            transition: all 0.3s ease;
         }
 
         .adv-grid {
@@ -137,12 +142,14 @@
             gap: 8px;
             padding: 0 24px;
             max-height: 0;
+            opacity: 0;
             overflow: hidden;
             transition: all 0.3s ease;
         }
 
         .adv-grid.show {
             max-height: 200px;
+            opacity: 1;
             padding: 12px 24px;
         }
 
@@ -175,7 +182,7 @@
         .btn-op {
             background: var(--primary-cont);
             color: var(--on-primary-cont);
-            font-size: 2rem;
+            font-size: 1.8rem;
         }
 
         .btn-fn {
@@ -194,6 +201,8 @@
             background: transparent;
             font-size: 1.1rem;
             color: var(--on-surface);
+            aspect-ratio: auto;
+            height: 48px;
         }
 
         .item {
@@ -202,6 +211,12 @@
             align-items: center;
             padding: 20px 0;
             border-bottom: 1px solid var(--surface);
+        }
+
+        input[type="range"] {
+            flex: 1;
+            margin: 0 16px;
+            accent-color: var(--accent);
         }
 
         select {
@@ -239,11 +254,11 @@
         </div>
 
         <div class="item">
-            <span>操作バイブレーション</span>
-            <select id="sel-vibe" onchange="applySettings()">
-                <option value="on">ON</option>
-                <option value="off">OFF</option>
-            </select>
+            <span>バイブレーション強度</span>
+            <div style="display:flex; align-items:center; flex:1; justify-content: flex-end;">
+                <input type="range" id="vibe-range" min="0" max="100" step="5" onchange="applySettings()">
+                <span id="vibe-val" style="width:40px; text-align:right;">30%</span>
+            </div>
         </div>
     </div>
 
@@ -270,7 +285,7 @@
             <span class="material-symbols-outlined" id="toggle-icon" onclick="toggleAdv()">keyboard_arrow_down</span>
         </div>
 
-        <div class="grid-wrapper">
+        <div class="grid-area">
             <div id="grid-adv" class="adv-grid">
                 <button class="btn-adv" onclick="add('sin(')">sin</button>
                 <button class="btn-adv" onclick="add('cos(')">cos</button>
@@ -314,15 +329,18 @@
     <script>
         let expr = '';
         let hData = JSON.parse(localStorage.getItem('calc_h') || '[]');
-        let config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":"on"}');
+        let config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":30}');
 
         function vib() { 
-            if (config.vibe === 'on' && navigator.vibrate) navigator.vibrate(15); 
+            const ms = parseInt(config.vibe);
+            if (ms > 0 && navigator.vibrate) navigator.vibrate(ms / 2); 
         }
 
         function applySettings() {
             config.theme = document.getElementById('sel-theme').value;
-            config.vibe = document.getElementById('sel-vibe').value;
+            config.vibe = document.getElementById('vibe-range').value;
+            document.getElementById('vibe-val').innerText = config.vibe + '%';
+            
             localStorage.setItem('calc_config', JSON.stringify(config));
             
             const isDark = config.theme === 'dark' || (config.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -403,7 +421,8 @@
         }
 
         document.getElementById('sel-theme').value = config.theme;
-        document.getElementById('sel-vibe').value = config.vibe;
+        document.getElementById('vibe-range').value = config.vibe;
+        document.getElementById('vibe-val').innerText = config.vibe + '%';
     </script>
 
 </body>
