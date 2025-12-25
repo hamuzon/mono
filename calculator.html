@@ -7,85 +7,79 @@
 
     <script>
         (function() {
-            const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
-            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            
-            const update = (isDark) => {
-                document.documentElement.className = isDark ? 'dark' : 'light';
-                document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
+            const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50}');
+            const q = window.matchMedia('(prefers-color-scheme: dark)');
+
+            const upd = (isD) => {
+                document.documentElement.className = isD ? 'dark' : 'light';
+                document.documentElement.style.backgroundColor = isD ? '#1B1C17' : '#FDFCF4';
             };
 
-            if (prefs.mode === 'system') {
-                update(darkQuery.matches);
-                darkQuery.addEventListener('change', e => update(e.matches));
+            if (p.mode === 'system') {
+                upd(q.matches);
+                q.addEventListener('change', e => upd(e.matches));
             } else {
-                update(prefs.mode === 'dark');
+                upd(p.mode === 'dark');
             }
         })();
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #FDFCF4;
-            --on-bg: #1B1C17;
-            --surf: #EFF1E0;
-            --on-surf: #44483D;
-            --pri: #4C662B;
-            --on-pri: #FFFFFF;
-            --pri-c: #D7E8B7;
-            --on-pri-c: #121F00;
-            --sec-c: #E3E4D3;
-            --sci-bg: #D7E8B7;
-            --btn-r: 40px;
+            --bg: #FDFCF4; --on-bg: #1B1C17;
+            --surf: #EFF1E0; --on-surf: #44483D;
+            --pri: #4C662B; --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7; --on-pri-c: #121F00;
+            --sec-c: #E3E4D3; --sci-bg: #D7E8B7;
+            --hdl: #74796B;
         }
 
         .dark {
-            --bg: #1B1C17;
-            --on-bg: #E3E4D3;
-            --surf: #2F3126;
-            --on-surf: #C7C8B8;
-            --pri: #B1D18A;
-            --on-pri: #1F3701;
-            --pri-c: #3E4A2B;
-            --on-pri-c: #D7E8B7;
-            --sec-c: #45483C;
-            --sci-bg: #3E4A2B;
+            --bg: #1B1C17; --on-bg: #E3E4D3;
+            --surf: #2F3126; --on-surf: #C7C8B8;
+            --pri: #B1D18A; --on-pri: #1F3701;
+            --pri-c: #3E4A2B; --on-pri-c: #D7E8B7;
+            --sec-c: #45483C; --sci-bg: #3E4A2B;
+            --hdl: #909284;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
             touch-action: manipulation;
+            user-select: none;
         }
 
-        body {
+        html, body {
             margin: 0;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg);
-            color: var(--on-bg);
+            height: 100%;
+            width: 100%;
             overflow: hidden;
+            background: var(--bg);
             font-family: 'Google Sans', sans-serif;
         }
 
-        .display-layer {
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .display-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 32px;
+            padding: 40px;
             text-align: right;
         }
 
         #log-view {
             font-size: 1.6rem;
             color: var(--on-surf);
-            min-height: 2.4rem;
-            opacity: 0.7;
+            opacity: 0.6;
+            min-height: 2.2rem;
             margin-bottom: 12px;
             white-space: nowrap;
             overflow-x: auto;
@@ -93,392 +87,278 @@
         }
 
         #main-view {
-            font-family: 'Potta One', cursive;
-            font-size: clamp(3rem, 15vw, 5.5rem);
+            font-size: clamp(3.5rem, 18vw, 7.5rem);
             white-space: nowrap;
             overflow-x: auto;
-            padding: 12px 0;
             scrollbar-width: none;
+            line-height: 1.1;
         }
 
-        .input-layer {
+        .pad-container {
             background: var(--surf);
-            border-radius: 48px 48px 0 0;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
-            box-shadow: 0 -15px 50px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
+            border-radius: 42px 42px 0 0;
+            padding: 12px 24px calc(24px + env(safe-area-inset-bottom));
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
         }
 
-        .action-bar {
+        .handle-bar {
+            width: 100%;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .handle-bar::after {
+            content: '';
+            width: 44px;
+            height: 5px;
+            background: var(--hdl);
+            border-radius: 3px;
+            opacity: 0.3;
+        }
+
+        .action-strip {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 32px;
-            color: var(--pri);
+            padding: 8px 12px 20px;
         }
 
-        .action-bar span {
-            cursor: pointer;
-            padding: 12px;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-
-        .action-bar span:active {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .sci-grid {
+        .sci-drawer {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            padding: 0 28px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
             height: 0;
             opacity: 0;
             overflow: hidden;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
 
-        .sci-grid.open {
-            height: 140px;
-            padding: 8px 28px 16px;
+        .sci-drawer.active {
+            height: 180px;
             opacity: 1;
+            margin-bottom: 16px;
         }
 
         .main-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
-            padding: 12px 28px 24px;
         }
 
         button {
-            height: clamp(68px, 11vh, 84px);
+            height: clamp(68px, 11vh, 88px);
             border: none;
-            border-radius: var(--btn-r);
-            font-size: 1.8rem;
+            border-radius: 44px;
+            font-size: 1.9rem;
             font-weight: 500;
             background: var(--bg);
             color: var(--on-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+            transition: transform 0.1s, filter 0.1s;
         }
 
         button:active {
-            transform: scale(0.9);
+            transform: scale(0.92);
             filter: brightness(0.9);
         }
 
-        .k-op { 
-            background: var(--pri-c); 
-            color: var(--on-pri-c); 
-        }
-
-        .k-sci { 
-            background: var(--sci-bg); 
-            font-size: 1.1rem; 
-            height: 52px; 
-            border-radius: 26px; 
-        }
-
-        .k-eq { 
-            background: var(--pri); 
-            color: var(--on-pri); 
-            font-size: 2.6rem; 
-            border-radius: var(--btn-r);
-        }
+        .k-op { background: var(--pri-c); color: var(--on-pri-c); }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.8rem; }
+        .k-sci { background: var(--sci-bg); font-size: 1.2rem; height: 56px; }
 
         .more-menu {
             position: absolute;
-            right: 32px;
-            bottom: 90px;
+            right: 24px;
+            bottom: 120px;
             background: var(--bg);
             border-radius: 28px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
             display: none;
             flex-direction: column;
-            box-shadow: 0 15px 60px rgba(0,0,0,0.3);
-            z-index: 500;
+            z-index: 999;
             min-width: 220px;
             overflow: hidden;
-            border: 1px solid var(--surf);
         }
 
         .more-menu div {
-            padding: 20px 28px;
+            padding: 22px 28px;
             border-bottom: 1px solid var(--surf);
-            white-space: nowrap;
             cursor: pointer;
-            font-size: 1rem;
         }
 
-        .sheet {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 1000;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.05, 0.7, 0.1, 1);
-            padding: calc(48px + env(safe-area-inset-top)) 32px 32px;
-        }
-
-        .sheet.active { 
-            transform: translateY(0); 
-        }
-
-        .history-card {
-            padding: 24px;
-            border-radius: 28px;
-            background: var(--surf);
-            margin-bottom: 18px;
-            text-align: right;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .history-card:active {
-            transform: scale(0.98);
-        }
-
-        @media (min-width: 800px) {
-            .input-layer {
-                display: flex;
-                flex-direction: row-reverse;
-                max-width: 900px;
-            }
-            .sci-grid {
-                height: auto !important;
+        @media (min-width: 850px) or (orientation: landscape) {
+            .pad-container { border-radius: 0; }
+            .handle-bar { display: none; }
+            .sci-drawer { 
+                display: grid !important; 
+                height: auto !important; 
                 opacity: 1 !important;
                 grid-template-columns: repeat(2, 1fr);
-                width: 35%;
-                padding: 32px 20px !important;
+                width: 30%;
+                margin: 0;
             }
-            .main-grid { flex: 1; padding: 32px 24px; }
-            .action-bar span[onclick*="toggleSci"] { display: none; }
+            .layout-flex { display: flex; gap: 20px; }
+            .main-grid { flex: 1; }
         }
     </style>
 </head>
-
 <body>
 
-    <div id="history-panel" class="sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:48px;">
-            <h1 id="h-title" style="margin:0; font-size:2.2rem; font-weight:400;">履歴</h1>
-            <div style="display:flex; gap:28px;">
-                <span class="material-symbols-outlined" style="font-size:2rem;" onclick="clearLog()">delete</span>
-                <span class="material-symbols-outlined" style="font-size:2rem;" onclick="location.hash='#home'">close</span>
-            </div>
-        </div>
-        <div id="history-list" style="overflow-y:auto; height:calc(100% - 140px); scrollbar-width: none;"></div>
-    </div>
-
-    <div class="display-layer">
+    <section class="display-area">
         <div id="log-view"></div>
         <div id="main-view">0</div>
-    </div>
+    </section>
 
-    <div class="input-layer">
-        <div class="action-bar">
-            <div style="display:flex; gap:20px;">
-                <span class="material-symbols-outlined" onclick="toggleSci()">science</span>
-                <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
-            </div>
-            
+    <nav class="pad-container">
+        <div class="handle-bar" onclick="toggleSci()"></div>
+
+        <div class="action-strip">
+            <span class="material-symbols-outlined" style="color:var(--pri); cursor:pointer;" onclick="location.reload()">refresh</span>
             <div style="position:relative;">
-                <span class="material-symbols-outlined" id="more-trigger" onclick="toggleMenu()">more_vert</span>
-                <div id="menu-box" class="more-menu">
-                    <div id="m-theme" onclick="cycleTheme()">テーマ: システム</div>
-                    <div id="m-lang" onclick="cycleLang()">Language: JP</div>
-                    <div id="m-copy" onclick="copyValue()">結果をコピー</div>
-                    <div onclick="press('AC')">すべてクリア</div>
+                <span class="material-symbols-outlined" style="color:var(--pri); cursor:pointer;" onclick="toggleMenu()">more_vert</span>
+                <div id="drop-menu" class="more-menu">
+                    <div onclick="setMode('light')">ライトモード</div>
+                    <div onclick="setMode('dark')">ダークモード</div>
+                    <div onclick="setMode('system')">システム同期</div>
+                    <div onclick="copyRes()">結果をコピー</div>
                 </div>
             </div>
         </div>
 
-        <div id="sci-box" class="sci-grid">
-            <button class="k-sci" onclick="press('sin(')">sin</button>
-            <button class="k-sci" onclick="press('cos(')">cos</button>
-            <button class="k-sci" onclick="press('tan(')">tan</button>
-            <button class="k-sci" onclick="press('π')">π</button>
-            <button class="k-sci" onclick="press('sqrt(')">√</button>
-            <button class="k-sci" onclick="press('log(')">log</button>
-            <button class="k-sci" onclick="press('ln(')">ln</button>
-            <button class="k-sci" onclick="press('^')">xʸ</button>
-            <button class="k-sci" onclick="press('e')">e</button>
-            <button class="k-sci" onclick="press('!')">n!</button>
-        </div>
+        <div class="layout-flex">
+            <div id="sci-panel" class="sci-drawer">
+                <button class="k-sci" onclick="run('sin(')">sin</button>
+                <button class="k-sci" onclick="run('cos(')">cos</button>
+                <button class="k-sci" onclick="run('tan(')">tan</button>
+                <button class="k-sci" onclick="run('sqrt(')">√</button>
+                <button class="k-sci" onclick="run('log(')">log</button>
+                <button class="k-sci" onclick="run('ln(')">ln</button>
+                <button class="k-sci" onclick="run('^')">xʸ</button>
+                <button class="k-sci" onclick="run('π')">π</button>
+            </div>
 
-        <div class="main-grid">
-            <button class="k-op" onclick="press('AC')">AC</button>
-            <button class="k-op" onclick="press('()')">( )</button>
-            <button class="k-op" onclick="press('%')">%</button>
-            <button class="k-op" onclick="press('÷')">÷</button>
-            
-            <button onclick="press('7')">7</button>
-            <button onclick="press('8')">8</button>
-            <button onclick="press('9')">9</button>
-            <button class="k-op" onclick="press('×')">×</button>
-            
-            <button onclick="press('4')">4</button>
-            <button onclick="press('5')">5</button>
-            <button onclick="runVibrate(20);press('6')">6</button>
-            <button class="k-op" onclick="press('-')">-</button>
-            
-            <button onclick="press('1')">1</button>
-            <button onclick="press('2')">2</button>
-            <button onclick="press('3')">3</button>
-            <button class="k-op" onclick="press('+')">+</button>
-            
-            <button onclick="press('0')">0</button>
-            <button onclick="press('.')">.</button>
-            <button onclick="press('DEL')"><span class="material-symbols-outlined">backspace</span></button>
-            <button class="k-eq" onclick="press('=')">=</button>
+            <div class="main-grid">
+                <button class="k-op" onclick="run('AC')">AC</button>
+                <button class="k-op" onclick="run('DEL')">⌫</button>
+                <button class="k-op" onclick="run('%')">%</button>
+                <button class="k-op" onclick="run('÷')">÷</button>
+
+                <button onclick="run('7')">7</button>
+                <button onclick="run('8')">8</button>
+                <button onclick="run('9')">9</button>
+                <button class="k-op" onclick="run('×')">×</button>
+
+                <button onclick="run('4')">4</button>
+                <button onclick="run('5')">5</button>
+                <button onclick="run('6')">6</button>
+                <button class="k-op" onclick="run('-')">-</button>
+
+                <button onclick="run('1')">1</button>
+                <button onclick="run('2')">2</button>
+                <button onclick="run('3')">3</button>
+                <button class="k-op" onclick="run('+')">+</button>
+
+                <button onclick="run('0')">0</button>
+                <button onclick="run('.')">.</button>
+                <button class="k-eq" onclick="run('=')" style="grid-column: span 2">=</button>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <script>
         let exp = "";
         let solved = false;
-        let logs = JSON.parse(localStorage.getItem('calc-log') || '[]');
-        let cfg = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
+        let p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50}');
 
-        const i18n = {
-            ja: { h: "履歴", empty: "履歴なし", err: "エラー", m_mode: "テーマ: ", m_copy: "結果をコピー", modes: {system:"システム", dark:"ダーク", light:"ライト"} },
-            en: { h: "History", empty: "No History", err: "Error", m_mode: "Theme: ", m_copy: "Copy Result", modes: {system:"System", dark:"Dark", light:"Light"} }
-        };
-
-        function runVibrate(ms) {
-            if (navigator.vibrate) navigator.vibrate(ms);
+        function vib() {
+            if (navigator.vibrate && p.vibe > 0) navigator.vibrate(15);
         }
 
-        function sync() {
-            const h = window.location.hash;
-            document.getElementById('history-panel').classList.toggle('active', h === '#history');
-            
-            if (h === '#history') buildLog();
-
-            const t = i18n[cfg.lang];
-            document.getElementById('h-title').innerText = t.h;
-            document.getElementById('m-theme').innerText = t.m_mode + t.modes[cfg.mode];
-            document.getElementById('m-lang').innerText = "Language: " + (cfg.lang === 'ja' ? 'JP' : 'EN');
-            document.getElementById('m-copy').innerText = t.m_copy;
+        function toggleSci() {
+            vib();
+            document.getElementById('sci-panel').classList.toggle('active');
         }
 
-        function toggleSci() { 
-            runVibrate(10);
-            document.getElementById('sci-box').classList.toggle('open'); 
+        function toggleMenu() {
+            const m = document.getElementById('drop-menu');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function toggleMenu() { 
-            const m = document.getElementById('menu-box'); 
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; 
-        }
-
-        function closeMenu() { 
-            document.getElementById('menu-box').style.display = 'none'; 
-        }
-
-        function press(v) {
-            runVibrate(15);
-            const mv = document.getElementById('main-view');
-            const lv = document.getElementById('log-view');
-            closeMenu();
-
-            if (v === 'AC') { 
-                exp = ""; lv.innerText = ""; solved = false; 
-            } else if (v === 'DEL') { 
-                exp = exp.slice(0, -1); 
-            } else if (v === '=') {
-                if (!exp) return;
-                try {
-                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
-                               .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
-                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
-                               .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
-                               .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
-                               .replace(/\^/g, '**');
-
-                    const op = (f.match(/\(/g) || []).length, cp = (f.match(/\)/g) || []).length;
-                    if (op > cp) f += ')'.repeat(op - cp);
-
-                    let res = eval(f);
-                    let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
-                    
-                    logs.unshift({q: exp, a: out});
-                    localStorage.setItem('calc-log', JSON.stringify(logs.slice(0, 30)));
-                    
-                    lv.innerText = exp + ' =';
-                    exp = out;
-                    solved = true;
-                } catch { 
-                    mv.innerText = i18n[cfg.lang].err; 
-                    setTimeout(render, 800); 
-                    return; 
-                }
-            } else if (v === '()') {
-                const op = (exp.match(/\(/g) || []).length, cp = (exp.match(/\)/g) || []).length;
-                exp += (op > cp && /[0-9)]$/.test(exp.slice(-1))) ? ')' : '(';
-            } else {
-                if (solved && /[0-9]/.test(v)) exp = "";
-                solved = false; 
-                exp += v;
-            }
-            render();
-        }
-
-        function render() {
-            const mv = document.getElementById('main-view');
-            mv.innerText = exp || '0';
-            mv.scrollLeft = mv.scrollWidth;
-        }
-
-        function copyValue() { 
-            navigator.clipboard.writeText(exp || '0'); 
-            closeMenu(); 
-        }
-
-        function buildLog() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = logs.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:80px;">${i18n[cfg.lang].empty}</div>`;
-            
-            logs.forEach(i => {
-                const d = document.createElement('div');
-                d.className = 'history-card';
-                d.innerHTML = `<div style="opacity:0.6;font-size:1rem;margin-bottom:8px;">${i.q}</div><div style="font-size:1.8rem;font-weight:500;">${i.a}</div>`;
-                d.onclick = () => { exp = i.a; render(); location.hash='#home'; };
-                list.appendChild(d);
-            });
-        }
-
-        function cycleTheme() {
-            const m = ['system', 'light', 'dark'];
-            cfg.mode = m[(m.indexOf(cfg.mode) + 1) % m.length];
-            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
+        function setMode(m) {
+            p.mode = m;
+            localStorage.setItem('calc-prefs', JSON.stringify(p));
             location.reload();
         }
 
-        function cycleLang() {
-            cfg.lang = cfg.lang === 'ja' ? 'en' : 'ja';
-            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
-            sync(); 
-            closeMenu();
+        function copyRes() {
+            navigator.clipboard.writeText(exp || "0");
+            toggleMenu();
         }
 
-        function clearLog() { 
-            logs = []; 
-            localStorage.setItem('calc-log', '[]'); 
-            buildLog(); 
+        function run(key) {
+            vib();
+            const mv = document.getElementById('main-view');
+            const lv = document.getElementById('log-view');
+
+            if (key === 'AC') {
+                exp = ""; lv.innerText = ""; solved = false;
+            } else if (key === 'DEL') {
+                exp = exp.slice(0, -1);
+            } else if (key === '=') {
+                if (!exp) return;
+                try {
+                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
+                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
+                               .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
+                               .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
+                               .replace(/π/g, 'Math.PI').replace(/\^/g, '**');
+
+                    if (f === "0/0") {
+                        mv.innerText = "結果なし";
+                        exp = ""; solved = true; return;
+                    }
+
+                    const o = (f.match(/\(/g) || []).length;
+                    const c = (f.match(/\)/g) || []).length;
+                    if (o > c) f += ')'.repeat(o - c);
+
+                    let res = eval(f);
+
+                    if (isNaN(res) || !isFinite(res)) {
+                        mv.innerText = "エラー";
+                    } else {
+                        lv.innerText = exp + " =";
+                        exp = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
+                        mv.innerText = exp;
+                    }
+                    solved = true;
+                    return;
+                } catch {
+                    mv.innerText = "エラー";
+                    setTimeout(() => mv.innerText = exp || "0", 1000);
+                    return;
+                }
+            } else {
+                if (solved && /[0-9]/.test(key)) exp = "";
+                solved = false;
+                exp += key;
+            }
+
+            mv.innerText = exp || "0";
+            mv.scrollLeft = mv.scrollWidth;
+            document.getElementById('drop-menu').style.display = 'none';
         }
 
-        window.onload = () => { render(); sync(); };
-        window.onhashchange = sync;
-
-        document.body.onclick = (e) => { 
-            if(!e.target.closest('#more-trigger') && !e.target.closest('#menu-box')) closeMenu(); 
-        };
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.more-menu') && !e.target.innerText.includes('more_vert')) {
+                document.getElementById('drop-menu').style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
