@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Calculator @Pixel10</title>
+    <title>Advanced Calculator</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <script>
         (function() {
@@ -14,41 +13,39 @@
             const isDark = prefs.mode === 'dark' || (prefs.mode === 'system' && darkQuery.matches);
             
             document.documentElement.className = isDark ? 'dark' : 'light';
-            document.documentElement.style.backgroundColor = '#000000';
+            document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
         })();
     </script>
 
+
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+
+
     <style>
         :root {
-            --outer-bg: #000000;
-            --frame-color: #334155;
-            --l-bg: #FDFCF4;
-            --l-on-bg: #1B1C17;
-            --l-surf: #E3E4D3;
-            --l-pri: #4C662B;
-            --l-on-pri: #FFFFFF;
-            --l-sec-c: #D7E8B7;
-            --l-on-sec-c: #1B1C17;
+            --bg: #FDFCF4;
+            --on-bg: #1B1C17;
+            --surface: #EFF1E0;
+            --on-surf: #44483D;
+            --pri: #4C662B;
+            --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7;
+            --on-pri-c: #121F00;
+            --sec-c: #E3E4D3;
+            --on-sec-c: #1B1C17;
         }
 
         .dark {
-            --sys-bg: #1B1C17;
-            --sys-on-bg: #E3E4D3;
-            --sys-surf: #2F3126;
-            --sys-pri: #B1D18A;
-            --sys-on-pri: #1F3701;
-            --sys-sec-c: #3E4A2B;
-            --sys-on-sec-c: #D7E8B7;
-        }
-
-        .light {
-            --sys-bg: var(--l-bg);
-            --sys-on-bg: var(--l-on-bg);
-            --sys-surf: var(--l-surf);
-            --sys-pri: var(--l-pri);
-            --sys-on-pri: var(--l-on-pri);
-            --sys-sec-c: var(--l-sec-c);
-            --sys-on-sec-c: var(--l-on-sec-c);
+            --bg: #1B1C17;
+            --on-bg: #E3E4D3;
+            --surface: #2F3126;
+            --on-surf: #C7C8B8;
+            --pri: #B1D18A;
+            --on-pri: #1F3701;
+            --pri-c: #3E4A2B;
+            --on-pri-c: #D7E8B7;
+            --sec-c: #45483C;
+            --on-sec-c: #E3E4D3;
         }
 
         * {
@@ -59,243 +56,203 @@
         body {
             margin: 0;
             height: 100dvh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            font-family: 'Kiwi Maru', sans-serif;
-            background: var(--outer-bg);
-        }
-
-        .phone-case {
-            width: 94%;
-            max-width: 400px;
-            height: 85vh;
-            background: #222;
-            border: 12px solid var(--frame-color);
-            border-radius: 54px;
-            position: relative;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            background: var(--bg);
+            color: var(--on-bg);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            font-family: 'Google Sans', sans-serif;
         }
 
-        .container {
+        /* 出力エリア */
+        .output-layer {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--sys-bg);
-            color: var(--sys-on-bg);
-            transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .status-bar {
-            height: 44px;
-            padding: 0 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .display-area {
-            flex: 1;
-            padding: 20px 28px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            padding: 24px 32px;
             text-align: right;
         }
 
-        #calc-log {
-            font-size: 1.2rem;
-            opacity: 0.6;
-            min-height: 1.8rem;
+        #log-view {
+            font-size: 1.4rem;
+            color: var(--on-surf);
+            min-height: 2.2rem;
+            opacity: 0.7;
+            margin-bottom: 8px;
             white-space: nowrap;
             overflow-x: auto;
         }
 
-        #calc-main {
-            font-family: 'Potta One';
-            font-size: clamp(2.2rem, 10vw, 3.8rem);
+        #main-view {
+            font-family: 'Potta One', cursive;
+            font-size: clamp(2.5rem, 12vw, 4.5rem);
             white-space: nowrap;
             overflow-x: auto;
-            padding: 12px 0;
+            padding: 8px 0;
         }
 
-        .keypad {
-            background: var(--sys-surf);
+        /* 入力エリア */
+        .input-layer {
+            background: var(--surface);
             border-radius: 32px 32px 0 0;
-            padding: 24px 20px calc(12px + env(safe-area-inset-bottom));
+            padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 12px 16px;
+            color: var(--pri);
+        }
+
+        .action-bar span {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .key-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
         }
 
         button {
-            height: 68px;
+            height: 72px;
             border: none;
             border-radius: 24px;
-            font-size: 1.5rem;
-            font-family: 'Kiwi Maru';
+            font-size: 1.6rem;
             font-weight: 500;
-            background: var(--sys-bg);
-            color: var(--sys-on-bg);
-            transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg);
+            color: var(--on-bg);
+            transition: transform 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
         }
 
-        button:active {
-            transform: scale(0.9);
-            opacity: 0.8;
-            background: var(--sys-sec-c);
-        }
+        button:active { transform: scale(0.92); opacity: 0.8; }
+        .k-op { background: var(--pri-c); color: var(--on-pri-c); }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2rem; }
 
-        .k-op { background: var(--sys-sec-c); color: var(--sys-on-sec-c); }
-        .k-pri { background: var(--sys-pri); color: var(--sys-on-pri); }
-
+        /* オーバーレイシート */
         .sheet {
-            position: absolute;
+            position: fixed;
             inset: 0;
-            background: var(--sys-bg);
+            background: var(--bg);
             z-index: 100;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            padding: 48px 24px 24px;
-            display: flex;
-            flex-direction: column;
+            padding: calc(40px + env(safe-area-inset-top)) 24px 24px;
         }
 
         .sheet.active { transform: translateY(0); }
 
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--sec-c);
+        }
+
         .h-item {
-            padding: 20px;
-            border-radius: 24px;
-            background: var(--sys-surf);
+            padding: 16px;
+            border-radius: 20px;
+            background: var(--surface);
             margin-bottom: 12px;
             text-align: right;
         }
-
-        #sparkle-canvas {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 200;
-        }
-
-        .nav-bar { height: 24px; display: flex; justify-content: center; align-items: center; background: var(--sys-surf); }
-        .nav-line { width: 60px; height: 5px; background: var(--sys-on-bg); opacity: 0.15; border-radius: 10px; }
     </style>
 </head>
 
+
 <body>
 
-    <div class="phone-case">
-        <canvas id="sparkle-canvas"></canvas>
+    <div id="settings" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <h2 id="t-pref" style="margin:0;">Preferences</h2>
+            <span class="material-symbols-outlined" onclick="location.hash='#home'">close</span>
+        </div>
 
-        <div class="container">
+        <div class="row">
+            <span id="t-mode">Theme Mode</span>
+            <button class="k-op" onclick="toggleTheme()" id="mode-label" style="height:44px; width:120px; font-size:1rem;">Dark/Light</button>
+        </div>
 
-            <div id="history-sheet" class="sheet">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
-                    <h2 id="t-hist" style="margin:0; font-family:'Potta One';">履歴</h2>
-                    <span class="material-symbols-outlined" onclick="location.hash='#home'" style="cursor:pointer">close</span>
-                </div>
-
-                <div id="hist-list" style="flex:1; overflow-y:auto;"></div>
-
-                <button class="k-op" onclick="clearHist()" id="t-clear" style="margin-top:16px; width:100%; height:60px;">消去</button>
-            </div>
-
-
-            <div id="settings-sheet" class="sheet">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:36px;">
-                    <h2 id="t-pref" style="margin:0; font-family:'Potta One';">設定</h2>
-                    <span class="material-symbols-outlined" onclick="location.hash='#home'" style="cursor:pointer">close</span>
-                </div>
-
-                <div style="display:flex; flex-direction:column; gap:28px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span id="t-mode">テーマ</span>
-                        <button class="k-op" onclick="toggleTheme()" style="width:140px; height:48px;">
-                            <span id="mode-label">Mode</span>
-                        </button>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span id="t-lang">言語</span>
-                        <button class="k-op" onclick="toggleLang()" style="width:140px; height:48px;">
-                            <span id="lang-label">Lang</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="status-bar">
-                <div id="st-time">00:00</div>
-                <div style="display:flex; gap:16px; align-items:center;">
-                    <span class="material-symbols-outlined" onclick="location.hash='#history'" style="font-size:20px; cursor:pointer;">history</span>
-                    <span class="material-symbols-outlined" onclick="location.hash='#settings'" style="font-size:20px; cursor:pointer;">settings</span>
-                    <span id="bat-lv">--%</span>
-                </div>
-            </div>
-
-
-            <div class="display-area">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:auto;">
-                    <span class="material-symbols-outlined" onclick="sparkleEffect()" style="cursor:pointer; opacity:0.3;">auto_awesome</span>
-                </div>
-
-                <div id="calc-log"></div>
-                <div id="calc-main">0</div>
-            </div>
-
-
-            <div class="keypad">
-                <button class="k-op" onclick="input('C')">AC</button>
-                <button class="k-op" onclick="input('()')">( )</button>
-                <button class="k-op" onclick="input('%')">%</button>
-                <button class="k-op" onclick="input('÷')">÷</button>
-                
-                <button onclick="input('7')">7</button>
-                <button onclick="input('8')">8</button>
-                <button onclick="input('9')">9</button>
-                <button class="k-op" onclick="input('×')">×</button>
-                
-                <button onclick="input('4')">4</button>
-                <button onclick="input('5')">5</button>
-                <button onclick="input('6')">6</button>
-                <button class="k-op" onclick="input('-')">-</button>
-                
-                <button onclick="input('1')">1</button>
-                <button onclick="input('2')">2</button>
-                <button onclick="input('3')">3</button>
-                <button class="k-op" onclick="input('+')">+</button>
-                
-                <button onclick="input('0')">0</button>
-                <button onclick="input('.')">.</button>
-                <button onclick="input('B')"><span class="material-symbols-outlined">backspace</span></button>
-                <button class="k-pri" onclick="input('=')">=</button>
-            </div>
-
-            <div class="nav-bar"><div class="nav-line"></div></div>
-
+        <div class="row">
+            <span id="t-lang">Language</span>
+            <button class="k-op" onclick="toggleLang()" id="lang-label" style="height:44px; width:120px; font-size:1rem;">JP/EN</button>
         </div>
     </div>
 
+
+    <div id="history" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <h2 id="t-hist" style="margin:0;">History</h2>
+            <div style="display:flex; gap:20px;">
+                <span class="material-symbols-outlined" onclick="clearLog()">delete</span>
+                <span class="material-symbols-outlined" onclick="location.hash='#home'">close</span>
+            </div>
+        </div>
+        <div id="log-list" style="overflow-y:auto; height:calc(100% - 120px);"></div>
+    </div>
+
+
+    <div class="output-layer">
+        <div id="log-view"></div>
+        <div id="main-view">0</div>
+    </div>
+
+
+    <div class="input-layer">
+        <div class="action-bar">
+            <div style="display:flex; gap:12px;">
+                <span class="material-symbols-outlined" onclick="location.hash='#settings'">settings</span>
+                <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
+            </div>
+            <span class="material-symbols-outlined">more_vert</span>
+        </div>
+
+        <div class="key-grid">
+            <button class="k-op" onclick="cmd('C')">AC</button>
+            <button class="k-op" onclick="cmd('()')">( )</button>
+            <button class="k-op" onclick="cmd('%')">%</button>
+            <button class="k-op" onclick="cmd('÷')">÷</button>
+            
+            <button onclick="cmd('7')">7</button>
+            <button onclick="cmd('8')">8</button>
+            <button onclick="cmd('9')">9</button>
+            <button class="k-op" onclick="cmd('×')">×</button>
+            
+            <button onclick="cmd('4')">4</button>
+            <button onclick="cmd('5')">5</button>
+            <button onclick="cmd('6')">6</button>
+            <button class="k-op" onclick="cmd('-')">-</button>
+            
+            <button onclick="cmd('1')">1</button>
+            <button onclick="cmd('2')">2</button>
+            <button onclick="cmd('3')">3</button>
+            <button class="k-op" onclick="cmd('+')">+</button>
+            
+            <button onclick="cmd('0')">0</button>
+            <button onclick="cmd('.')">.</button>
+            <button onclick="cmd('B')"><span class="material-symbols-outlined">backspace</span></button>
+            <button class="k-eq" onclick="cmd('=')">=</button>
+        </div>
+    </div>
+
+
     <script>
-        let buffer = localStorage.getItem('calc-buf') || "";
-        let solved = false;
-        let prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"auto"}');
+        let buffer = localStorage.getItem('calc-buf') || '';
         let historyData = JSON.parse(localStorage.getItem('calc-log') || '[]');
+        let prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"auto"}');
+        let solved = false;
 
         const i18n = {
-            ja: { hist: "履歴", pref: "設定", clear: "消去", mode: "テーマ", lang: "言語", empty: "履歴なし", err: "エラー" },
-            en: { hist: "History", pref: "Settings", clear: "Clear", mode: "Theme", lang: "Language", empty: "Empty", err: "Error" }
+            ja: { pref: "設定", mode: "テーマ", lang: "言語", hist: "履歴", empty: "履歴はありません", err: "エラー" },
+            en: { pref: "Settings", mode: "Theme", lang: "Language", hist: "History", empty: "No History", err: "Error" }
         };
 
         function getLang() {
@@ -303,94 +260,64 @@
             return navigator.language.startsWith('ja') ? 'ja' : 'en';
         }
 
-        function applyUI() {
+        function syncUI() {
+            const h = window.location.hash;
+            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+            if (h === '#settings') document.getElementById('settings').classList.add('active');
+            else if (h === '#history') { document.getElementById('history').classList.add('active'); renderLog(); }
+            
             const lang = getLang();
             const t = i18n[lang];
-
-            document.getElementById('t-hist').innerText = t.hist;
             document.getElementById('t-pref').innerText = t.pref;
-            document.getElementById('t-clear').innerText = t.clear;
             document.getElementById('t-mode').innerText = t.mode;
             document.getElementById('t-lang').innerText = t.lang;
-            
-            const isDark = document.documentElement.classList.contains('dark');
-            document.getElementById('mode-label').innerText = isDark ? "Dark" : "Light";
+            document.getElementById('t-hist').innerText = t.hist;
             document.getElementById('lang-label').innerText = lang === 'ja' ? "日本語" : "English";
-
-            document.getElementById('calc-main').innerText = buffer || "0";
+            document.getElementById('mode-label').innerText = document.documentElement.classList.contains('dark') ? "Dark" : "Light";
         }
 
-        function syncHash() {
-            const h = location.hash;
-            document.getElementById('history-sheet').classList.toggle('active', h === '#history');
-            document.getElementById('settings-sheet').classList.toggle('active', h === '#settings');
-            if (h === '#history') renderHist();
-        }
+        function cmd(v) {
+            const mv = document.getElementById('main-view');
+            const lv = document.getElementById('log-view');
 
-        function input(v) {
-            const main = document.getElementById('calc-main');
-            const log = document.getElementById('calc-log');
-
-            if (v === 'C') {
-                buffer = ""; log.innerText = ""; solved = false;
-            } else if (v === 'B') {
-                buffer = buffer.slice(0, -1);
-            } else if (v === '=') {
-                if (!buffer) return;
+            if(v === 'C') { buffer = ''; lv.innerText = ''; solved = false; }
+            else if(v === 'B') { buffer = buffer.slice(0, -1); }
+            else if(v === '=') {
+                if(!buffer) return;
                 try {
-                    let exp = buffer.replace(/÷/g, '/').replace(/×/g, '*');
-                    const res = eval(exp);
-                    const out = Number.isInteger(res) ? res : parseFloat(res.toFixed(10));
-                    
-                    historyData.unshift({ q: buffer, a: out });
+                    let raw = buffer.replace(/÷/g, '/').replace(/×/g, '*');
+                    const res = eval(raw);
+                    const out = Number(Math.round(res + 'e12') + 'e-12').toString();
+                    historyData.unshift({q: buffer, a: out});
                     localStorage.setItem('calc-log', JSON.stringify(historyData.slice(0, 20)));
-                    
-                    log.innerText = buffer + " =";
-                    buffer = out.toString();
+                    lv.innerText = buffer + ' =';
+                    buffer = out;
                     solved = true;
-                } catch {
-                    main.innerText = i18n[getLang()].err;
-                    setTimeout(() => { main.innerText = buffer || "0"; }, 800);
-                    return;
-                }
+                } catch { mv.innerText = i18n[getLang()].err; setTimeout(() => draw(), 800); return; }
             } else {
-                if (solved && /[0-9]/.test(v)) buffer = "";
-                solved = false;
-                buffer += v;
+                if(solved && /[0-9]/.test(v)) buffer = '';
+                solved = false; buffer += v;
             }
+            draw();
+        }
 
-            main.innerText = buffer || "0";
+        function draw() {
+            const mv = document.getElementById('main-view');
+            mv.innerText = buffer || '0';
             localStorage.setItem('calc-buf', buffer);
-            main.scrollLeft = main.scrollWidth;
+            mv.scrollLeft = mv.scrollWidth;
         }
 
-        function renderHist() {
-            const list = document.getElementById('hist-list');
-            const lang = getLang();
-            
-            if (historyData.length === 0) {
-                list.innerHTML = `<div style="text-align:center; opacity:0.3; margin-top:60px;">${i18n[lang].empty}</div>`;
-                return;
-            }
-
-            list.innerHTML = historyData.map(i => `
-                <div class="h-item" onclick="useHist('${i.a}')">
-                    <div style="font-size:0.9rem; opacity:0.5;">${i.q}</div>
-                    <div style="font-size:1.6rem; font-family:'Potta One';">${i.a}</div>
-                </div>
-            `).join('');
-        }
-
-        function useHist(val) {
-            buffer = val;
-            document.getElementById('calc-main').innerText = buffer;
-            location.hash = '#home';
-        }
-
-        function clearHist() {
-            historyData = [];
-            localStorage.setItem('calc-log', '[]');
-            renderHist();
+        function renderLog() {
+            const container = document.getElementById('log-list');
+            container.innerHTML = historyData.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:60px;">${i18n[getLang()].empty}</div>`;
+            historyData.forEach(i => {
+                const d = document.createElement('div');
+                d.className = 'h-item';
+                d.innerHTML = `<div style="opacity:0.6;font-size:0.9rem">${i.q}</div><div style="font-size:1.6rem;font-weight:500;">${i.a}</div>`;
+                d.onclick = () => { buffer = i.a; draw(); location.hash='#home'; };
+                container.appendChild(d);
+            });
         }
 
         function toggleTheme() {
@@ -398,64 +325,19 @@
             prefs.mode = isDark ? 'light' : 'dark';
             document.documentElement.className = prefs.mode;
             localStorage.setItem('calc-prefs', JSON.stringify(prefs));
-            applyUI();
+            syncUI();
         }
 
         function toggleLang() {
             prefs.lang = getLang() === 'ja' ? 'en' : 'ja';
             localStorage.setItem('calc-prefs', JSON.stringify(prefs));
-            applyUI();
+            syncUI();
         }
 
-        function sparkleEffect() {
-            const canvas = document.getElementById('sparkle-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
-            let particles = [];
-            for(let i=0; i<30; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height / 2,
-                    v: Math.random() * 2 + 1,
-                    s: Math.random() * 3
-                });
-            }
+        function clearLog() { historyData = []; localStorage.setItem('calc-log', '[]'); renderLog(); }
 
-            function draw() {
-                ctx.clearRect(0,0,canvas.width,canvas.height);
-                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--sys-pri');
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.s, 0, Math.PI*2);
-                    ctx.fill();
-                    p.y += p.v;
-                });
-                if(particles[0].y < canvas.height) requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        window.onload = () => {
-            initBattery();
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('st-time').innerText = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-            }, 1000);
-            applyUI();
-            syncHash();
-        };
-
-        async function initBattery() {
-            if ('getBattery' in navigator) {
-                const b = await navigator.getBattery();
-                const u = () => document.getElementById('bat-lv').innerText = Math.round(b.level * 100) + '%';
-                u(); b.onlevelchange = u;
-            }
-        }
-
-        window.onhashchange = syncHash;
+        window.onload = () => { draw(); syncUI(); };
+        window.onhashchange = syncUI;
     </script>
 </body>
 </html>
