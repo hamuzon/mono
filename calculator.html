@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>計算機 / Calculator</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
     <style>
@@ -18,27 +17,23 @@
             --sec-cont: #E3E4D3;
             --on-sec-cont: #1B1C17;
             --accent: #4C662B;
-            --error: #BA1A1A;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #1B1C17;
-                --on-bg: #E3E4D3;
-                --surface: #2F3126;
-                --on-surface: #C7C8B8;
-                --primary-cont: #3E4A2B;
-                --on-primary-cont: #D7E8B7;
-                --sec-cont: #45483C;
-                --on-sec-cont: #E3E4D3;
-                --accent: #B1D18A;
-            }
+        .dark-mode {
+            --bg: #1B1C17;
+            --on-bg: #E3E4D3;
+            --surface: #2F3126;
+            --on-surface: #C7C8B8;
+            --primary-cont: #3E4A2B;
+            --on-primary-cont: #D7E8B7;
+            --sec-cont: #45483C;
+            --on-sec-cont: #E3E4D3;
+            --accent: #B1D18A;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         body {
@@ -47,58 +42,28 @@
             height: 100dvh;
             background: var(--bg);
             color: var(--on-bg);
-            font-family: 'Google Sans', 'Roboto', sans-serif;
+            font-family: 'Google Sans', sans-serif;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
-        #history-panel {
+        .overlay-panel {
             position: absolute;
             top: -100%;
             left: 0;
             width: 100%;
-            height: 70%;
+            height: 80%;
             background: var(--bg);
-            z-index: 100;
-            transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
+            z-index: 500;
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 24px;
-            display: flex;
-            flex-direction: column;
+            overflow-y: auto;
             border-bottom: 1px solid var(--surface);
         }
 
-        #history-panel.open {
+        .overlay-panel.open {
             top: 0;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            padding-top: env(safe-area-inset-top);
-        }
-
-        .history-item {
-            text-align: right;
-            margin-bottom: 28px;
-            cursor: pointer;
-        }
-
-        .history-expr {
-            font-size: 1.2rem;
-            color: var(--on-surface);
-            opacity: 0.7;
-            margin-bottom: 4px;
-        }
-
-        .history-res {
-            font-size: 2rem;
-            font-weight: 500;
         }
 
         .display-area {
@@ -108,245 +73,280 @@
             justify-content: flex-end;
             align-items: flex-end;
             padding: 24px 32px;
-            padding-top: calc(24px + env(safe-area-inset-top));
-            cursor: pointer;
+            padding-top: calc(30px + env(safe-area-inset-top));
         }
 
         #sub-display {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: var(--on-surface);
-            min-height: 2rem;
-            margin-bottom: 8px;
-            opacity: 0.8;
+            opacity: 0.7;
+            min-height: 1.6rem;
         }
 
         #main-display {
             width: 100%;
-            font-size: clamp(3.5rem, 18vw, 5.5rem);
+            font-size: clamp(3rem, 15vw, 5rem);
             text-align: right;
             border: none;
             background: transparent;
             color: var(--on-bg);
             outline: none;
-            padding: 0;
-            font-family: inherit;
         }
 
-        .keypad {
+        .keyboard-container {
+            background: var(--surface);
+            border-radius: 40px 40px 0 0;
+            padding-bottom: env(safe-area-inset-bottom);
+            transition: height 0.3s ease;
+        }
+
+        .tool-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 32px 4px;
+        }
+
+        .adv-grid {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 8px 24px;
+        }
+
+        .adv-grid.active {
+            display: grid;
+        }
+
+        .main-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            padding: 24px;
-            background: var(--surface);
-            border-radius: 40px 40px 0 0;
-            padding-bottom: calc(24px + env(safe-area-inset-bottom));
+            padding: 16px 24px 24px;
         }
 
         button {
             aspect-ratio: 1/1;
             border: none;
             border-radius: 50%;
-            font-size: 1.8rem;
-            font-family: inherit;
+            font-size: 1.5rem;
             font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s, background-color 0.2s, border-radius 0.2s;
+            background: var(--bg);
+            color: var(--on-bg);
+            transition: transform 0.1s, border-radius 0.2s;
         }
 
         button:active {
             transform: scale(0.9);
-            border-radius: 28%;
+            border-radius: 30%;
         }
 
-        .btn-num { background: var(--bg); color: var(--on-bg); }
-        .btn-op { background: var(--primary-cont); color: var(--on-primary-cont); font-size: 2.2rem; }
+        .btn-op { background: var(--primary-cont); color: var(--on-primary-cont); font-size: 2rem; }
         .btn-fn { background: var(--sec-cont); color: var(--on-sec-cont); }
-        .btn-eq { background: var(--accent); color: var(--bg); border-radius: 44px; font-size: 2.2rem; }
+        .btn-eq { background: var(--accent); color: var(--bg); border-radius: 44px; }
+        .btn-adv { background: transparent; font-size: 1.1rem; color: var(--accent); }
 
-        .material-symbols-outlined { font-size: 2.2rem; }
-        .error-text { color: var(--error) !important; }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--surface);
+        }
 
-        @media (min-width: 600px) {
-            .keypad, #history-panel {
-                max-width: 500px;
-                margin: 0 auto;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            #history-panel.open { transform: translateX(-50%); }
+        select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--on-bg);
+            border: none;
+            font-size: 1rem;
         }
     </style>
 </head>
 <body>
 
-    <div id="history-panel">
-        <div class="history-header">
-            <span style="font-size: 1.4rem; font-weight: 500;">履歴</span>
-            <div style="display: flex; gap: 16px; align-items: center;">
-                <button onclick="clearHistory()" style="width:auto; height:44px; padding:0 20px; border-radius:22px; font-size:1rem; background:var(--sec-cont);">履歴を削除</button>
-                <span class="material-symbols-outlined" onclick="toggleHistory()">close</span>
-            </div>
+    <div id="set-panel" class="overlay-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <span style="font-size:1.4rem; font-weight:500;">設定</span>
+            <span class="material-symbols-outlined" onclick="closePanels()">close</span>
         </div>
-        <div id="history-list"></div>
+        <div class="settings-item">
+            <span>テーマ</span>
+            <select id="theme-sel" onchange="saveConf()">
+                <option value="system">システムの設定</option>
+                <option value="light">ライトモード</option>
+                <option value="dark">ダークモード</option>
+            </select>
+        </div>
+        <div class="settings-item">
+            <span>バイブレーション</span>
+            <select id="vibe-sel" onchange="saveConf()">
+                <option value="0">オフ</option>
+                <option value="12">弱</option>
+                <option value="30">中</option>
+                <option value="60">強</option>
+            </select>
+        </div>
     </div>
 
-    <div class="display-area" onclick="toggleHistory()">
+    <div id="hist-panel" class="overlay-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <span style="font-size:1.4rem; font-weight:500;">履歴</span>
+            <div style="display:flex; gap:16px;">
+                <button onclick="clearHist()" style="width:auto; height:36px; padding:0 16px; border-radius:18px; font-size:0.9rem; background:var(--sec-cont);">削除</button>
+                <span class="material-symbols-outlined" onclick="closePanels()">close</span>
+            </div>
+        </div>
+        <div id="hist-content"></div>
+    </div>
+
+    <div class="display-area">
         <div id="sub-display"></div>
         <input type="text" id="main-display" readonly placeholder="0">
     </div>
 
-    <div class="keypad">
-        <button class="btn-fn" onclick="press('AC')">AC</button>
-        <button class="btn-fn" onclick="press('()')">( )</button>
-        <button class="btn-fn" onclick="press('%')">%</button>
-        <button class="btn-op" onclick="press('÷')">÷</button>
+    <div class="keyboard-container">
+        <div class="tool-bar">
+            <span class="material-symbols-outlined" onclick="openPanel('set')">settings</span>
+            <span class="material-symbols-outlined" onclick="openPanel('hist')">history</span>
+            <span class="material-symbols-outlined" id="adv-icon" onclick="toggleAdv()">keyboard_arrow_down</span>
+        </div>
 
-        <button class="btn-num" onclick="press('7')">7</button>
-        <button class="btn-num" onclick="press('8')">8</button>
-        <button class="btn-num" onclick="press('9')">9</button>
-        <button class="btn-op" onclick="press('×')">×</button>
+        <div id="adv-grid" class="adv-grid">
+            <button class="btn-adv" onclick="add('sin(')">sin</button>
+            <button class="btn-adv" onclick="add('cos(')">cos</button>
+            <button class="btn-adv" onclick="add('tan(')">tan</button>
+            <button class="btn-adv" onclick="add('π')">π</button>
+            <button class="btn-adv" onclick="add('ln(')">ln</button>
+            <button class="btn-adv" onclick="add('log(')">log</button>
+            <button class="btn-adv" onclick="add('!')">!</button>
+            <button class="btn-adv" onclick="add('^')">^</button>
+        </div>
 
-        <button class="btn-num" onclick="press('4')">4</button>
-        <button class="btn-num" onclick="press('5')">5</button>
-        <button class="btn-num" onclick="press('6')">6</button>
-        <button class="btn-op" onclick="press('−')">−</button>
+        <div class="main-grid">
+            <button class="btn-fn" onclick="add('AC')">AC</button>
+            <button class="btn-fn" onclick="add('()')">( )</button>
+            <button class="btn-fn" onclick="add('%')">%</button>
+            <button class="btn-op" onclick="add('÷')">÷</button>
 
-        <button class="btn-num" onclick="press('1')">1</button>
-        <button class="btn-num" onclick="press('2')">2</button>
-        <button class="btn-num" onclick="press('3')">3</button>
-        <button class="btn-op" onclick="press('+')">+</button>
+            <button class="btn-num" onclick="add('7')">7</button>
+            <button class="btn-num" onclick="add('8')">8</button>
+            <button class="btn-num" onclick="add('9')">9</button>
+            <button class="btn-op" onclick="add('×')">×</button>
 
-        <button class="btn-num" onclick="press('0')">0</button>
-        <button class="btn-num" onclick="press('.')">.</button>
-        <button class="btn-fn" onclick="press('DEL')">
-            <span class="material-symbols-outlined">backspace</span>
-        </button>
-        <button class="btn-eq" onclick="press('=')">=</button>
+            <button class="btn-num" onclick="add('4')">4</button>
+            <button class="btn-num" onclick="add('5')">5</button>
+            <button class="btn-num" onclick="add('6')">6</button>
+            <button class="btn-op" onclick="add('−')">−</button>
+
+            <button class="btn-num" onclick="add('1')">1</button>
+            <button class="btn-num" onclick="add('2')">2</button>
+            <button class="btn-num" onclick="add('3')">3</button>
+            <button class="btn-op" onclick="add('+')">+</button>
+
+            <button class="btn-num" onclick="add('0')">0</button>
+            <button class="btn-num" onclick="add('.')">.</button>
+            <button class="btn-fn" onclick="add('DEL')"><span class="material-symbols-outlined">backspace</span></button>
+            <button class="btn-eq" onclick="add('=')">=</button>
+        </div>
     </div>
 
     <script>
-        let currentExpr = '';
-        let isEvaluated = false;
-        let historyData = JSON.parse(localStorage.getItem('p10_calc_history') || '[]');
+        let cur = '';
+        let hData = JSON.parse(localStorage.getItem('calc_h') || '[]');
+        let conf = JSON.parse(localStorage.getItem('calc_s') || '{"theme":"system","vibe":"30"}');
 
-        function haptic() {
-            if (navigator.vibrate) navigator.vibrate(12);
+        function vib() {
+            const v = parseInt(conf.vibe);
+            if (v > 0 && navigator.vibrate) navigator.vibrate(v);
         }
 
-        function toggleHistory() {
-            haptic();
-            const panel = document.getElementById('history-panel');
-            panel.classList.toggle('open');
-            if (panel.classList.contains('open')) renderHistory();
+        function saveConf() {
+            conf.theme = document.getElementById('theme-sel').value;
+            conf.vibe = document.getElementById('vibe-sel').value;
+            localStorage.setItem('calc_s', JSON.stringify(conf));
+            applyTheme();
+            vib();
         }
 
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            if (historyData.length === 0) {
-                list.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">履歴はありません</p>';
-                return;
+        function applyTheme() {
+            const dark = conf.theme === 'dark' || (conf.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.body.classList.toggle('dark-mode', dark);
+        }
+
+        function openPanel(id) {
+            vib();
+            document.getElementById(id + '-panel').classList.add('open');
+            if (id === 'hist') renderHist();
+        }
+
+        function closePanels() {
+            document.querySelectorAll('.overlay-panel').forEach(p => p.classList.remove('open'));
+        }
+
+        function toggleAdv() {
+            vib();
+            const g = document.getElementById('adv-grid');
+            const i = document.getElementById('adv-icon');
+            g.classList.toggle('active');
+            i.innerText = g.classList.contains('active') ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
+        }
+
+        function add(v) {
+            vib();
+            if (v === 'AC') { cur = ''; document.getElementById('sub-display').innerText = ''; }
+            else if (v === 'DEL') { cur = cur.slice(0, -1); }
+            else if (v === '=') { calc(); return; }
+            else if (v === '()') {
+                const o = (cur.match(/\(/g) || []).length;
+                const c = (cur.match(/\)/g) || []).length;
+                cur += (o > c && /[0-9π!%)]$/.test(cur.slice(-1))) ? ')' : '(';
+            } else { cur += v; }
+            document.getElementById('main-display').value = cur || '0';
+        }
+
+        function calc() {
+            if (!cur) return;
+            try {
+                let f = cur.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/%/g, '/100')
+                           .replace(/π/g, 'Math.PI').replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
+                           .replace(/tan\(/g, 'Math.tan(').replace(/ln\(/g, 'Math.log(').replace(/log\(/g, 'Math.log10(')
+                           .replace(/\^/g, '**');
+                const res = eval(f);
+                const out = Number(res.toPrecision(12)).toString();
+                hData.unshift({ q: cur, a: out });
+                localStorage.setItem('calc_h', JSON.stringify(hData.slice(0, 20)));
+                document.getElementById('sub-display').innerText = cur + ' =';
+                cur = out.replace(/-/g, '−');
+                document.getElementById('main-display').value = cur;
+            } catch {
+                document.getElementById('main-display').value = "Error";
+                setTimeout(() => { cur = ''; add(''); }, 800);
             }
-            historyData.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `<div class="history-expr">${item.expr}</div><div class="history-res">${item.res}</div>`;
-                div.onclick = () => {
-                    currentExpr = item.res.replace(/-/g, '−');
-                    document.getElementById('sub-display').innerText = '';
-                    updateUI();
-                    toggleHistory();
-                };
-                list.appendChild(div);
+        }
+
+        function renderHist() {
+            const c = document.getElementById('hist-content');
+            c.innerHTML = hData.length ? '' : '<p style="text-align:center; opacity:0.5; margin-top:40px;">履歴はありません</p>';
+            hData.forEach(i => {
+                const d = document.createElement('div');
+                d.style.textAlign = 'right';
+                d.style.marginBottom = '20px';
+                d.innerHTML = `<div style="opacity:0.6">${i.q}</div><div style="font-size:1.8rem">${i.a}</div>`;
+                d.onclick = () => { cur = i.a.replace(/-/g, '−'); add(''); closePanels(); };
+                c.appendChild(d);
             });
         }
 
-        function clearHistory() {
-            haptic();
-            historyData = [];
-            localStorage.setItem('p10_calc_history', JSON.stringify(historyData));
-            renderHistory();
-        }
+        function clearHist() { vib(); hData = []; localStorage.removeItem('calc_h'); renderHist(); }
 
-        function press(v) {
-            haptic();
-            const sub = document.getElementById('sub-display');
-            
-            if (v === 'AC') {
-                currentExpr = '';
-                sub.innerText = '';
-                isEvaluated = false;
-            } else if (v === 'DEL') {
-                if (isEvaluated) { currentExpr = ''; isEvaluated = false; }
-                else { currentExpr = currentExpr.slice(0, -1); }
-            } else if (v === '=') {
-                run();
-                return;
-            } else if (v === '()') {
-                const open = (currentExpr.match(/\(/g) || []).length;
-                const close = (currentExpr.match(/\)/g) || []).length;
-                if (/[+−×÷(]$/.test(currentExpr) || currentExpr === '') currentExpr += '(';
-                else if (open > close) currentExpr += ')';
-            } else if (['+', '−', '×', '÷', '%'].includes(v)) {
-                if (isEvaluated) isEvaluated = false;
-                const last = currentExpr.slice(-1);
-                if (/[+−×÷%]$/.test(last)) currentExpr = currentExpr.slice(0, -1) + v;
-                else if (currentExpr !== '' || v === '−') currentExpr += v;
-            } else {
-                if (isEvaluated) { currentExpr = ''; isEvaluated = false; }
-                if (currentExpr.length < 20) currentExpr += v;
-            }
-            updateUI();
-        }
-
-        function run() {
-            if (!currentExpr) return;
-            try {
-                let formula = currentExpr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/%/g, '/100');
-                const openCount = (formula.match(/\(/g) || []).length;
-                const closeCount = (formula.match(/\)/g) || []).length;
-                if (openCount > closeCount) formula += ')'.repeat(openCount - closeCount);
-                
-                const result = new Function('"use strict"; return (' + formula + ')')();
-                const formatted = Number(result.toPrecision(12)).toString();
-                
-                historyData.unshift({ expr: currentExpr, res: formatted });
-                if (historyData.length > 30) historyData.pop();
-                localStorage.setItem('p10_calc_history', JSON.stringify(historyData));
-
-                document.getElementById('sub-display').innerText = currentExpr + ' =';
-                currentExpr = formatted.replace(/-/g, '−');
-                isEvaluated = true;
-                updateUI();
-            } catch {
-                const main = document.getElementById('main-display');
-                main.value = 'エラー';
-                main.classList.add('error-text');
-                setTimeout(() => {
-                    main.classList.remove('error-text');
-                    press('AC');
-                }, 1000);
-            }
-        }
-
-        function updateUI() {
-            const main = document.getElementById('main-display');
-            main.value = currentExpr || '0';
-            if (currentExpr.length > 9) main.style.fontSize = '3rem';
-            else main.style.fontSize = '';
-        }
-
-        window.addEventListener('keydown', e => {
-            const m = {
-                'Enter': '=', 'Backspace': 'DEL', 'Escape': 'AC',
-                '*': '×', '/': '÷', '-': '−', '+': '+', '%': '%'
-            };
-            const v = m[e.key] || (/[0-9.]/.test(e.key) ? e.key : null);
-            if (v) { e.preventDefault(); press(v); }
-        });
+        document.getElementById('theme-sel').value = conf.theme;
+        document.getElementById('vibe-sel').value = conf.vibe;
+        applyTheme();
     </script>
 </body>
 </html>
