@@ -7,160 +7,157 @@
 
     <script>
         (function() {
-            const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
-
-            const upd = (isD) => {
-                document.documentElement.className = isD ? 'dark' : 'light';
-                document.documentElement.style.backgroundColor = isD ? '#1B1C17' : '#FDFCF4';
+            const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
+            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            const update = (isDark) => {
+                document.documentElement.className = isDark ? 'dark' : 'light';
+                document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
             };
 
-            if (p.mode === 'system') {
-                const q = window.matchMedia('(prefers-color-scheme: dark)');
-                upd(q.matches);
-                q.addEventListener('change', e => upd(e.matches));
+            if (prefs.mode === 'system') {
+                update(darkQuery.matches);
+                darkQuery.addEventListener('change', e => update(e.matches));
             } else {
-                upd(p.mode === 'dark');
+                update(prefs.mode === 'dark');
             }
         })();
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #FDFCF4; --on-bg: #1B1C17;
-            --surf: #EFF1E0; --on-surf: #44483D;
-            --pri: #4C662B; --on-pri: #FFFFFF;
-            --pri-c: #D7E8B7; --on-pri-c: #121F00;
-            --sec-c: #E3E4D3; --sci-bg: #D7E8B7;
-            --hdl: #74796B;
+            --bg: #FDFCF4;
+            --on-bg: #1B1C17;
+            --surf: #EFF1E0;
+            --on-surf: #44483D;
+            --pri: #4C662B;
+            --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7;
+            --on-pri-c: #121F00;
+            --sec-c: #E3E4D3;
+            --sci-bg: #D7E8B7;
+            --btn-r: 40px;
         }
 
         .dark {
-            --bg: #1B1C17; --on-bg: #E3E4D3;
-            --surf: #2F3126; --on-surf: #C7C8B8;
-            --pri: #B1D18A; --on-pri: #1F3701;
-            --pri-c: #3E4A2B; --on-pri-c: #D7E8B7;
-            --sec-c: #45483C; --sci-bg: #3E4A2B;
-            --hdl: #909284;
+            --bg: #1B1C17;
+            --on-bg: #E3E4D3;
+            --surf: #2F3126;
+            --on-surf: #C7C8B8;
+            --pri: #B1D18A;
+            --on-pri: #1F3701;
+            --pri-c: #3E4A2B;
+            --on-pri-c: #D7E8B7;
+            --sec-c: #45483C;
+            --sci-bg: #3E4A2B;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
             user-select: none;
-            outline: none;
-        }
-
-        html, body {
-            margin: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            background: var(--bg);
-            font-family: 'Google Sans', sans-serif;
+            touch-action: manipulation;
         }
 
         body {
+            margin: 0;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
+            background: var(--bg);
+            color: var(--on-bg);
+            overflow: hidden;
+            font-family: 'Google Sans', sans-serif;
         }
 
-        .display-container {
+        .display-layer {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 32px 40px;
+            padding: 32px;
             text-align: right;
         }
 
-        #log-display {
+        #log-view {
             font-size: 1.6rem;
             color: var(--on-surf);
+            min-height: 2.4rem;
             opacity: 0.7;
-            min-height: 2.2rem;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
         }
 
-        #main-display {
-            font-size: clamp(3.5rem, 18vw, 7.2rem);
+        #main-view {
+            font-family: 'Potta One', cursive;
+            font-size: clamp(3rem, 15vw, 5.5rem);
             white-space: nowrap;
             overflow-x: auto;
+            padding: 12px 0;
             scrollbar-width: none;
         }
 
-        .panel {
+        .input-layer {
             background: var(--surf);
-            border-radius: 40px 40px 0 0;
-            padding: 8px 24px calc(24px + env(safe-area-inset-bottom));
-        }
-
-        .handle-bar {
+            border-radius: 48px 48px 0 0;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            box-shadow: 0 -15px 50px rgba(0,0,0,0.08);
             width: 100%;
-            height: 32px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            max-width: 700px;
+            margin: 0 auto;
         }
 
-        .handle-bar::after {
-            content: '';
-            width: 40px;
-            height: 4px;
-            background: var(--hdl);
-            border-radius: 2px;
-            opacity: 0.3;
-        }
-
-        .utility-bar {
+        .action-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 16px 16px;
-        }
-
-        #unit-toggle {
-            font-size: 0.9rem;
-            font-weight: 700;
+            padding: 16px 32px;
             color: var(--pri);
-            padding: 6px 18px;
-            border-radius: 18px;
-            background: var(--pri-c);
-            text-transform: uppercase;
+        }
+
+        .action-bar span {
             cursor: pointer;
+            padding: 12px;
+            border-radius: 50%;
+            transition: background 0.2s;
         }
 
-        .layout-engine {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .action-bar span:active {
+            background: rgba(0,0,0,0.1);
         }
 
-        .sci-cluster {
-            display: flex;
-            overflow-x: auto;
+        .sci-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            padding-bottom: 12px;
-            scrollbar-width: none;
+            padding: 0 28px;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .sci-cluster::-webkit-scrollbar { display: none; }
+        .sci-grid.open {
+            height: 140px;
+            padding: 8px 28px 16px;
+            opacity: 1;
+        }
 
-        .num-cluster {
+        .main-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 14px;
+            padding: 12px 28px 24px;
         }
 
         button {
-            height: clamp(64px, 11vh, 88px);
+            height: clamp(68px, 11vh, 84px);
             border: none;
-            border-radius: 44px;
+            border-radius: var(--btn-r);
             font-size: 1.8rem;
             font-weight: 500;
             background: var(--bg);
@@ -168,239 +165,319 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s;
-            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
         }
 
-        button:active { transform: scale(0.92); }
-
-        .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.8rem; }
-
-        .k-sci {
-            background: var(--sci-bg);
-            font-size: 1.15rem;
-            min-width: 88px;
-            height: 52px;
-            border-radius: 26px;
-            flex-shrink: 0;
+        button:active {
+            transform: scale(0.9);
+            filter: brightness(0.9);
         }
 
-        @media (min-width: 850px) or (orientation: landscape) {
-            .layout-engine { flex-direction: row; }
-            .sci-cluster {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                width: 42%;
-                overflow-x: visible;
-                height: auto;
-            }
-            .k-sci { height: clamp(64px, 11vh, 88px); width: auto; }
-            .panel { border-radius: 0; }
-            .handle-bar { display: none; }
+        .k-op { 
+            background: var(--pri-c); 
+            color: var(--on-pri-c); 
         }
 
-        .overlay-menu {
+        .k-sci { 
+            background: var(--sci-bg); 
+            font-size: 1.1rem; 
+            height: 52px; 
+            border-radius: 26px; 
+        }
+
+        .k-eq { 
+            background: var(--pri); 
+            color: var(--on-pri); 
+            font-size: 2.6rem; 
+            border-radius: var(--btn-r);
+        }
+
+        .more-menu {
             position: absolute;
-            right: 24px;
-            bottom: 120px;
+            right: 32px;
+            bottom: 90px;
             background: var(--bg);
             border-radius: 28px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
             display: none;
             flex-direction: column;
-            z-index: 5000;
-            min-width: 240px;
+            box-shadow: 0 15px 60px rgba(0,0,0,0.3);
+            z-index: 500;
+            min-width: 220px;
             overflow: hidden;
+            border: 1px solid var(--surf);
         }
 
-        .overlay-menu div {
-            padding: 22px 28px;
-            border-bottom: 1px solid var(--surf);
-            cursor: pointer;
-        }
-
-        .vibe-box {
+        .more-menu div {
             padding: 20px 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            border-bottom: 1px solid var(--surf);
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
-        input[type="range"] { accent-color: var(--pri); cursor: pointer; }
+        .sheet {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.05, 0.7, 0.1, 1);
+            padding: calc(48px + env(safe-area-inset-top)) 32px 32px;
+        }
+
+        .sheet.active { 
+            transform: translateY(0); 
+        }
+
+        .history-card {
+            padding: 24px;
+            border-radius: 28px;
+            background: var(--surf);
+            margin-bottom: 18px;
+            text-align: right;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .history-card:active {
+            transform: scale(0.98);
+        }
+
+        @media (min-width: 800px) {
+            .input-layer {
+                display: flex;
+                flex-direction: row-reverse;
+                max-width: 900px;
+            }
+            .sci-grid {
+                height: auto !important;
+                opacity: 1 !important;
+                grid-template-columns: repeat(2, 1fr);
+                width: 35%;
+                padding: 32px 20px !important;
+            }
+            .main-grid { flex: 1; padding: 32px 24px; }
+            .action-bar span[onclick*="toggleSci"] { display: none; }
+        }
     </style>
 </head>
+
 <body>
 
-    <section class="display-container">
-        <div id="log-display"></div>
-        <div id="main-display">0</div>
-    </section>
+    <div id="history-panel" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:48px;">
+            <h1 id="h-title" style="margin:0; font-size:2.2rem; font-weight:400;">履歴</h1>
+            <div style="display:flex; gap:28px;">
+                <span class="material-symbols-outlined" style="font-size:2rem;" onclick="clearLog()">delete</span>
+                <span class="material-symbols-outlined" style="font-size:2rem;" onclick="location.hash='#home'">close</span>
+            </div>
+        </div>
+        <div id="history-list" style="overflow-y:auto; height:calc(100% - 140px); scrollbar-width: none;"></div>
+    </div>
 
-    <nav class="panel">
-        <div class="handle-bar"></div>
+    <div class="display-layer">
+        <div id="log-view"></div>
+        <div id="main-view">0</div>
+    </div>
 
-        <div class="utility-bar">
-            <div id="unit-toggle" onclick="ui('unit')">deg</div>
+    <div class="input-layer">
+        <div class="action-bar">
+            <div style="display:flex; gap:20px;">
+                <span class="material-symbols-outlined" onclick="toggleSci()">science</span>
+                <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
+            </div>
+            
             <div style="position:relative;">
-                <span class="material-symbols-outlined" style="color:var(--pri); cursor:pointer; padding:8px;" onclick="ui('menu')">more_vert</span>
-                <div id="settings-menu" class="overlay-menu">
-                    <div onclick="sys('light')">ライトモード</div>
-                    <div onclick="sys('dark')">ダークモード</div>
-                    <div onclick="sys('system')">システム同期</div>
-                    <div onclick="sys('copy')">結果をコピー</div>
-                    <div class="vibe-box">
-                        <span style="font-size:0.9rem">振動: <span id="v-val">50</span>%</span>
-                        <input type="range" id="v-range" min="0" max="100" value="50" oninput="sys('vibe', this.value)">
-                    </div>
+                <span class="material-symbols-outlined" id="more-trigger" onclick="toggleMenu()">more_vert</span>
+                <div id="menu-box" class="more-menu">
+                    <div id="m-theme" onclick="cycleTheme()">テーマ: システム</div>
+                    <div id="m-lang" onclick="cycleLang()">Language: JP</div>
+                    <div id="m-copy" onclick="copyValue()">結果をコピー</div>
+                    <div onclick="press('AC')">すべてクリア</div>
                 </div>
             </div>
         </div>
 
-        <div class="layout-engine">
-            <div class="sci-cluster">
-                <button class="k-sci" onclick="run('sin(')">sin</button>
-                <button class="k-sci" onclick="run('cos(')">cos</button>
-                <button class="k-sci" onclick="run('tan(')">tan</button>
-                <button class="k-sci" onclick="run('log(')">log</button>
-                <button class="k-sci" onclick="run('ln(')">ln</button>
-                <button class="k-sci" onclick="run('sqrt(')">√</button>
-                <button class="k-sci" onclick="run('^')">xʸ</button>
-                <button class="k-sci" onclick="run('π')">π</button>
-                <button class="k-sci" onclick="run('e')">e</button>
-                <button class="k-sci" onclick="run('!')">n!</button>
-                <button class="k-sci" onclick="run('inv(')">1/x</button>
-                <button class="k-sci" onclick="run('abs(')">|x|</button>
-            </div>
-
-            <div class="num-cluster">
-                <button class="k-op" onclick="run('AC')">AC</button>
-                <button class="k-op" onclick="run('DEL')">⌫</button>
-                <button class="k-op" onclick="run('(')">(</button>
-                <button class="k-op" onclick="run('÷')">÷</button>
-
-                <button onclick="run('7')">7</button>
-                <button onclick="run('8')">8</button>
-                <button onclick="run('9')">9</button>
-                <button class="k-op" onclick="run('×')">×</button>
-
-                <button onclick="run('4')">4</button>
-                <button onclick="run('5')">5</button>
-                <button onclick="run('6')">6</button>
-                <button class="k-op" onclick="run('-')">-</button>
-
-                <button onclick="run('1')">1</button>
-                <button onclick="run('2')">2</button>
-                <button onclick="run('3')">3</button>
-                <button class="k-op" onclick="run('+')">+</button>
-
-                <button onclick="run('0')">0</button>
-                <button onclick="run('.')">.</button>
-                <button class="k-eq" onclick="run('=')" style="grid-column: span 2">=</button>
-            </div>
+        <div id="sci-box" class="sci-grid">
+            <button class="k-sci" onclick="press('sin(')">sin</button>
+            <button class="k-sci" onclick="press('cos(')">cos</button>
+            <button class="k-sci" onclick="press('tan(')">tan</button>
+            <button class="k-sci" onclick="press('π')">π</button>
+            <button class="k-sci" onclick="press('sqrt(')">√</button>
+            <button class="k-sci" onclick="press('log(')">log</button>
+            <button class="k-sci" onclick="press('ln(')">ln</button>
+            <button class="k-sci" onclick="press('^')">xʸ</button>
+            <button class="k-sci" onclick="press('e')">e</button>
+            <button class="k-sci" onclick="press('!')">n!</button>
         </div>
-    </nav>
+
+        <div class="main-grid">
+            <button class="k-op" onclick="press('AC')">AC</button>
+            <button class="k-op" onclick="press('()')">( )</button>
+            <button class="k-op" onclick="press('%')">%</button>
+            <button class="k-op" onclick="press('÷')">÷</button>
+            
+            <button onclick="press('7')">7</button>
+            <button onclick="press('8')">8</button>
+            <button onclick="press('9')">9</button>
+            <button class="k-op" onclick="press('×')">×</button>
+            
+            <button onclick="press('4')">4</button>
+            <button onclick="press('5')">5</button>
+            <button onclick="runVibrate(20);press('6')">6</button>
+            <button class="k-op" onclick="press('-')">-</button>
+            
+            <button onclick="press('1')">1</button>
+            <button onclick="press('2')">2</button>
+            <button onclick="press('3')">3</button>
+            <button class="k-op" onclick="press('+')">+</button>
+            
+            <button onclick="press('0')">0</button>
+            <button onclick="press('.')">.</button>
+            <button onclick="press('DEL')"><span class="material-symbols-outlined">backspace</span></button>
+            <button class="k-eq" onclick="press('=')">=</button>
+        </div>
+    </div>
 
     <script>
         let exp = "";
         let solved = false;
-        let p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
+        let logs = JSON.parse(localStorage.getItem('calc-log') || '[]');
+        let cfg = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
 
-        function vib() {
-            if (navigator.vibrate && p.vibe > 0) navigator.vibrate(p.vibe / 4);
+        const i18n = {
+            ja: { h: "履歴", empty: "履歴なし", err: "エラー", m_mode: "テーマ: ", m_copy: "結果をコピー", modes: {system:"システム", dark:"ダーク", light:"ライト"} },
+            en: { h: "History", empty: "No History", err: "Error", m_mode: "Theme: ", m_copy: "Copy Result", modes: {system:"System", dark:"Dark", light:"Light"} }
+        };
+
+        function runVibrate(ms) {
+            if (navigator.vibrate) navigator.vibrate(ms);
         }
 
-        function ui(type) {
-            vib();
-            if (type === 'unit') {
-                p.unit = p.unit === 'deg' ? 'rad' : 'deg';
-                document.getElementById('unit-toggle').innerText = p.unit;
-                localStorage.setItem('calc-prefs', JSON.stringify(p));
-            } else if (type === 'menu') {
-                const m = document.getElementById('settings-menu');
-                m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-            }
+        function sync() {
+            const h = window.location.hash;
+            document.getElementById('history-panel').classList.toggle('active', h === '#history');
+            
+            if (h === '#history') buildLog();
+
+            const t = i18n[cfg.lang];
+            document.getElementById('h-title').innerText = t.h;
+            document.getElementById('m-theme').innerText = t.m_mode + t.modes[cfg.mode];
+            document.getElementById('m-lang').innerText = "Language: " + (cfg.lang === 'ja' ? 'JP' : 'EN');
+            document.getElementById('m-copy').innerText = t.m_copy;
         }
 
-        function sys(cmd, val) {
-            vib();
-            if (cmd === 'vibe') {
-                p.vibe = val;
-                document.getElementById('v-val').innerText = val;
-                localStorage.setItem('calc-prefs', JSON.stringify(p));
-            } else if (['light', 'dark', 'system'].includes(cmd)) {
-                p.mode = cmd;
-                localStorage.setItem('calc-prefs', JSON.stringify(p));
-                location.reload();
-            } else if (cmd === 'copy') {
-                navigator.clipboard.writeText(exp || "0");
-                ui('menu');
-            }
+        function toggleSci() { 
+            runVibrate(10);
+            document.getElementById('sci-box').classList.toggle('open'); 
         }
 
-        function run(key) {
-            vib();
-            const m = document.getElementById('main-display');
-            const l = document.getElementById('log-display');
+        function toggleMenu() { 
+            const m = document.getElementById('menu-box'); 
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; 
+        }
 
-            if (key === 'AC') {
-                exp = ""; l.innerText = ""; solved = false;
-            } else if (key === 'DEL') {
-                exp = exp.slice(0, -1);
-            } else if (key === '=') {
+        function closeMenu() { 
+            document.getElementById('menu-box').style.display = 'none'; 
+        }
+
+        function press(v) {
+            runVibrate(15);
+            const mv = document.getElementById('main-view');
+            const lv = document.getElementById('log-view');
+            closeMenu();
+
+            if (v === 'AC') { 
+                exp = ""; lv.innerText = ""; solved = false; 
+            } else if (v === 'DEL') { 
+                exp = exp.slice(0, -1); 
+            } else if (v === '=') {
+                if (!exp) return;
                 try {
                     let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
-                               .replace(/sin\(/g, p.unit === 'deg' ? 'Math.sin(Math.PI/180*' : 'Math.sin(')
-                               .replace(/cos\(/g, p.unit === 'deg' ? 'Math.cos(Math.PI/180*' : 'Math.cos(')
-                               .replace(/tan\(/g, p.unit === 'deg' ? 'Math.tan(Math.PI/180*' : 'Math.tan(')
-                               .replace(/log\(/g, 'Math.log10(').replace(/ln\(/g, 'Math.log(')
-                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/inv\(/g, '1/(')
-                               .replace(/abs\(/g, 'Math.abs(').replace(/π/g, 'Math.PI')
-                               .replace(/e/g, 'Math.E').replace(/\^/g, '**');
+                               .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
+                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
+                               .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
+                               .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
+                               .replace(/\^/g, '**');
 
-                    const o = (f.match(/\(/g) || []).length;
-                    const c = (f.match(/\)/g) || []).length;
-                    if (o > c) f += ')'.repeat(o - c);
+                    const op = (f.match(/\(/g) || []).length, cp = (f.match(/\)/g) || []).length;
+                    if (op > cp) f += ')'.repeat(op - cp);
 
                     let res = eval(f);
-                    l.innerText = exp + " =";
-                    exp = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
+                    let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
+                    
+                    logs.unshift({q: exp, a: out});
+                    localStorage.setItem('calc-log', JSON.stringify(logs.slice(0, 30)));
+                    
+                    lv.innerText = exp + ' =';
+                    exp = out;
                     solved = true;
-                } catch {
-                    m.innerText = "Error";
-                    setTimeout(() => m.innerText = exp || "0", 800);
-                    return;
+                } catch { 
+                    mv.innerText = i18n[cfg.lang].err; 
+                    setTimeout(render, 800); 
+                    return; 
                 }
+            } else if (v === '()') {
+                const op = (exp.match(/\(/g) || []).length, cp = (exp.match(/\)/g) || []).length;
+                exp += (op > cp && /[0-9)]$/.test(exp.slice(-1))) ? ')' : '(';
             } else {
-                if (solved && /[0-9]/.test(key)) exp = "";
-                solved = false;
-                exp += key;
+                if (solved && /[0-9]/.test(v)) exp = "";
+                solved = false; 
+                exp += v;
             }
-
-            m.innerText = exp || "0";
-            m.scrollLeft = m.scrollWidth;
-            document.getElementById('settings-menu').style.display = 'none';
+            render();
         }
 
-        window.addEventListener('keydown', (e) => {
-            const keys = {'*':'×', '/':'÷', 'Enter':'=', 'Backspace':'DEL', 'Escape':'AC'};
-            const val = keys[e.key] || e.key;
-            if (/[0-9]/.test(val) || ['+','-','×','÷','=','DEL','AC','.', '(', ')'].includes(val)) {
-                if(val === '÷' || val === '=') e.preventDefault();
-                run(val);
-            }
-        });
+        function render() {
+            const mv = document.getElementById('main-view');
+            mv.innerText = exp || '0';
+            mv.scrollLeft = mv.scrollWidth;
+        }
 
-        document.addEventListener('click', e => {
-            if (!e.target.closest('#settings-menu') && !e.target.classList.contains('material-symbols-outlined')) {
-                document.getElementById('settings-menu').style.display = 'none';
-            }
-        });
+        function copyValue() { 
+            navigator.clipboard.writeText(exp || '0'); 
+            closeMenu(); 
+        }
 
-        window.onload = () => {
-            document.getElementById('v-range').value = p.vibe;
-            document.getElementById('v-val').innerText = p.vibe;
-            document.getElementById('unit-toggle').innerText = p.unit;
+        function buildLog() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = logs.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:80px;">${i18n[cfg.lang].empty}</div>`;
+            
+            logs.forEach(i => {
+                const d = document.createElement('div');
+                d.className = 'history-card';
+                d.innerHTML = `<div style="opacity:0.6;font-size:1rem;margin-bottom:8px;">${i.q}</div><div style="font-size:1.8rem;font-weight:500;">${i.a}</div>`;
+                d.onclick = () => { exp = i.a; render(); location.hash='#home'; };
+                list.appendChild(d);
+            });
+        }
+
+        function cycleTheme() {
+            const m = ['system', 'light', 'dark'];
+            cfg.mode = m[(m.indexOf(cfg.mode) + 1) % m.length];
+            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
+            location.reload();
+        }
+
+        function cycleLang() {
+            cfg.lang = cfg.lang === 'ja' ? 'en' : 'ja';
+            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
+            sync(); 
+            closeMenu();
+        }
+
+        function clearLog() { 
+            logs = []; 
+            localStorage.setItem('calc-log', '[]'); 
+            buildLog(); 
+        }
+
+        window.onload = () => { render(); sync(); };
+        window.onhashchange = sync;
+
+        document.body.onclick = (e) => { 
+            if(!e.target.closest('#more-trigger') && !e.target.closest('#menu-box')) closeMenu(); 
         };
     </script>
 </body>
