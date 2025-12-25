@@ -3,112 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Calculator</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>計算 / Calculator</title>
+
     <script>
         (function() {
             const cfg = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":30}');
             const isDark = cfg.theme === 'dark' || (cfg.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) document.documentElement.classList.add('dark-mode');
-            if (window.location.hash === '#home') document.documentElement.classList.add('home-design');
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark-mode');
+            }
+            
+            if (window.location.hash === '#home') {
+                document.documentElement.classList.add('home-design');
+            }
         })();
     </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg: #FDFCF4; --on-bg: #1B1C17;
-            --surface: #EFF1E0; --on-surface: #44483D;
-            --primary-cont: #D7E8B7; --on-primary-cont: #121F00;
-            --sec-cont: #E3E4D3; --on-sec-cont: #1B1C17;
-            --accent: #4C662B; --radius: 50%;
+            --bg: #FDFCF4;
+            --on-bg: #1B1C17;
+            --surface: #EFF1E0;
+            --on-surface: #44483D;
+            --primary-cont: #D7E8B7;
+            --on-primary-cont: #121F00;
+            --sec-cont: #E3E4D3;
+            --on-sec-cont: #1B1C17;
+            --accent: #4C662B;
+            --radius: 50%;
+            --grid-gap: 12px;
         }
+
         .dark-mode {
-            --bg: #1B1C17; --on-bg: #E3E4D3;
-            --surface: #2F3126; --on-surface: #C7C8B8;
-            --primary-cont: #3E4A2B; --on-primary-cont: #D7E8B7;
-            --sec-cont: #45483C; --on-sec-cont: #E3E4D3;
+            --bg: #1B1C17;
+            --on-bg: #E3E4D3;
+            --surface: #2F3126;
+            --on-surface: #C7C8B8;
+            --primary-cont: #3E4A2B;
+            --on-primary-cont: #D7E8B7;
+            --sec-cont: #45483C;
+            --on-sec-cont: #E3E4D3;
             --accent: #B1D18A;
         }
-        .home-design { --radius: 30%; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        .home-design {
+            --radius: 30%;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
         body {
-            margin: 0; height: 100dvh; background: var(--bg); color: var(--on-bg);
-            font-family: 'Google Sans', sans-serif; display: flex; flex-direction: column; overflow: hidden;
+            margin: 0;
+            height: 100dvh;
+            background: var(--bg);
+            color: var(--on-bg);
+            font-family: 'Google Sans', sans-serif;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
+
         .overlay {
-            position: fixed; top: -100%; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 1000; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 24px; padding-top: env(safe-area-inset-top); display: flex; flex-direction: column;
+            position: fixed;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 1000;
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px;
+            padding-top: env(safe-area-inset-top);
+            display: flex;
+            flex-direction: column;
         }
-        .overlay.open { top: 0; }
+
+        .overlay.open {
+            top: 0;
+        }
+
         .display {
-            flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
-            align-items: flex-end; padding: 24px 32px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 16px 32px;
+            transition: all 0.3s ease;
         }
-        #sub { font-size: 1.4rem; color: var(--on-surface); opacity: 0.7; min-height: 1.6rem; text-align: right; margin-bottom: 8px; }
-        #main { width: 100%; font-size: clamp(2.5rem, 12vw, 5rem); text-align: right; border: none; background: transparent; color: var(--on-bg); font-family: inherit; outline: none; }
+
+        #sub {
+            font-size: 1.4rem;
+            color: var(--on-surface);
+            opacity: 0.7;
+            min-height: 1.6rem;
+            text-align: right;
+            margin-bottom: 4px;
+        }
+
+        #main {
+            width: 100%;
+            font-size: clamp(2rem, 10vw, 4.5rem);
+            text-align: right;
+            border: none;
+            background: transparent;
+            color: var(--on-bg);
+            font-family: inherit;
+        }
+
         .pad-container {
-            background: var(--surface); border-radius: 40px 40px 0 0;
+            background: var(--surface);
+            border-radius: 40px 40px 0 0;
             padding-bottom: env(safe-area-inset-bottom);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .toolbar { display: flex; justify-content: space-between; padding: 12px 32px; color: var(--accent); }
-        .toolbar span { cursor: pointer; font-size: 1.8rem; }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 32px 0;
+            color: var(--accent);
+        }
+
+        .toolbar span {
+            cursor: pointer;
+            padding: 8px;
+            font-size: 1.6rem;
+        }
+
         .adv-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 24px;
-            max-height: 0; opacity: 0; overflow: hidden; transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 0 24px;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .adv-grid.show { max-height: 160px; opacity: 1; padding: 12px 24px; }
-        .main-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px 24px 24px; }
+
+        .adv-grid.show {
+            max-height: 200px;
+            opacity: 1;
+            visibility: visible;
+            padding: 12px 24px 8px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--grid-gap);
+            padding: 8px 24px 16px;
+            transition: all 0.3s ease;
+        }
+
         button {
-            aspect-ratio: 1/1; border: none; border-radius: var(--radius);
-            font-size: 1.6rem; font-weight: 500; cursor: pointer;
-            background: var(--bg); color: var(--on-bg); transition: transform 0.1s, border-radius 0.3s;
+            aspect-ratio: 1/1;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: var(--on-bg);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        button:active { transform: scale(0.92); }
-        .btn-op { background: var(--primary-cont); color: var(--on-primary-cont); }
-        .btn-fn { background: var(--sec-cont); color: var(--on-sec-cont); }
-        .btn-eq { background: var(--accent); color: var(--bg); border-radius: 32px; font-size: 2rem; }
-        .btn-adv { background: transparent; font-size: 1rem; height: 40px; aspect-ratio: auto; color: var(--on-surface); }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--surface); }
-        select, input[type="range"] { accent-color: var(--accent); font-family: inherit; }
+
+        .adv-grid.show ~ .main-grid button {
+            font-size: 1.3rem;
+        }
+
+        .adv-grid.show ~ .main-grid {
+            gap: 8px;
+            padding-top: 4px;
+        }
+
+        button:active {
+            transform: scale(0.9);
+            filter: brightness(0.9);
+        }
+
+        .btn-op {
+            background: var(--primary-cont);
+            color: var(--on-primary-cont);
+        }
+
+        .btn-fn {
+            background: var(--sec-cont);
+            color: var(--on-sec-cont);
+        }
+
+        .btn-eq {
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 28px;
+            font-size: 1.8rem;
+        }
+
+        .btn-adv {
+            background: transparent;
+            font-size: 0.95rem;
+            height: 38px;
+            aspect-ratio: auto;
+            color: var(--on-surface);
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--surface);
+        }
+
+        input[type="range"] {
+            flex: 1;
+            margin: 0 16px;
+            accent-color: var(--accent);
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--on-bg);
+            border: none;
+            font-family: inherit;
+        }
+
+        .hist-row {
+            text-align: right;
+            margin-bottom: 32px;
+            cursor: pointer;
+        }
+
+        @media (max-height: 700px) {
+            .display { padding: 8px 24px; }
+            #main { font-size: 2.5rem; }
+            .main-grid { gap: 6px; padding: 4px 20px 12px; }
+            .adv-grid.show { padding: 4px 20px; }
+        }
     </style>
 </head>
+
 <body>
+
     <div id="panel-settings" class="overlay">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
-            <span style="font-size:1.5rem;">Settings</span>
+            <span style="font-size:1.5rem; font-weight:500;">Settings</span>
             <span class="material-symbols-outlined" onclick="closeOverlay()">close</span>
         </div>
+
         <div class="item">
             <span>Theme</span>
             <select id="sel-theme" onchange="applySettings()">
-                <option value="system">System</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
+                <option value="system">System Default</option>
+                <option value="light">Light Mode</option>
+                <option value="dark">Dark Mode</option>
             </select>
         </div>
+
         <div class="item">
-            <span>Vibration</span>
-            <input type="range" id="vibe-range" min="0" max="100" step="5" onchange="applySettings()">
-            <span id="vibe-val">30%</span>
+            <span>Vibration Strength</span>
+            <div style="display:flex; align-items:center; flex:1; justify-content: flex-end;">
+                <input type="range" id="vibe-range" min="0" max="100" step="5" onchange="applySettings()">
+                <span id="vibe-val" style="width:40px; text-align:right;">30%</span>
+            </div>
         </div>
     </div>
+
     <div id="panel-history" class="overlay">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
-            <span style="font-size:1.5rem;">History</span>
+            <span style="font-size:1.5rem; font-weight:500;">History</span>
             <span class="material-symbols-outlined" onclick="closeOverlay()">close</span>
         </div>
         <div id="hist-list" style="overflow-y:auto; flex:1;"></div>
     </div>
+
     <div class="display">
         <div id="sub"></div>
-        <input type="text" id="main" readonly value="0">
+        <input type="text" id="main" readonly placeholder="0">
     </div>
+
     <div class="pad-container">
         <div class="toolbar">
             <span class="material-symbols-outlined" onclick="openOverlay('settings')">settings</span>
             <span class="material-symbols-outlined" onclick="openOverlay('history')">history</span>
             <span class="material-symbols-outlined" id="toggle-icon" onclick="toggleAdv()">keyboard_arrow_down</span>
         </div>
+
         <div class="adv-grid" id="grid-adv">
             <button class="btn-adv" onclick="add('sin(')">sin</button>
             <button class="btn-adv" onclick="add('cos(')">cos</button>
@@ -119,88 +314,167 @@
             <button class="btn-adv" onclick="add('^')">^</button>
             <button class="btn-adv" onclick="add('√(')">√</button>
         </div>
+
         <div class="main-grid">
             <button class="btn-fn" onclick="add('AC')">AC</button>
             <button class="btn-fn" onclick="add('()')">( )</button>
             <button class="btn-fn" onclick="add('%')">%</button>
             <button class="btn-op" onclick="add('÷')">÷</button>
+
             <button onclick="add('7')">7</button>
             <button onclick="add('8')">8</button>
             <button onclick="add('9')">9</button>
             <button class="btn-op" onclick="add('×')">×</button>
+
             <button onclick="add('4')">4</button>
             <button onclick="add('5')">5</button>
             <button onclick="add('6')">6</button>
             <button class="btn-op" onclick="add('−')">−</button>
+
             <button onclick="add('1')">1</button>
             <button onclick="add('2')">2</button>
             <button onclick="add('3')">3</button>
             <button class="btn-op" onclick="add('+')">+</button>
+
             <button onclick="add('0')">0</button>
             <button onclick="add('.')">.</button>
             <button class="btn-fn" onclick="add('DEL')"><span class="material-symbols-outlined">backspace</span></button>
             <button class="btn-eq" onclick="add('=')">=</button>
         </div>
     </div>
+
     <script>
         let expr = localStorage.getItem('calc_last_expr') || '';
         let hData = JSON.parse(localStorage.getItem('calc_h') || '[]');
         let config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":30}');
-        function vib() { if (config.vibe > 0 && navigator.vibrate) navigator.vibrate(config.vibe / 3); }
+
+        function vib() {
+            const ms = parseInt(config.vibe);
+            if (ms > 0 && navigator.vibrate) navigator.vibrate(ms / 3);
+        }
+
         function applySettings() {
             config.theme = document.getElementById('sel-theme').value;
             config.vibe = document.getElementById('vibe-range').value;
             document.getElementById('vibe-val').innerText = config.vibe + '%';
+            
             localStorage.setItem('calc_config', JSON.stringify(config));
+            
             const isDark = config.theme === 'dark' || (config.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.classList.toggle('dark-mode', isDark);
             vib();
         }
-        function openOverlay(id) { vib(); document.getElementById('panel-' + id).classList.add('open'); if(id === 'history') renderHist(); }
-        function closeOverlay() { document.querySelectorAll('.overlay').forEach(el => el.classList.remove('open')); }
+
+        function openOverlay(id) {
+            vib();
+            document.getElementById('panel-' + id).classList.add('open');
+            if(id === 'history') renderHist();
+        }
+
+        function closeOverlay() {
+            document.querySelectorAll('.overlay').forEach(el => el.classList.remove('open'));
+        }
+
         function toggleAdv() {
             vib();
-            const g = document.getElementById('grid-adv'), i = document.getElementById('toggle-icon');
+            const g = document.getElementById('grid-adv');
+            const i = document.getElementById('toggle-icon');
             g.classList.toggle('show');
             i.innerText = g.classList.contains('show') ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
         }
+
         function add(v) {
             vib();
-            const m = document.getElementById('main'), s = document.getElementById('sub');
-            if (v === 'AC') { expr = ''; s.innerText = ''; }
-            else if (v === 'DEL') { expr = expr.slice(0, -1); }
-            else if (v === '=') {
+            const mainEl = document.getElementById('main');
+            const subEl = document.getElementById('sub');
+
+            if (v === 'AC') {
+                expr = '';
+                subEl.innerText = '';
+            } else if (v === 'DEL') {
+                expr = expr.slice(0, -1);
+            } else if (v === '=') {
                 try {
-                    let f = expr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/π/g, 'Math.PI').replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(').replace(/tan\(/g, 'Math.tan(').replace(/ln\(/g, 'Math.log(').replace(/log\(/g, 'Math.log10(').replace(/\^/g, '**').replace(/√\(/g, 'Math.sqrt(');
-                    let res = eval(f);
-                    let out = Number(res.toPrecision(12)).toString();
+                    let sanitizedExpr = expr
+                        .replace(/÷/g, '/')
+                        .replace(/×/g, '*')
+                        .replace(/−/g, '-')
+                        .replace(/%/g, '/100')
+                        .replace(/π/g, 'Math.PI')
+                        .replace(/sin\(/g, 'Math.sin(')
+                        .replace(/cos\(/g, 'Math.cos(')
+                        .replace(/tan\(/g, 'Math.tan(')
+                        .replace(/ln\(/g, 'Math.log(')
+                        .replace(/log\(/g, 'Math.log10(')
+                        .replace(/\^/g, '**')
+                        .replace(/√\(/g, 'Math.sqrt(');
+                    
+                    let res = eval(sanitizedExpr);
+                    
+                    let out = formatResult(res);
+                    
                     hData.unshift({ q: expr, a: out });
                     localStorage.setItem('calc_h', JSON.stringify(hData.slice(0, 30)));
-                    s.innerText = expr + ' =';
+                    subEl.innerText = expr + ' =';
                     expr = out.replace(/-/g, '−');
-                } catch { m.value = 'Error'; setTimeout(() => add('AC'), 800); return; }
+                } catch {
+                    mainEl.value = 'Error';
+                    setTimeout(() => add('AC'), 800);
+                    return;
+                }
             } else if (v === '()') {
-                const o = (expr.match(/\(/g) || []).length, c = (expr.match(/\)/g) || []).length;
+                const o = (expr.match(/\(/g) || []).length;
+                const c = (expr.match(/\)/g) || []).length;
                 expr += (o > c && /[0-9π)]$/.test(expr.slice(-1))) ? ')' : '(';
-            } else { expr += v; }
-            m.value = expr || '0';
+            } else {
+                expr += v;
+            }
+            
+            mainEl.value = expr || '0';
             localStorage.setItem('calc_last_expr', expr);
         }
+
+        function formatResult(num) {
+            if (!isFinite(num)) return "Error";
+            
+            let result = Number(num.toPrecision(12)).toString();
+            
+            if (result.includes('e')) {
+                let parts = result.split('e');
+                return parseFloat(parts[0]).toFixed(4) + 'e' + parts[1];
+            }
+            return result;
+        }
+
         function renderHist() {
-            const l = document.getElementById('hist-list');
-            l.innerHTML = hData.length ? '' : '<p style="text-align:center; opacity:0.5; margin-top:50px;">No History</p>';
+            const list = document.getElementById('hist-list');
+            list.innerHTML = hData.length ? '' : '<p style="text-align:center; opacity:0.5; margin-top:50px;">No History</p>';
             hData.forEach(i => {
-                const d = document.createElement('div');
-                d.style.textAlign = 'right'; d.style.marginBottom = '24px';
-                d.innerHTML = `<div style="opacity:0.6;">${i.q}</div><div style="font-size:1.8rem;">${i.a}</div>`;
-                d.onclick = () => { expr = i.a.replace(/-/g, '−'); document.getElementById('main').value = expr; closeOverlay(); };
-                l.appendChild(d);
+                const div = document.createElement('div');
+                div.className = 'hist-row';
+                div.innerHTML = `<div style="opacity:0.6; font-size:1.1rem;">${i.q}</div><div style="font-size:1.8rem;">${i.a}</div>`;
+                div.onclick = () => {
+                    expr = i.a.replace(/-/g, '−');
+                    document.getElementById('main').value = expr;
+                    closeOverlay();
+                };
+                list.appendChild(div);
             });
         }
+
         document.getElementById('sel-theme').value = config.theme;
         document.getElementById('vibe-range').value = config.vibe;
         document.getElementById('vibe-val').innerText = config.vibe + '%';
         document.getElementById('main').value = expr || '0';
+
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#home') {
+                closeOverlay();
+                document.documentElement.classList.add('home-design');
+            } else {
+                document.documentElement.classList.remove('home-design');
+            }
+        });
     </script>
 </body>
 </html>
