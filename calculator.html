@@ -8,7 +8,7 @@
     <script>
         (function() {
             const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
-            
+
             const upd = (isD) => {
                 document.documentElement.className = isD ? 'dark' : 'light';
                 document.documentElement.style.backgroundColor = isD ? '#1B1C17' : '#FDFCF4';
@@ -58,7 +58,7 @@
             background: var(--bg);
             font-family: 'Google Sans', sans-serif;
         }
-        
+
         body {
             display: flex;
             flex-direction: column;
@@ -69,323 +69,322 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 32px;
+            padding: 32px 40px;
             text-align: right;
         }
 
-        #log-display {
-            font-size: 1.5rem;
+        #log-view {
+            font-size: 1.6rem;
             color: var(--on-surf);
             opacity: 0.7;
-            white-space: nowrap;
-            overflow-x: auto;
-            scrollbar-width: none;
+            min-height: 2rem;
             margin-bottom: 8px;
-            min-height: 1.6rem;
-        }
-
-        #main-display {
-            font-size: clamp(3.2rem, 16vw, 6.8rem);
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
         }
 
-        .input-panel {
+        #main-view {
+            font-size: clamp(3.5rem, 18vw, 7rem);
+            white-space: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .panel {
             background: var(--surf);
             border-radius: 40px 40px 0 0;
-            padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
-            transition: background 0.4s;
+            padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
         }
 
-        .utility-bar {
+        .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 16px 16px;
         }
 
-        .utility-bar span {
+        .panel-header span {
             cursor: pointer;
             padding: 12px;
             border-radius: 50%;
             color: var(--pri);
-            font-size: 24px;
         }
 
-        #mode-toggle {
-            font-size: 0.85rem;
+        #unit-toggle {
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--pri);
-            padding: 6px 14px;
-            border-radius: 14px;
+            padding: 6px 16px;
+            border-radius: 16px;
             background: var(--pri-c);
-            text-transform: uppercase;
         }
 
-        .layout-engine {
+        .grid-container {
             display: flex;
             gap: 12px;
         }
-        
-        .sci-cluster {
+
+        .sci-area {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 12px;
             width: 0;
             opacity: 0;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .sci-cluster.active {
-            width: 44%;
+        .sci-area.active {
+            width: 45%;
             opacity: 1;
         }
 
-        .num-cluster {
+        .num-area {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 12px;
             flex: 1;
         }
 
         button {
-            height: clamp(60px, 11vh, 84px);
+            height: clamp(64px, 11vh, 88px);
             border: none;
-            border-radius: 42px;
-            font-size: 1.5rem;
+            border-radius: 44px;
+            font-size: 1.7rem;
             font-weight: 500;
             background: var(--bg);
             color: var(--on-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s;
+            transition: transform 0.1s, background 0.2s;
         }
 
         button:active {
-            transform: scale(0.9);
-            filter: brightness(0.9);
+            transform: scale(0.92);
+            background: var(--sec-c);
         }
 
         .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-sci { background: var(--sci-bg); font-size: 1.05rem; border-radius: 22px; height: 52px; }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.6rem; }
+        .k-sci { background: var(--sci-bg); font-size: 1.1rem; height: 56px; border-radius: 24px; }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.5rem; }
 
-        @media (min-width: 850px) or (orientation: landscape) {
-            .sci-cluster { width: 36% !important; opacity: 1 !important; display: grid !important; }
-            #flask-btn { display: none; }
-            .input-panel { border-radius: 0; }
+        @media (min-width: 900px) or (orientation: landscape) {
+            .sci-area { width: 40% !important; opacity: 1 !important; display: grid !important; }
+            #expand-arrow { display: none; }
+            .panel { border-radius: 0; }
         }
 
-        .overlay-menu {
+        .menu-dropdown {
             position: absolute;
             right: 24px;
-            bottom: 110px;
+            bottom: 120px;
             background: var(--bg);
-            border-radius: 28px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.3);
             display: none;
             flex-direction: column;
-            z-index: 5000;
-            overflow: hidden;
+            z-index: 100;
             min-width: 220px;
+            overflow: hidden;
         }
 
-        .overlay-menu div {
+        .menu-dropdown div {
             padding: 20px 24px;
             border-bottom: 1px solid var(--surf);
             cursor: pointer;
         }
 
-        .vibe-slider {
+        .vibe-control {
             padding: 16px 24px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
-        input[type="range"] {
-            accent-color: var(--pri);
-            cursor: pointer;
-        }
+        input[type="range"] { accent-color: var(--pri); cursor: pointer; }
     </style>
 </head>
 <body>
 
     <section class="display-container">
-        <div id="log-display"></div>
-        <div id="main-display">0</div>
+        <div id="log-view"></div>
+        <div id="main-view">0</div>
     </section>
 
-    <nav class="input-panel">
-        <div class="utility-bar">
+    <nav class="panel">
+        <div class="panel-header">
             <div style="display:flex; align-items:center; gap:12px;">
-                <span id="flask-btn" class="material-symbols-outlined" onclick="ui('sci')">flask</span>
-                <div id="mode-toggle" onclick="ui('unit')">deg</div>
+                <span id="expand-arrow" class="material-symbols-outlined" onclick="ui('toggle')">keyboard_arrow_left</span>
+                <div id="unit-toggle" onclick="ui('unit')">DEG</div>
             </div>
 
             <div style="position:relative;">
-                <span class="material-symbols-outlined" id="menu-btn" onclick="ui('menu')">more_vert</span>
-                <div id="settings-menu" class="overlay-menu">
-                    <div onclick="sys('light')">ライトモード</div>
-                    <div onclick="sys('dark')">ダークモード</div>
-                    <div onclick="sys('system')">システム同期</div>
-                    <div onclick="sys('copy')">結果をコピー</div>
-                    <div class="vibe-slider">
-                        <span style="font-size:0.85rem">振動: <span id="v-val">50</span>%</span>
-                        <input type="range" id="v-range" min="0" max="100" value="50" oninput="sys('vibe', this.value)">
+                <span class="material-symbols-outlined" id="menu-trigger" onclick="ui('menu')">more_vert</span>
+                <div id="menu-box" class="menu-dropdown">
+                    <div onclick="cfg('light')">ライトモード</div>
+                    <div onclick="cfg('dark')">ダークモード</div>
+                    <div onclick="cfg('copy')">結果をコピー</div>
+                    <div class="vibe-control">
+                        <span style="font-size:0.85rem">振動: <span id="v-txt">50</span>%</span>
+                        <input type="range" id="v-range" min="0" max="100" value="50" oninput="cfg('vibe', this.value)">
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="layout-engine">
-            <div id="sci-grid" class="sci-cluster">
+        <div class="grid-container">
+            <div id="sci-grid" class="sci-area">
                 <button class="k-sci" onclick="run('sin(')">sin</button>
                 <button class="k-sci" onclick="run('cos(')">cos</button>
                 <button class="k-sci" onclick="run('tan(')">tan</button>
                 <button class="k-sci" onclick="run('log(')">log</button>
                 <button class="k-sci" onclick="run('ln(')">ln</button>
                 <button class="k-sci" onclick="run('sqrt(')">√</button>
-                <button class="k-sci" onclick="run('inv(')">1/x</button>
-                <button class="k-sci" onclick="run('^')">xʸ</button>
-                <button class="k-sci" onclick="run('abs(')">|x|</button>
+                <button class="k-sci" onclick="run('^')">^</button>
                 <button class="k-sci" onclick="run('π')">π</button>
                 <button class="k-sci" onclick="run('e')">e</button>
-                <button class="k-sci" onclick="run('!')">n!</button>
+                <button class="k-sci" onclick="run('(')">(</button>
+                <button class="k-sci" onclick="run(')')">)</button>
+                <button class="k-sci" onclick="run('!')">!</button>
             </div>
 
-            <div class="num-cluster">
+            <div class="num-area">
                 <button class="k-op" onclick="run('AC')">AC</button>
                 <button class="k-op" onclick="run('DEL')">⌫</button>
-                <button class="k-op" onclick="run('(')">(</button>
-                <button class="k-op" onclick="run(')')">)</button>
+                <button class="k-op" onclick="run('%')">%</button>
+                <button class="k-op" onclick="run('÷')">÷</button>
 
                 <button onclick="run('7')">7</button>
                 <button onclick="run('8')">8</button>
                 <button onclick="run('9')">9</button>
-                <button class="k-op" onclick="run('÷')">÷</button>
+                <button class="k-op" onclick="run('×')">×</button>
 
                 <button onclick="run('4')">4</button>
                 <button onclick="run('5')">5</button>
                 <button onclick="run('6')">6</button>
-                <button class="k-op" onclick="run('×')">×</button>
+                <button class="k-op" onclick="run('-')">-</button>
 
                 <button onclick="run('1')">1</button>
                 <button onclick="run('2')">2</button>
                 <button onclick="run('3')">3</button>
-                <button class="k-op" onclick="run('-')">-</button>
+                <button class="k-op" onclick="run('+')">+</button>
 
                 <button onclick="run('0')">0</button>
                 <button onclick="run('.')">.</button>
-                <button class="k-eq" onclick="run('=')">=</button>
-                <button class="k-op" onclick="run('+')">+</button>
+                <button class="k-eq" onclick="run('=')" style="grid-column: span 2">=</button>
             </div>
         </div>
     </nav>
 
     <script>
-        let exp = "";
+        let buf = "";
         let solved = false;
         let p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
 
         function vib() {
-            if (navigator.vibrate && p.vibe > 0) {
-                navigator.vibrate(p.vibe / 4);
-            }
+            if (navigator.vibrate && p.vibe > 0) navigator.vibrate(p.vibe / 4);
         }
 
-        function ui(type) {
+        function ui(cmd) {
             vib();
-            if (type === 'sci') {
-                const g = document.getElementById('sci-grid');
-                g.classList.toggle('active');
-                document.getElementById('flask-btn').style.fontVariationSettings = g.classList.contains('active') ? "'FILL' 1" : "'FILL' 0";
-            }
-            if (type === 'unit') {
+            if (cmd === 'toggle') {
+                const s = document.getElementById('sci-grid');
+                const a = document.getElementById('expand-arrow');
+                s.classList.toggle('active');
+                a.innerText = s.classList.contains('active') ? 'keyboard_arrow_right' : 'keyboard_arrow_left';
+            } else if (cmd === 'unit') {
                 p.unit = p.unit === 'deg' ? 'rad' : 'deg';
-                document.getElementById('mode-toggle').innerText = p.unit;
+                document.getElementById('unit-toggle').innerText = p.unit.toUpperCase();
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
-            }
-            if (type === 'menu') {
-                const m = document.getElementById('settings-menu');
+            } else if (cmd === 'menu') {
+                const m = document.getElementById('menu-box');
                 m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
             }
         }
 
-        function sys(cmd, val) {
+        function cfg(cmd, val) {
             vib();
             if (cmd === 'vibe') {
                 p.vibe = val;
-                document.getElementById('v-val').innerText = val;
+                document.getElementById('v-txt').innerText = val;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
-            }
-            if (['light', 'dark', 'system'].includes(cmd)) {
+            } else if (cmd === 'light' || cmd === 'dark') {
                 p.mode = cmd;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
                 location.reload();
-            }
-            if (cmd === 'copy') {
-                navigator.clipboard.writeText(exp || "0");
+            } else if (cmd === 'copy') {
+                navigator.clipboard.writeText(buf || "0");
                 ui('menu');
             }
         }
 
         function run(key) {
             vib();
-            const m = document.getElementById('main-display');
-            const l = document.getElementById('log-display');
+            const m = document.getElementById('main-view');
+            const l = document.getElementById('log-view');
 
             if (key === 'AC') {
-                exp = ""; l.innerText = ""; solved = false;
+                buf = ""; l.innerText = ""; solved = false;
             } else if (key === 'DEL') {
-                exp = exp.slice(0, -1);
+                buf = buf.slice(0, -1);
             } else if (key === '=') {
                 try {
-                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
+                    let f = buf.replace(/÷/g, '/').replace(/×/g, '*')
                                .replace(/sin\(/g, p.unit === 'deg' ? 'Math.sin(Math.PI/180*' : 'Math.sin(')
                                .replace(/cos\(/g, p.unit === 'deg' ? 'Math.cos(Math.PI/180*' : 'Math.cos(')
                                .replace(/tan\(/g, p.unit === 'deg' ? 'Math.tan(Math.PI/180*' : 'Math.tan(')
                                .replace(/log\(/g, 'Math.log10(').replace(/ln\(/g, 'Math.log(')
-                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/inv\(/g, '1/(')
-                               .replace(/abs\(/g, 'Math.abs(').replace(/π/g, 'Math.PI')
+                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/π/g, 'Math.PI')
                                .replace(/e/g, 'Math.E').replace(/\^/g, '**');
 
-                    const o = (f.match(/\(/g) || []).length;
-                    const c = (f.match(/\)/g) || []).length;
-                    if (o > c) f += ')'.repeat(o - c);
+                    const open = (f.match(/\(/g) || []).length;
+                    const close = (f.match(/\)/g) || []).length;
+                    if (open > close) f += ')'.repeat(open - close);
 
                     let res = eval(f);
-                    l.innerText = exp + " =";
-                    exp = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
+                    l.innerText = buf + " =";
+                    buf = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
                     solved = true;
                 } catch {
                     m.innerText = "Error";
-                    setTimeout(() => m.innerText = exp || "0", 800);
+                    setTimeout(() => m.innerText = buf || "0", 800);
                     return;
                 }
             } else {
-                if (solved && /[0-9]/.test(key)) exp = "";
-                solved = false; exp += key;
+                if (solved && /[0-9]/.test(key)) buf = "";
+                solved = false; buf += key;
             }
 
-            m.innerText = exp || "0";
+            m.innerText = buf || "0";
             m.scrollLeft = m.scrollWidth;
-            document.getElementById('settings-menu').style.display = 'none';
+            document.getElementById('menu-box').style.display = 'none';
         }
 
+        window.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') run(e.key);
+            if (e.key === '.') run('.');
+            if (e.key === '+') run('+');
+            if (e.key === '-') run('-');
+            if (e.key === '*') run('×');
+            if (e.key === '/') { e.preventDefault(); run('÷'); }
+            if (e.key === '%') run('%');
+            if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); run('='); }
+            if (e.key === 'Backspace') run('DEL');
+            if (e.key === 'Escape') run('AC');
+        });
+
         document.addEventListener('click', e => {
-            if (!e.target.closest('#menu-btn') && !e.target.closest('#settings-menu')) {
-                document.getElementById('settings-menu').style.display = 'none';
+            if (!e.target.closest('#menu-trigger') && !e.target.closest('#menu-box')) {
+                document.getElementById('menu-box').style.display = 'none';
             }
         });
 
         window.onload = () => {
             document.getElementById('v-range').value = p.vibe;
-            document.getElementById('v-val').innerText = p.vibe;
-            document.getElementById('mode-toggle').innerText = p.unit;
+            document.getElementById('v-txt').innerText = p.vibe;
+            document.getElementById('unit-toggle').innerText = p.unit.toUpperCase();
         };
     </script>
 </body>
