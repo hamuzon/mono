@@ -2,29 +2,29 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>計算機 / Calculator</title>
 
     <script>
         (function() {
-            const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system"}');
-            const q = window.matchMedia('(prefers-color-scheme: dark)');
+            const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
+            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
             
             const update = (isDark) => {
                 document.documentElement.className = isDark ? 'dark' : 'light';
                 document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
             };
 
-            if (p.mode === 'system') {
-                update(q.matches);
-                q.addEventListener('change', e => update(e.matches));
+            if (prefs.mode === 'system') {
+                update(darkQuery.matches);
+                darkQuery.addEventListener('change', e => update(e.matches));
             } else {
-                update(p.mode === 'dark');
+                update(prefs.mode === 'dark');
             }
         })();
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -64,37 +64,39 @@
             background: var(--bg);
             color: var(--on-bg);
             font-family: 'Google Sans', sans-serif;
-            overflow: hidden;
-            overscroll-behavior-y: contain;
+            /* スクール再読み込みを許可するため overscroll は auto */
+            overscroll-behavior-y: auto;
         }
 
         body {
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
-        .display-section {
+        .display-layer {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 24px 32px;
+            padding: 32px 32px 16px;
             text-align: right;
-            min-height: 200px;
+            min-height: 180px;
         }
 
         #log-view {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             color: var(--on-surf);
             opacity: 0.7;
+            min-height: 2.4rem;
             margin-bottom: 8px;
-            min-height: 1.8rem;
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
         }
 
         #main-view {
+            font-family: 'Potta One', cursive;
             font-size: clamp(3rem, 15vw, 6rem);
             white-space: nowrap;
             overflow-x: auto;
@@ -102,16 +104,19 @@
             line-height: 1.2;
         }
 
-        .input-panel {
+        .input-layer {
             background: var(--surf);
-            border-radius: 40px 40px 0 0;
+            border-radius: 42px 42px 0 0;
             padding: 8px 24px calc(16px + env(safe-area-inset-bottom));
-            box-shadow: 0 -8px 24px rgba(0,0,0,0.05);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.06);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .handle-bar {
             width: 100%;
-            height: 32px;
+            height: 28px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -124,21 +129,22 @@
             height: 4px;
             background: var(--hdl);
             border-radius: 2px;
-            opacity: 0.4;
+            opacity: 0.3;
         }
 
-        .top-actions {
+        .action-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px 16px;
+            padding: 4px 12px 16px;
         }
 
-        .top-actions span {
+        .action-bar span {
             color: var(--pri);
             cursor: pointer;
-            padding: 8px;
-            font-size: 24px;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 26px;
             user-select: none;
         }
 
@@ -148,32 +154,32 @@
             gap: 12px;
         }
 
-        .sci-row {
-            display: flex;
+        .sci-drawer {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            padding-bottom: 8px;
             height: 0;
             opacity: 0;
-            transition: all 0.3s ease;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .sci-row.active {
-            height: 60px;
+        .sci-drawer.open {
+            height: 120px;
             opacity: 1;
+            margin-bottom: 8px;
         }
 
-        .num-grid {
+        .main-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 14px;
         }
 
         button {
-            height: clamp(64px, 10vh, 84px);
+            height: clamp(64px, 10vh, 88px);
             border: none;
-            border-radius: 42px;
+            border-radius: 40px;
             font-size: 1.8rem;
             font-weight: 500;
             background: var(--bg);
@@ -181,34 +187,52 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.1s, background 0.2s;
         }
 
-        button:active { transform: scale(0.92); }
+        button:active {
+            transform: scale(0.92);
+            background: var(--pri-c);
+        }
 
-        .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.5rem; }
-        .k-sci { background: var(--pri-c); font-size: 1.1rem; height: 50px; min-width: 80px; }
+        .k-op { 
+            background: var(--pri-c); 
+            color: var(--on-pri-c); 
+        }
 
-        .menu-pop {
+        .k-sci { 
+            background: var(--pri-c); 
+            font-size: 1rem; 
+            height: 50px; 
+            border-radius: 25px; 
+        }
+
+        .k-eq { 
+            background: var(--pri); 
+            color: var(--on-pri); 
+            font-size: 2.6rem; 
+        }
+
+        .menu-box {
             position: absolute;
-            right: 24px;
-            bottom: 120px;
+            right: 16px;
+            bottom: 110px;
             background: var(--bg);
             border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             display: none;
             flex-direction: column;
-            z-index: 100;
-            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+            z-index: 500;
             min-width: 200px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
-        .menu-pop div {
+        .menu-box div {
             padding: 18px 24px;
             border-bottom: 1px solid var(--surf);
             cursor: pointer;
+            font-size: 1rem;
         }
 
         .sheet {
@@ -217,85 +241,102 @@
             background: var(--bg);
             z-index: 1000;
             transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            padding: 60px 24px;
+            transition: transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: calc(48px + env(safe-area-inset-top)) 28px 28px;
         }
 
-        .sheet.open { transform: translateY(0); }
+        .sheet.active { 
+            transform: translateY(0); 
+        }
 
-        .history-item {
-            padding: 20px;
+        .history-card {
+            padding: 24px;
+            border-radius: 28px;
             background: var(--surf);
-            border-radius: 24px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             text-align: right;
+            cursor: pointer;
+        }
+
+        /* ランドスケープ及び大型機種対応 */
+        @media (min-width: 600px) {
+            .sci-drawer { 
+                height: auto !important; 
+                opacity: 1 !important; 
+                margin-bottom: 12px;
+            }
+            .handle-bar { display: none; }
         }
     </style>
 </head>
+
 <body>
 
-    <div id="history-sheet" class="sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
-            <h2 style="margin:0;">履歴</h2>
-            <span class="material-symbols-outlined" onclick="toggleHistory(false)">close</span>
+    <div id="history-panel" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+            <h1 id="h-title" style="margin:0; font-size:2rem; font-weight:400;">履歴</h1>
+            <div style="display:flex; gap:24px;">
+                <span class="material-symbols-outlined" style="font-size:2rem;" onclick="clearLog()">delete</span>
+                <span class="material-symbols-outlined" style="font-size:2rem;" onclick="location.hash='#home'">close</span>
+            </div>
         </div>
-        <div id="history-list" style="overflow-y:auto; height:80%;"></div>
+        <div id="history-list" style="overflow-y:auto; height:calc(100% - 120px); scrollbar-width: none;"></div>
     </div>
 
-    <div class="display-section">
+    <div class="display-layer">
         <div id="log-view"></div>
         <div id="main-view">0</div>
     </div>
 
-    <div class="input-panel">
+    <div class="input-layer">
         <div class="handle-bar" onclick="toggleSci()"></div>
-        
-        <div class="top-actions">
-            <span class="material-symbols-outlined" onclick="toggleHistory(true)">history</span>
+
+        <div class="action-bar">
+            <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
+            
             <div style="position:relative;">
-                <span class="material-symbols-outlined" onclick="toggleMenu()">more_vert</span>
-                <div id="main-menu" class="menu-pop">
-                    <div onclick="setTheme('light')">ライトモード</div>
-                    <div onclick="setTheme('dark')">ダークモード</div>
-                    <div onclick="setTheme('system')">システム同期</div>
+                <span class="material-symbols-outlined" id="more-trigger" onclick="toggleMenu()">more_vert</span>
+                <div id="menu-box" class="menu-box">
+                    <div onclick="cycleTheme()">テーマ切り替え</div>
+                    <div onclick="copyValue()">結果をコピー</div>
+                    <div onclick="press('AC')">AC (全消去)</div>
                 </div>
             </div>
         </div>
 
         <div class="grid-container">
-            <div id="sci-row" class="sci-row">
-                <button class="k-sci" onclick="run('sin(')">sin</button>
-                <button class="k-sci" onclick="run('cos(')">cos</button>
-                <button class="k-sci" onclick="run('tan(')">tan</button>
-                <button class="k-sci" onclick="run('sqrt(')">√</button>
-                <button class="k-sci" onclick="run('π')">π</button>
-                <button class="k-sci" onclick="run('^')">^</button>
+            <div id="sci-box" class="sci-drawer">
+                <button class="k-sci" onclick="press('sin(')">sin</button>
+                <button class="k-sci" onclick="press('cos(')">cos</button>
+                <button class="k-sci" onclick="press('tan(')">tan</button>
+                <button class="k-sci" onclick="press('sqrt(')">√</button>
+                <button class="k-sci" onclick="press('π')">π</button>
             </div>
 
-            <div class="num-grid">
-                <button class="k-op" onclick="run('AC')">AC</button>
-                <button class="k-op" onclick="run('DEL')">⌫</button>
-                <button class="k-op" onclick="run('%')">%</button>
-                <button class="k-op" onclick="run('÷')">÷</button>
+            <div class="main-grid">
+                <button class="k-op" onclick="press('AC')">AC</button>
+                <button class="k-op" onclick="press('DEL')">⌫</button>
+                <button class="k-op" onclick="press('%')">%</button>
+                <button class="k-op" onclick="press('÷')">÷</button>
                 
-                <button onclick="run('7')">7</button>
-                <button onclick="run('8')">8</button>
-                <button onclick="run('9')">9</button>
-                <button class="k-op" onclick="run('×')">×</button>
+                <button onclick="press('7')">7</button>
+                <button onclick="press('8')">8</button>
+                <button onclick="press('9')">9</button>
+                <button class="k-op" onclick="press('×')">×</button>
                 
-                <button onclick="run('4')">4</button>
-                <button onclick="run('5')">5</button>
-                <button onclick="run('6')">6</button>
-                <button class="k-op" onclick="run('-')">-</button>
+                <button onclick="press('4')">4</button>
+                <button onclick="press('5')">5</button>
+                <button onclick="press('6')">6</button>
+                <button class="k-op" onclick="press('-')">-</button>
                 
-                <button onclick="run('1')">1</button>
-                <button onclick="run('2')">2</button>
-                <button onclick="run('3')">3</button>
-                <button class="k-op" onclick="run('+')">+</button>
+                <button onclick="press('1')">1</button>
+                <button onclick="press('2')">2</button>
+                <button onclick="press('3')">3</button>
+                <button class="k-op" onclick="press('+')">+</button>
                 
-                <button onclick="run('0')">0</button>
-                <button onclick="run('.')">.</button>
-                <button class="k-eq" onclick="run('=')" style="grid-column: span 2">=</button>
+                <button onclick="runVibrate(20);press('0')">0</button>
+                <button onclick="press('.')">.</button>
+                <button class="k-eq" onclick="press('=')" style="grid-column: span 2">=</button>
             </div>
         </div>
     </div>
@@ -303,78 +344,127 @@
     <script>
         let exp = "";
         let solved = false;
-        let logs = JSON.parse(localStorage.getItem('calc-history') || '[]');
+        let logs = JSON.parse(localStorage.getItem('calc-log') || '[]');
+        let cfg = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system"}');
 
-        function toggleSci() {
-            document.getElementById('sci-row').classList.toggle('active');
+        function runVibrate(ms) {
+            if (navigator.vibrate) navigator.vibrate(ms);
         }
 
-        function toggleMenu() {
-            const m = document.getElementById('main-menu');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        function sync() {
+            const h = window.location.hash;
+            document.getElementById('history-panel').classList.toggle('active', h === '#history');
+            if (h === '#history') buildLog();
         }
 
-        function setTheme(m) {
-            localStorage.setItem('calc-prefs', JSON.stringify({mode: m}));
-            location.reload();
+        function toggleSci() { 
+            runVibrate(10);
+            document.getElementById('sci-box').classList.toggle('open'); 
         }
 
-        function toggleHistory(open) {
-            const s = document.getElementById('history-sheet');
-            s.classList.toggle('open', open);
-            if(open) renderHistory();
+        function toggleMenu() { 
+            const m = document.getElementById('menu-box'); 
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; 
         }
 
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = logs.map(i => `<div class="history-item"><div style="opacity:0.6">${i.q}</div><div style="font-size:1.5rem">${i.a}</div></div>`).join('');
+        function closeMenu() { 
+            document.getElementById('menu-box').style.display = 'none'; 
         }
 
-        function run(key) {
+        function press(v) {
+            runVibrate(15);
             const mv = document.getElementById('main-view');
             const lv = document.getElementById('log-view');
+            closeMenu();
 
-            if (key === 'AC') { exp = ""; lv.innerText = ""; solved = false; }
-            else if (key === 'DEL') { exp = exp.slice(0, -1); }
-            else if (key === '=') {
+            if (v === 'AC') { 
+                exp = ""; lv.innerText = ""; solved = false; 
+            } else if (v === 'DEL') { 
+                exp = exp.slice(0, -1); 
+            } else if (v === '=') {
+                if (!exp) return;
                 try {
-                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*').replace(/π/g, 'Math.PI').replace(/\^/g, '**');
+                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
+                               .replace(/π/g, 'Math.PI')
+                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
+                               .replace(/tan\(/g, 'Math.tan(').replace(/sqrt\(/g, 'Math.sqrt(');
+                    
+                    if (f === "0/0") { mv.innerText = "結果なし"; exp = ""; return; }
+
                     let res = eval(f);
                     let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
-                    if(exp) {
-                        logs.unshift({q: exp, a: out});
-                        localStorage.setItem('calc-history', JSON.stringify(logs.slice(0, 20)));
-                    }
-                    lv.innerText = exp + " =";
+                    
+                    logs.unshift({q: exp, a: out});
+                    localStorage.setItem('calc-log', JSON.stringify(logs.slice(0, 30)));
+                    
+                    lv.innerText = exp + ' =';
                     exp = out;
                     solved = true;
-                } catch { mv.innerText = "Error"; setTimeout(() => render(), 800); return; }
+                } catch { 
+                    mv.innerText = "エラー"; 
+                    setTimeout(render, 800); 
+                    return; 
+                }
             } else {
-                if (solved && /[0-9]/.test(key)) exp = "";
-                solved = false;
-                exp += key;
+                if (solved && /[0-9]/.test(v)) exp = "";
+                solved = false; 
+                exp += v;
             }
             render();
         }
 
         function render() {
             const mv = document.getElementById('main-view');
-            mv.innerText = exp || "0";
+            mv.innerText = exp || '0';
             mv.scrollLeft = mv.scrollWidth;
-            document.getElementById('main-menu').style.display = 'none';
         }
 
+        function copyValue() { 
+            navigator.clipboard.writeText(exp || '0'); 
+            closeMenu(); 
+        }
+
+        function buildLog() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = logs.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:80px;">履歴なし</div>`;
+            logs.forEach(i => {
+                const d = document.createElement('div');
+                d.className = 'history-card';
+                d.innerHTML = `<div style="opacity:0.6;font-size:1rem;margin-bottom:8px;">${i.q}</div><div style="font-size:1.8rem;font-weight:500;">${i.a}</div>`;
+                d.onclick = () => { exp = i.a; render(); location.hash='#home'; };
+                list.appendChild(d);
+            });
+        }
+
+        function cycleTheme() {
+            const m = ['system', 'light', 'dark'];
+            cfg.mode = m[(m.indexOf(cfg.mode) + 1) % m.length];
+            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
+            location.reload();
+        }
+
+        function clearLog() { 
+            logs = []; 
+            localStorage.setItem('calc-log', '[]'); 
+            buildLog(); 
+        }
+
+        window.onload = () => { render(); sync(); };
+        window.onhashchange = sync;
+
+        // 物理キーボード対応
         window.addEventListener('keydown', (e) => {
             const map = {'Enter': '=', 'Backspace': 'DEL', 'Escape': 'AC', '*': '×', '/': '÷'};
             const k = map[e.key] || e.key;
-            if (/[0-9+\-×÷.%=^()]/.test(k) || k === 'DEL' || k === 'AC' || k === '=') {
-                e.preventDefault(); run(k);
+            if (/[0-9+\-×÷.%=()]/.test(k) || k === 'DEL' || k === 'AC' || k === '=') {
+                e.preventDefault();
+                press(k);
             }
         });
 
-        document.addEventListener('click', e => {
-            if(!e.target.closest('.top-actions')) document.getElementById('main-menu').style.display = 'none';
-        });
+        document.body.onclick = (e) => { 
+            if(!e.target.closest('#more-trigger') && !e.target.closest('#menu-box')) closeMenu(); 
+        };
     </script>
 </body>
 </html>
