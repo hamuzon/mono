@@ -9,10 +9,16 @@
         (function() {
             const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"auto"}');
             const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const isDark = prefs.mode === 'dark' || (prefs.mode === 'system' && darkQuery.matches);
-            
-            document.documentElement.className = isDark ? 'dark' : 'light';
-            document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
+            const update = (isDark) => {
+                document.documentElement.className = isDark ? 'dark' : 'light';
+                document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
+            };
+            if (prefs.mode === 'system') {
+                update(darkQuery.matches);
+                darkQuery.addEventListener('change', e => update(e.matches));
+            } else {
+                update(prefs.mode === 'dark');
+            }
         })();
     </script>
 
@@ -62,7 +68,7 @@
             font-family: 'Google Sans', sans-serif;
         }
 
-        .display-container {
+        .display-layer {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -84,22 +90,24 @@
 
         #main-view {
             font-family: 'Potta One', cursive;
-            font-size: clamp(2.8rem, 14vw, 4.8rem);
+            font-size: clamp(2.5rem, 12vw, 4.5rem);
             white-space: nowrap;
             overflow-x: auto;
             padding: 8px 0;
             scrollbar-width: none;
         }
 
-        .pad-layer {
+        .input-layer {
             background: var(--surf);
             border-radius: 40px 40px 0 0;
             padding-bottom: env(safe-area-inset-bottom);
             box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-            transition: background 0.3s;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .top-nav {
+        .action-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -107,7 +115,7 @@
             color: var(--pri);
         }
 
-        .top-nav span {
+        .action-bar span {
             cursor: pointer;
             padding: 10px;
             border-radius: 50%;
@@ -136,9 +144,9 @@
         }
 
         button {
-            height: 74px;
+            height: clamp(60px, 10vh, 76px);
             border: none;
-            border-radius: 37px;
+            border-radius: 38px;
             font-size: 1.6rem;
             font-weight: 500;
             background: var(--bg);
@@ -168,7 +176,8 @@
             flex-direction: column;
             box-shadow: 0 12px 40px rgba(0,0,0,0.25);
             z-index: 500;
-            min-width: 180px;
+            min-width: 200px;
+            overflow: hidden;
         }
 
         .more-menu div {
@@ -178,7 +187,9 @@
             cursor: pointer;
         }
 
-        .side-sheet {
+        .more-menu div:active { background: var(--pri-c); }
+
+        .sheet {
             position: fixed;
             inset: 0;
             background: var(--bg);
@@ -188,9 +199,9 @@
             padding: calc(40px + env(safe-area-inset-top)) 32px 32px;
         }
 
-        .side-sheet.active { transform: translateY(0); }
+        .sheet.active { transform: translateY(0); }
 
-        .log-card {
+        .history-card {
             padding: 20px;
             border-radius: 24px;
             background: var(--surf);
@@ -198,12 +209,17 @@
             text-align: right;
             cursor: pointer;
         }
+
+        @media (min-width: 600px) {
+            .sci-grid { height: auto !important; padding: 10px 24px !important; }
+            .action-bar span[onclick*="toggleSci"] { display: none; }
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="history-panel" class="side-sheet">
+    <div id="history-panel" class="sheet">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
             <h1 id="h-title" style="margin:0; font-size:1.8rem;">履歴</h1>
             <div style="display:flex; gap:24px;">
@@ -214,23 +230,24 @@
         <div id="history-list" style="overflow-y:auto; height:calc(100% - 120px); scrollbar-width: none;"></div>
     </div>
 
-    <div class="display-container">
+    <div class="display-layer">
         <div id="log-view"></div>
         <div id="main-view">0</div>
     </div>
 
-    <div class="pad-layer">
-        <div class="top-nav">
+    <div class="input-layer">
+        <div class="action-bar">
             <div style="display:flex; gap:16px;">
                 <span class="material-symbols-outlined" onclick="toggleSci()">science</span>
                 <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
             </div>
             <div style="position:relative;">
-                <span class="material-symbols-outlined" id="more-btn" onclick="toggleMenu()">more_vert</span>
+                <span class="material-symbols-outlined" id="more-trigger" onclick="toggleMenu()">more_vert</span>
                 <div id="menu-box" class="more-menu">
-                    <div id="m-theme" onclick="changeTheme()">ダークモード</div>
-                    <div id="m-lang" onclick="changeLang()">English</div>
+                    <div id="m-theme" onclick="cycleTheme()">テーマ: システム</div>
+                    <div id="m-lang" onclick="cycleLang()">Language: JP</div>
                     <div id="m-copy" onclick="copyValue()">結果をコピー</div>
+                    <div onclick="press('AC')">すべてクリア</div>
                 </div>
             </div>
         </div>
@@ -262,7 +279,7 @@
             <button onclick="press('4')">4</button>
             <button onclick="press('5')">5</button>
             <button onclick="press('6')">6</button>
-            <button class="k-op" onclick="cmd('-')">-</button>
+            <button class="k-op" onclick="press('-')">-</button>
             
             <button onclick="press('1')">1</button>
             <button onclick="press('2')">2</button>
@@ -283,20 +300,20 @@
         let cfg = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
 
         const i18n = {
-            ja: { h: "履歴", empty: "履歴なし", err: "エラー", dark: "ダークモード", light: "ライトモード", copy: "コピー" },
-            en: { h: "History", empty: "No History", err: "Error", dark: "Dark Mode", light: "Light Mode", copy: "Copy" }
+            ja: { h: "履歴", empty: "履歴なし", err: "エラー", m_mode: "テーマ: ", m_copy: "結果をコピー", modes: {system:"システム", dark:"ダーク", light:"ライト"} },
+            en: { h: "History", empty: "No History", err: "Error", m_mode: "Theme: ", m_copy: "Copy Result", modes: {system:"System", dark:"Dark", light:"Light"} }
         };
 
         function sync() {
             const h = window.location.hash;
             document.getElementById('history-panel').classList.toggle('active', h === '#history');
             if (h === '#history') buildLog();
-            
+
             const t = i18n[cfg.lang];
-            const isDark = document.documentElement.classList.contains('dark');
             document.getElementById('h-title').innerText = t.h;
-            document.getElementById('m-theme').innerText = isDark ? t.light : t.dark;
-            document.getElementById('m-copy').innerText = t.copy;
+            document.getElementById('m-theme').innerText = t.m_mode + t.modes[cfg.mode];
+            document.getElementById('m-lang').innerText = "Language: " + (cfg.lang === 'ja' ? 'JP' : 'EN');
+            document.getElementById('m-copy').innerText = t.m_copy;
         }
 
         function toggleSci() { document.getElementById('sci-box').classList.toggle('open'); }
@@ -313,18 +330,17 @@
             else if (v === '=') {
                 if (!exp) return;
                 try {
-                    let formula = exp.replace(/÷/g, '/').replace(/×/g, '*')
-                                     .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
-                                     .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
-                                     .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
-                                     .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
-                                     .replace(/\^/g, '**');
+                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
+                               .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
+                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
+                               .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
+                               .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
+                               .replace(/\^/g, '**');
 
-                    const openP = (formula.match(/\(/g) || []).length;
-                    const closeP = (formula.match(/\)/g) || []).length;
-                    if (openP > closeP) formula += ')'.repeat(openP - closeP);
+                    const op = (f.match(/\(/g) || []).length, cp = (f.match(/\)/g) || []).length;
+                    if (op > cp) f += ')'.repeat(op - cp);
 
-                    let res = eval(formula);
+                    let res = eval(f);
                     let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
                     
                     logs.unshift({q: exp, a: out});
@@ -333,10 +349,10 @@
                     lv.innerText = exp + ' =';
                     exp = out;
                     solved = true;
-                } catch { mv.innerText = i18n[cfg.lang].err; setTimeout(() => render(), 800); return; }
+                } catch { mv.innerText = i18n[cfg.lang].err; setTimeout(render, 800); return; }
             } else if (v === '()') {
-                const openP = (exp.match(/\(/g) || []).length, closeP = (exp.match(/\)/g) || []).length;
-                exp += (openP > closeP && /[0-9)]$/.test(exp.slice(-1))) ? ')' : '(';
+                const op = (exp.match(/\(/g) || []).length, cp = (exp.match(/\)/g) || []).length;
+                exp += (op > cp && /[0-9)]$/.test(exp.slice(-1))) ? ')' : '(';
             } else {
                 if (solved && /[0-9]/.test(v)) exp = "";
                 solved = false; exp += v;
@@ -357,23 +373,21 @@
             list.innerHTML = logs.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:60px;">${i18n[cfg.lang].empty}</div>`;
             logs.forEach(i => {
                 const d = document.createElement('div');
-                d.className = 'log-card';
+                d.className = 'history-card';
                 d.innerHTML = `<div style="opacity:0.6;font-size:0.9rem">${i.q}</div><div style="font-size:1.7rem;font-weight:500;">${i.a}</div>`;
                 d.onclick = () => { exp = i.a; render(); location.hash='#home'; };
                 list.appendChild(d);
             });
         }
 
-        function changeTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
-            cfg.mode = isDark ? 'light' : 'dark';
-            document.documentElement.className = cfg.mode;
-            document.documentElement.style.backgroundColor = isDark ? '#FDFCF4' : '#1B1C17';
+        function cycleTheme() {
+            const m = ['system', 'light', 'dark'];
+            cfg.mode = m[(m.indexOf(cfg.mode) + 1) % m.length];
             localStorage.setItem('calc-prefs', JSON.stringify(cfg));
-            sync(); closeMenu();
+            location.reload();
         }
 
-        function changeLang() {
+        function cycleLang() {
             cfg.lang = cfg.lang === 'ja' ? 'en' : 'ja';
             localStorage.setItem('calc-prefs', JSON.stringify(cfg));
             sync(); closeMenu();
@@ -383,7 +397,7 @@
 
         window.onload = () => { render(); sync(); };
         window.onhashchange = sync;
-        document.body.onclick = (e) => { if(!e.target.id.includes('more-btn')) closeMenu(); };
+        document.body.onclick = (e) => { if(!e.target.id.includes('more')) closeMenu(); };
     </script>
 </body>
 </html>
