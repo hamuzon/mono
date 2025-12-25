@@ -9,10 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <script>
+        // 再読み込み時の白飛び防止（即時実行）
         (function() {
             const config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":30}');
             const isDark = config.theme === 'dark' || (config.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (isDark) document.documentElement.classList.add('dark-mode');
+            
+            // #home チェック
+            if (window.location.hash === '#home') {
+                document.documentElement.classList.add('home-design');
+            }
         })();
     </script>
 
@@ -27,6 +33,7 @@
             --sec-cont: #E3E4D3;
             --on-sec-cont: #1B1C17;
             --accent: #4C662B;
+            --radius: 50%;
         }
 
         .dark-mode {
@@ -39,6 +46,11 @@
             --sec-cont: #45483C;
             --on-sec-cont: #E3E4D3;
             --accent: #B1D18A;
+        }
+
+        /* #home 時の特別デザイン */
+        .home-design {
+            --radius: 35%; /* 少し角ばったモダンなデザイン */
         }
 
         * {
@@ -112,7 +124,7 @@
             border-radius: 40px 40px 0 0;
             display: flex;
             flex-direction: column;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* ジェスチャーバー対策 */
         }
 
         .toolbar {
@@ -133,7 +145,6 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            transition: all 0.3s ease;
         }
 
         .adv-grid {
@@ -148,7 +159,7 @@
         }
 
         .adv-grid.show {
-            max-height: 200px;
+            max-height: 180px;
             opacity: 1;
             padding: 12px 24px;
         }
@@ -157,13 +168,13 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            padding: 12px 24px 24px;
+            padding: 12px 24px 8px;
         }
 
         button {
             aspect-ratio: 1/1;
             border: none;
-            border-radius: 50%;
+            border-radius: var(--radius);
             font-size: 1.6rem;
             font-weight: 500;
             cursor: pointer;
@@ -172,11 +183,11 @@
             justify-content: center;
             background: var(--bg);
             color: var(--on-bg);
-            transition: transform 0.1s;
+            transition: transform 0.1s, border-radius 0.3s;
         }
 
         button:active {
-            transform: scale(0.9);
+            transform: scale(0.92);
         }
 
         .btn-op {
@@ -193,16 +204,16 @@
         .btn-eq {
             background: var(--accent);
             color: var(--bg);
-            border-radius: 40px;
+            border-radius: 32px;
             font-size: 2rem;
         }
 
         .btn-adv {
             background: transparent;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--on-surface);
+            height: 44px;
             aspect-ratio: auto;
-            height: 48px;
         }
 
         .item {
@@ -327,20 +338,19 @@
     </div>
 
     <script>
-        let expr = '';
+        let expr = localStorage.getItem('calc_last_expr') || '';
         let hData = JSON.parse(localStorage.getItem('calc_h') || '[]');
         let config = JSON.parse(localStorage.getItem('calc_config') || '{"theme":"system","vibe":30}');
 
         function vib() { 
             const ms = parseInt(config.vibe);
-            if (ms > 0 && navigator.vibrate) navigator.vibrate(ms / 2); 
+            if (ms > 0 && navigator.vibrate) navigator.vibrate(ms / 3); 
         }
 
         function applySettings() {
             config.theme = document.getElementById('sel-theme').value;
             config.vibe = document.getElementById('vibe-range').value;
             document.getElementById('vibe-val').innerText = config.vibe + '%';
-            
             localStorage.setItem('calc_config', JSON.stringify(config));
             
             const isDark = config.theme === 'dark' || (config.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -368,13 +378,9 @@
         function add(v) {
             vib();
             const mainEl = document.getElementById('main'), subEl = document.getElementById('sub');
-
-            if (v === 'AC') { 
-                expr = ''; 
-                subEl.innerText = ''; 
-            } else if (v === 'DEL') { 
-                expr = expr.slice(0, -1); 
-            } else if (v === '=') {
+            if (v === 'AC') { expr = ''; subEl.innerText = ''; }
+            else if (v === 'DEL') { expr = expr.slice(0, -1); }
+            else if (v === '=') {
                 try {
                     let f = expr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-').replace(/%/g, '/100').replace(/π/g, 'Math.PI').replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(').replace(/tan\(/g, 'Math.tan(').replace(/ln\(/g, 'Math.log(').replace(/log\(/g, 'Math.log10(').replace(/\^/g, '**').replace(/√\(/g, 'Math.sqrt(');
                     let res = eval(f);
@@ -383,18 +389,13 @@
                     localStorage.setItem('calc_h', JSON.stringify(hData.slice(0, 30)));
                     subEl.innerText = expr + ' =';
                     expr = out.replace(/-/g, '−');
-                } catch { 
-                    mainEl.value = 'Error'; 
-                    setTimeout(() => add('AC'), 800); 
-                    return; 
-                }
+                } catch { mainEl.value = 'Error'; setTimeout(() => add('AC'), 800); return; }
             } else if (v === '()') {
                 const o = (expr.match(/\(/g) || []).length, c = (expr.match(/\)/g) || []).length;
                 expr += (o > c && /[0-9π)]$/.test(expr.slice(-1))) ? ')' : '(';
-            } else { 
-                expr += v; 
-            }
+            } else { expr += v; }
             mainEl.value = expr || '0';
+            localStorage.setItem('calc_last_expr', expr);
         }
 
         function renderHist() {
@@ -404,26 +405,28 @@
                 const div = document.createElement('div');
                 div.className = 'hist-row';
                 div.innerHTML = `<div style="opacity:0.6; font-size:1.1rem;">${i.q}</div><div style="font-size:2rem; font-weight:500;">${i.a}</div>`;
-                div.onclick = () => { 
-                    expr = i.a.replace(/-/g, '−'); 
-                    document.getElementById('main').value = expr; 
-                    closeOverlay(); 
-                };
+                div.onclick = () => { expr = i.a.replace(/-/g, '−'); document.getElementById('main').value = expr; closeOverlay(); };
                 list.appendChild(div);
             });
         }
 
-        function clearHist() { 
-            vib(); 
-            hData = []; 
-            localStorage.removeItem('calc_h'); 
-            renderHist(); 
-        }
+        function clearHist() { vib(); hData = []; localStorage.removeItem('calc_h'); renderHist(); }
 
+        // 初期化
         document.getElementById('sel-theme').value = config.theme;
         document.getElementById('vibe-range').value = config.vibe;
         document.getElementById('vibe-val').innerText = config.vibe + '%';
-    </script>
+        document.getElementById('main').value = expr || '0';
 
+        // ハッシュ変更監視
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#home') {
+                closeOverlay();
+                document.documentElement.classList.add('home-design');
+            } else {
+                document.documentElement.classList.remove('home-design');
+            }
+        });
+    </script>
 </body>
 </html>
