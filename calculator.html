@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>計算機 / Calculator</title>
+    <title>Google Calculator Clone</title>
 
     <script>
         (function() {
@@ -33,6 +33,7 @@
             --pri: #4C662B; --on-pri: #FFFFFF;
             --pri-c: #D7E8B7; --on-pri-c: #121F00;
             --sec-c: #E3E4D3; --sci-bg: #D7E8B7;
+            --hdl: #74796B;
         }
 
         .dark {
@@ -41,6 +42,7 @@
             --pri: #B1D18A; --on-pri: #1F3701;
             --pri-c: #3E4A2B; --on-pri-c: #D7E8B7;
             --sec-c: #45483C; --sci-bg: #3E4A2B;
+            --hdl: #909284;
         }
 
         * {
@@ -94,7 +96,26 @@
         .panel {
             background: var(--surf);
             border-radius: 40px 40px 0 0;
-            padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
+            padding: 8px 20px calc(24px + env(safe-area-inset-bottom));
+            transition: background 0.4s;
+        }
+
+        .handle-bar {
+            width: 100%;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .handle-bar::after {
+            content: '';
+            width: 36px;
+            height: 4px;
+            background: var(--hdl);
+            border-radius: 2px;
+            opacity: 0.4;
         }
 
         .utility-bar {
@@ -104,21 +125,20 @@
             padding: 0 16px 12px;
         }
 
-        .utility-bar span {
-            cursor: pointer;
-            padding: 10px;
-            color: var(--pri);
-            font-size: 24px;
-        }
-
         #unit-toggle {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--pri);
-            padding: 6px 14px;
-            border-radius: 14px;
+            padding: 6px 16px;
+            border-radius: 16px;
             background: var(--pri-c);
             text-transform: uppercase;
+        }
+
+        .menu-trigger {
+            color: var(--pri);
+            cursor: pointer;
+            padding: 8px;
         }
 
         .layout-engine {
@@ -130,7 +150,7 @@
         .sci-cluster {
             display: flex;
             overflow-x: auto;
-            gap: 8px;
+            gap: 10px;
             padding-bottom: 8px;
             scrollbar-width: none;
         }
@@ -144,10 +164,10 @@
         }
 
         button {
-            height: clamp(60px, 10vh, 84px);
+            height: clamp(64px, 11vh, 88px);
             border: none;
-            border-radius: 42px;
-            font-size: 1.6rem;
+            border-radius: 44px;
+            font-size: 1.7rem;
             font-weight: 500;
             background: var(--bg);
             color: var(--on-bg);
@@ -160,12 +180,12 @@
         button:active { transform: scale(0.92); }
 
         .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.5rem; }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.6rem; }
 
         .k-sci { 
             background: var(--sci-bg); 
             font-size: 1.1rem; 
-            min-width: 80px; 
+            min-width: 84px; 
             height: 48px; 
             border-radius: 24px;
             flex-shrink: 0;
@@ -176,12 +196,13 @@
             .sci-cluster { 
                 display: grid; 
                 grid-template-columns: repeat(3, 1fr); 
-                width: 40%; 
+                width: 42%; 
                 overflow-x: visible;
                 height: auto;
             }
-            .k-sci { height: clamp(60px, 10vh, 84px); width: auto; }
+            .k-sci { height: clamp(64px, 11vh, 88px); width: auto; }
             .panel { border-radius: 0; }
+            .handle-bar { display: none; }
         }
 
         .overlay-menu {
@@ -194,7 +215,7 @@
             display: none;
             flex-direction: column;
             z-index: 5000;
-            min-width: 220px;
+            min-width: 240px;
             overflow: hidden;
         }
 
@@ -222,17 +243,18 @@
     </section>
 
     <nav class="panel">
+        <div class="handle-bar"></div>
+
         <div class="utility-bar">
             <div id="unit-toggle" onclick="ui('unit')">deg</div>
             <div style="position:relative;">
-                <span class="material-symbols-outlined" id="menu-btn" onclick="ui('menu')">more_vert</span>
+                <span class="material-symbols-outlined menu-trigger" id="menu-btn" onclick="ui('menu')">more_vert</span>
                 <div id="settings-menu" class="overlay-menu">
                     <div onclick="sys('light')">ライトモード</div>
                     <div onclick="sys('dark')">ダークモード</div>
-                    <div onclick="sys('system')">システム同期</div>
                     <div onclick="sys('copy')">結果をコピー</div>
                     <div class="vibe-box">
-                        <span style="font-size:0.85rem">振動: <span id="v-val">50</span>%</span>
+                        <span style="font-size:0.85rem">振動強度: <span id="v-val">50</span>%</span>
                         <input type="range" id="v-range" min="0" max="100" value="50" oninput="sys('vibe', this.value)">
                     </div>
                 </div>
@@ -250,36 +272,33 @@
                 <button class="k-sci" onclick="run('^')">^</button>
                 <button class="k-sci" onclick="run('π')">π</button>
                 <button class="k-sci" onclick="run('e')">e</button>
-                <button class="k-sci" onclick="run('!')">n!</button>
-                <button class="k-sci" onclick="run('inv(')">1/x</button>
-                <button class="k-sci" onclick="run('abs(')">|x|</button>
+                <button class="k-sci" onclick="run('!')">!</button>
             </div>
 
             <div class="num-cluster">
                 <button class="k-op" onclick="run('AC')">AC</button>
                 <button class="k-op" onclick="run('DEL')">⌫</button>
                 <button class="k-op" onclick="run('(')">(</button>
-                <button class="k-op" onclick="run(')')">)</button>
+                <button class="k-op" onclick="run('÷')">÷</button>
 
                 <button onclick="run('7')">7</button>
                 <button onclick="run('8')">8</button>
                 <button onclick="run('9')">9</button>
-                <button class="k-op" onclick="run('÷')">÷</button>
+                <button class="k-op" onclick="run('×')">×</button>
 
                 <button onclick="run('4')">4</button>
                 <button onclick="run('5')">5</button>
                 <button onclick="run('6')">6</button>
-                <button class="k-op" onclick="run('×')">×</button>
+                <button class="k-op" onclick="run('-')">-</button>
 
                 <button onclick="run('1')">1</button>
                 <button onclick="run('2')">2</button>
                 <button onclick="run('3')">3</button>
-                <button class="k-op" onclick="run('-')">-</button>
+                <button class="k-op" onclick="run('+')">+</button>
 
                 <button onclick="run('0')">0</button>
                 <button onclick="run('.')">.</button>
-                <button class="k-eq" onclick="run('=')">=</button>
-                <button class="k-op" onclick="run('+')">+</button>
+                <button class="k-eq" onclick="run('=')" style="grid-column: span 2">=</button>
             </div>
         </div>
     </nav>
@@ -312,7 +331,7 @@
                 p.vibe = val;
                 document.getElementById('v-val').innerText = val;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
-            } else if (['light', 'dark', 'system'].includes(cmd)) {
+            } else if (cmd === 'light' || cmd === 'dark') {
                 p.mode = cmd;
                 localStorage.setItem('calc-prefs', JSON.stringify(p));
                 location.reload();
@@ -338,8 +357,7 @@
                                .replace(/cos\(/g, p.unit === 'deg' ? 'Math.cos(Math.PI/180*' : 'Math.cos(')
                                .replace(/tan\(/g, p.unit === 'deg' ? 'Math.tan(Math.PI/180*' : 'Math.tan(')
                                .replace(/log\(/g, 'Math.log10(').replace(/ln\(/g, 'Math.log(')
-                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/inv\(/g, '1/(')
-                               .replace(/abs\(/g, 'Math.abs(').replace(/π/g, 'Math.PI')
+                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/π/g, 'Math.PI')
                                .replace(/e/g, 'Math.E').replace(/\^/g, '**');
 
                     const o = (f.match(/\(/g) || []).length;
