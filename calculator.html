@@ -2,24 +2,24 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>計算機 / Calculator</title>
 
     <script>
         (function() {
-            const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50}');
+            const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system"}');
             const q = window.matchMedia('(prefers-color-scheme: dark)');
-
-            const upd = (isD) => {
-                document.documentElement.className = isD ? 'dark' : 'light';
-                document.documentElement.style.backgroundColor = isD ? '#1B1C17' : '#FDFCF4';
+            
+            const update = (isDark) => {
+                document.documentElement.className = isDark ? 'dark' : 'light';
+                document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
             };
 
             if (p.mode === 'system') {
-                upd(q.matches);
-                q.addEventListener('change', e => upd(e.matches));
+                update(q.matches);
+                q.addEventListener('change', e => update(e.matches));
             } else {
-                upd(p.mode === 'dark');
+                update(p.mode === 'dark');
             }
         })();
     </script>
@@ -28,37 +28,44 @@
 
     <style>
         :root {
-            --bg: #FDFCF4; --on-bg: #1B1C17;
-            --surf: #EFF1E0; --on-surf: #44483D;
-            --pri: #4C662B; --on-pri: #FFFFFF;
-            --pri-c: #D7E8B7; --on-pri-c: #121F00;
-            --sec-c: #E3E4D3; --sci-bg: #D7E8B7;
+            --bg: #FDFCF4;
+            --on-bg: #1B1C17;
+            --surf: #EFF1E0;
+            --on-surf: #44483D;
+            --pri: #4C662B;
+            --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7;
+            --on-pri-c: #121F00;
             --hdl: #74796B;
         }
 
         .dark {
-            --bg: #1B1C17; --on-bg: #E3E4D3;
-            --surf: #2F3126; --on-surf: #C7C8B8;
-            --pri: #B1D18A; --on-pri: #1F3701;
-            --pri-c: #3E4A2B; --on-pri-c: #D7E8B7;
-            --sec-c: #45483C; --sci-bg: #3E4A2B;
+            --bg: #1B1C17;
+            --on-bg: #E3E4D3;
+            --surf: #2F3126;
+            --on-surf: #C7C8B8;
+            --pri: #B1D18A;
+            --on-pri: #1F3701;
+            --pri-c: #3E4A2B;
+            --on-pri-c: #D7E8B7;
             --hdl: #909284;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            user-select: none;
+            outline: none;
         }
 
         html, body {
             margin: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
             background: var(--bg);
+            color: var(--on-bg);
             font-family: 'Google Sans', sans-serif;
+            overflow: hidden;
+            overscroll-behavior-y: contain;
         }
 
         body {
@@ -66,44 +73,45 @@
             flex-direction: column;
         }
 
-        .display-area {
+        .display-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 40px;
+            padding: 24px 32px;
             text-align: right;
+            min-height: 200px;
         }
 
         #log-view {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             color: var(--on-surf);
-            opacity: 0.6;
-            min-height: 2.2rem;
-            margin-bottom: 12px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            min-height: 1.8rem;
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
         }
 
         #main-view {
-            font-size: clamp(3.5rem, 18vw, 7.5rem);
+            font-size: clamp(3rem, 15vw, 6rem);
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
-        .pad-container {
+        .input-panel {
             background: var(--surf);
-            border-radius: 42px 42px 0 0;
-            padding: 12px 24px calc(24px + env(safe-area-inset-bottom));
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+            border-radius: 40px 40px 0 0;
+            padding: 8px 24px calc(16px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.05);
         }
 
         .handle-bar {
             width: 100%;
-            height: 36px;
+            height: 32px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -112,252 +120,260 @@
 
         .handle-bar::after {
             content: '';
-            width: 44px;
-            height: 5px;
+            width: 40px;
+            height: 4px;
             background: var(--hdl);
-            border-radius: 3px;
-            opacity: 0.3;
+            border-radius: 2px;
+            opacity: 0.4;
         }
 
-        .action-strip {
+        .top-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px 20px;
+            padding: 8px 12px 16px;
         }
 
-        .sci-drawer {
+        .top-actions span {
+            color: var(--pri);
+            cursor: pointer;
+            padding: 8px;
+            font-size: 24px;
+            user-select: none;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sci-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 8px;
+            height: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sci-row.active {
+            height: 60px;
+            opacity: 1;
+        }
+
+        .num-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-        }
-
-        .sci-drawer.active {
-            height: 180px;
-            opacity: 1;
-            margin-bottom: 16px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
         }
 
         button {
-            height: clamp(68px, 11vh, 88px);
+            height: clamp(64px, 10vh, 84px);
             border: none;
-            border-radius: 44px;
-            font-size: 1.9rem;
+            border-radius: 42px;
+            font-size: 1.8rem;
             font-weight: 500;
             background: var(--bg);
             color: var(--on-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s, filter 0.1s;
+            cursor: pointer;
+            transition: transform 0.1s;
         }
 
-        button:active {
-            transform: scale(0.92);
-            filter: brightness(0.9);
-        }
+        button:active { transform: scale(0.92); }
 
         .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.8rem; }
-        .k-sci { background: var(--sci-bg); font-size: 1.2rem; height: 56px; }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.5rem; }
+        .k-sci { background: var(--pri-c); font-size: 1.1rem; height: 50px; min-width: 80px; }
 
-        .more-menu {
+        .menu-pop {
             position: absolute;
             right: 24px;
             bottom: 120px;
             background: var(--bg);
-            border-radius: 28px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             display: none;
             flex-direction: column;
-            z-index: 999;
-            min-width: 220px;
+            z-index: 100;
             overflow: hidden;
+            min-width: 200px;
         }
 
-        .more-menu div {
-            padding: 22px 28px;
+        .menu-pop div {
+            padding: 18px 24px;
             border-bottom: 1px solid var(--surf);
             cursor: pointer;
         }
 
-        @media (min-width: 850px) or (orientation: landscape) {
-            .pad-container { border-radius: 0; }
-            .handle-bar { display: none; }
-            .sci-drawer { 
-                display: grid !important; 
-                height: auto !important; 
-                opacity: 1 !important;
-                grid-template-columns: repeat(2, 1fr);
-                width: 30%;
-                margin: 0;
-            }
-            .layout-flex { display: flex; gap: 20px; }
-            .main-grid { flex: 1; }
+        .sheet {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 60px 24px;
+        }
+
+        .sheet.open { transform: translateY(0); }
+
+        .history-item {
+            padding: 20px;
+            background: var(--surf);
+            border-radius: 24px;
+            margin-bottom: 12px;
+            text-align: right;
         }
     </style>
 </head>
 <body>
 
-    <section class="display-area">
+    <div id="history-sheet" class="sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <h2 style="margin:0;">履歴</h2>
+            <span class="material-symbols-outlined" onclick="toggleHistory(false)">close</span>
+        </div>
+        <div id="history-list" style="overflow-y:auto; height:80%;"></div>
+    </div>
+
+    <div class="display-section">
         <div id="log-view"></div>
         <div id="main-view">0</div>
-    </section>
+    </div>
 
-    <nav class="pad-container">
+    <div class="input-panel">
         <div class="handle-bar" onclick="toggleSci()"></div>
-
-        <div class="action-strip">
-            <span class="material-symbols-outlined" style="color:var(--pri); cursor:pointer;" onclick="location.reload()">refresh</span>
+        
+        <div class="top-actions">
+            <span class="material-symbols-outlined" onclick="toggleHistory(true)">history</span>
             <div style="position:relative;">
-                <span class="material-symbols-outlined" style="color:var(--pri); cursor:pointer;" onclick="toggleMenu()">more_vert</span>
-                <div id="drop-menu" class="more-menu">
-                    <div onclick="setMode('light')">ライトモード</div>
-                    <div onclick="setMode('dark')">ダークモード</div>
-                    <div onclick="setMode('system')">システム同期</div>
-                    <div onclick="copyRes()">結果をコピー</div>
+                <span class="material-symbols-outlined" onclick="toggleMenu()">more_vert</span>
+                <div id="main-menu" class="menu-pop">
+                    <div onclick="setTheme('light')">ライトモード</div>
+                    <div onclick="setTheme('dark')">ダークモード</div>
+                    <div onclick="setTheme('system')">システム同期</div>
                 </div>
             </div>
         </div>
 
-        <div class="layout-flex">
-            <div id="sci-panel" class="sci-drawer">
+        <div class="grid-container">
+            <div id="sci-row" class="sci-row">
                 <button class="k-sci" onclick="run('sin(')">sin</button>
                 <button class="k-sci" onclick="run('cos(')">cos</button>
                 <button class="k-sci" onclick="run('tan(')">tan</button>
                 <button class="k-sci" onclick="run('sqrt(')">√</button>
-                <button class="k-sci" onclick="run('log(')">log</button>
-                <button class="k-sci" onclick="run('ln(')">ln</button>
-                <button class="k-sci" onclick="run('^')">xʸ</button>
                 <button class="k-sci" onclick="run('π')">π</button>
+                <button class="k-sci" onclick="run('^')">^</button>
             </div>
 
-            <div class="main-grid">
+            <div class="num-grid">
                 <button class="k-op" onclick="run('AC')">AC</button>
                 <button class="k-op" onclick="run('DEL')">⌫</button>
                 <button class="k-op" onclick="run('%')">%</button>
                 <button class="k-op" onclick="run('÷')">÷</button>
-
+                
                 <button onclick="run('7')">7</button>
                 <button onclick="run('8')">8</button>
                 <button onclick="run('9')">9</button>
                 <button class="k-op" onclick="run('×')">×</button>
-
+                
                 <button onclick="run('4')">4</button>
                 <button onclick="run('5')">5</button>
                 <button onclick="run('6')">6</button>
                 <button class="k-op" onclick="run('-')">-</button>
-
+                
                 <button onclick="run('1')">1</button>
                 <button onclick="run('2')">2</button>
                 <button onclick="run('3')">3</button>
                 <button class="k-op" onclick="run('+')">+</button>
-
+                
                 <button onclick="run('0')">0</button>
                 <button onclick="run('.')">.</button>
                 <button class="k-eq" onclick="run('=')" style="grid-column: span 2">=</button>
             </div>
         </div>
-    </nav>
+    </div>
 
     <script>
         let exp = "";
         let solved = false;
-        let p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50}');
-
-        function vib() {
-            if (navigator.vibrate && p.vibe > 0) navigator.vibrate(15);
-        }
+        let logs = JSON.parse(localStorage.getItem('calc-history') || '[]');
 
         function toggleSci() {
-            vib();
-            document.getElementById('sci-panel').classList.toggle('active');
+            document.getElementById('sci-row').classList.toggle('active');
         }
 
         function toggleMenu() {
-            const m = document.getElementById('drop-menu');
+            const m = document.getElementById('main-menu');
             m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function setMode(m) {
-            p.mode = m;
-            localStorage.setItem('calc-prefs', JSON.stringify(p));
+        function setTheme(m) {
+            localStorage.setItem('calc-prefs', JSON.stringify({mode: m}));
             location.reload();
         }
 
-        function copyRes() {
-            navigator.clipboard.writeText(exp || "0");
-            toggleMenu();
+        function toggleHistory(open) {
+            const s = document.getElementById('history-sheet');
+            s.classList.toggle('open', open);
+            if(open) renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = logs.map(i => `<div class="history-item"><div style="opacity:0.6">${i.q}</div><div style="font-size:1.5rem">${i.a}</div></div>`).join('');
         }
 
         function run(key) {
-            vib();
             const mv = document.getElementById('main-view');
             const lv = document.getElementById('log-view');
 
-            if (key === 'AC') {
-                exp = ""; lv.innerText = ""; solved = false;
-            } else if (key === 'DEL') {
-                exp = exp.slice(0, -1);
-            } else if (key === '=') {
-                if (!exp) return;
+            if (key === 'AC') { exp = ""; lv.innerText = ""; solved = false; }
+            else if (key === 'DEL') { exp = exp.slice(0, -1); }
+            else if (key === '=') {
                 try {
-                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
-                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
-                               .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
-                               .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
-                               .replace(/π/g, 'Math.PI').replace(/\^/g, '**');
-
-                    if (f === "0/0") {
-                        mv.innerText = "結果なし";
-                        exp = ""; solved = true; return;
-                    }
-
-                    const o = (f.match(/\(/g) || []).length;
-                    const c = (f.match(/\)/g) || []).length;
-                    if (o > c) f += ')'.repeat(o - c);
-
+                    let f = exp.replace(/÷/g, '/').replace(/×/g, '*').replace(/π/g, 'Math.PI').replace(/\^/g, '**');
                     let res = eval(f);
-
-                    if (isNaN(res) || !isFinite(res)) {
-                        mv.innerText = "エラー";
-                    } else {
-                        lv.innerText = exp + " =";
-                        exp = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
-                        mv.innerText = exp;
+                    let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
+                    if(exp) {
+                        logs.unshift({q: exp, a: out});
+                        localStorage.setItem('calc-history', JSON.stringify(logs.slice(0, 20)));
                     }
+                    lv.innerText = exp + " =";
+                    exp = out;
                     solved = true;
-                    return;
-                } catch {
-                    mv.innerText = "エラー";
-                    setTimeout(() => mv.innerText = exp || "0", 1000);
-                    return;
-                }
+                } catch { mv.innerText = "Error"; setTimeout(() => render(), 800); return; }
             } else {
                 if (solved && /[0-9]/.test(key)) exp = "";
                 solved = false;
                 exp += key;
             }
-
-            mv.innerText = exp || "0";
-            mv.scrollLeft = mv.scrollWidth;
-            document.getElementById('drop-menu').style.display = 'none';
+            render();
         }
 
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.more-menu') && !e.target.innerText.includes('more_vert')) {
-                document.getElementById('drop-menu').style.display = 'none';
+        function render() {
+            const mv = document.getElementById('main-view');
+            mv.innerText = exp || "0";
+            mv.scrollLeft = mv.scrollWidth;
+            document.getElementById('main-menu').style.display = 'none';
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const map = {'Enter': '=', 'Backspace': 'DEL', 'Escape': 'AC', '*': '×', '/': '÷'};
+            const k = map[e.key] || e.key;
+            if (/[0-9+\-×÷.%=^()]/.test(k) || k === 'DEL' || k === 'AC' || k === '=') {
+                e.preventDefault(); run(k);
             }
+        });
+
+        document.addEventListener('click', e => {
+            if(!e.target.closest('.top-actions')) document.getElementById('main-menu').style.display = 'none';
         });
     </script>
 </body>
