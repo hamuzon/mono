@@ -7,397 +7,386 @@
 
     <script>
         (function() {
-            const prefs = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"auto"}');
-            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const update = (isDark) => {
-                document.documentElement.className = isDark ? 'dark' : 'light';
-                document.documentElement.style.backgroundColor = isDark ? '#1B1C17' : '#FDFCF4';
+            const p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
+            
+            const upd = (isD) => {
+                document.documentElement.className = isD ? 'dark' : 'light';
+                document.documentElement.style.backgroundColor = isD ? '#1B1C17' : '#FDFCF4';
             };
-            if (prefs.mode === 'system') {
-                update(darkQuery.matches);
-                darkQuery.addEventListener('change', e => update(e.matches));
+
+            if (p.mode === 'system') {
+                const q = window.matchMedia('(prefers-color-scheme: dark)');
+                upd(q.matches);
+                q.addEventListener('change', e => upd(e.matches));
             } else {
-                update(prefs.mode === 'dark');
+                upd(p.mode === 'dark');
             }
         })();
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Potta+One&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #FDFCF4;
-            --on-bg: #1B1C17;
-            --surf: #EFF1E0;
-            --on-surf: #44483D;
-            --pri: #4C662B;
-            --on-pri: #FFFFFF;
-            --pri-c: #D7E8B7;
-            --on-pri-c: #121F00;
-            --sec-c: #E3E4D3;
-            --sci-bg: #D7E8B7;
+            --bg: #FDFCF4; --on-bg: #1B1C17;
+            --surf: #EFF1E0; --on-surf: #44483D;
+            --pri: #4C662B; --on-pri: #FFFFFF;
+            --pri-c: #D7E8B7; --on-pri-c: #121F00;
+            --sec-c: #E3E4D3; --sci-bg: #D7E8B7;
         }
 
         .dark {
-            --bg: #1B1C17;
-            --on-bg: #E3E4D3;
-            --surf: #2F3126;
-            --on-surf: #C7C8B8;
-            --pri: #B1D18A;
-            --on-pri: #1F3701;
-            --pri-c: #3E4A2B;
-            --on-pri-c: #D7E8B7;
-            --sec-c: #45483C;
-            --sci-bg: #3E4A2B;
+            --bg: #1B1C17; --on-bg: #E3E4D3;
+            --surf: #2F3126; --on-surf: #C7C8B8;
+            --pri: #B1D18A; --on-pri: #1F3701;
+            --pri-c: #3E4A2B; --on-pri-c: #D7E8B7;
+            --sec-c: #45483C; --sci-bg: #3E4A2B;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            outline: none;
         }
 
-        body {
+        html, body {
             margin: 0;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg);
-            color: var(--on-bg);
+            height: 100%;
+            width: 100%;
             overflow: hidden;
+            background: var(--bg);
             font-family: 'Google Sans', sans-serif;
         }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
 
-        .display-layer {
+        .display-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 24px 32px;
+            padding: 32px;
             text-align: right;
         }
 
-        #log-view {
-            font-size: 1.4rem;
+        #log-display {
+            font-size: 1.5rem;
             color: var(--on-surf);
-            min-height: 2.2rem;
             opacity: 0.7;
+            white-space: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
             margin-bottom: 8px;
+            min-height: 1.6rem;
+        }
+
+        #main-display {
+            font-size: clamp(3.2rem, 16vw, 6.8rem);
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
         }
 
-        #main-view {
-            font-family: 'Potta One', cursive;
-            font-size: clamp(2.5rem, 12vw, 4.5rem);
-            white-space: nowrap;
-            overflow-x: auto;
-            padding: 8px 0;
-            scrollbar-width: none;
-        }
-
-        .input-layer {
+        .input-panel {
             background: var(--surf);
             border-radius: 40px 40px 0 0;
-            padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
+            padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+            transition: background 0.4s;
         }
 
-        .action-bar {
+        .utility-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 28px;
-            color: var(--pri);
+            padding: 0 16px 16px;
         }
 
-        .action-bar span {
+        .utility-bar span {
             cursor: pointer;
-            padding: 10px;
+            padding: 12px;
             border-radius: 50%;
+            color: var(--pri);
+            font-size: 24px;
         }
 
-        .sci-grid {
+        #mode-toggle {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--pri);
+            padding: 6px 14px;
+            border-radius: 14px;
+            background: var(--pri-c);
+            text-transform: uppercase;
+        }
+
+        .layout-engine {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .sci-cluster {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            padding: 0 24px;
-            height: 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 0;
+            opacity: 0;
             overflow: hidden;
-            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
 
-        .sci-grid.open {
-            height: 160px;
-            padding: 10px 24px;
+        .sci-cluster.active {
+            width: 44%;
+            opacity: 1;
         }
 
-        .main-grid {
+        .num-cluster {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            padding: 12px 24px 24px;
+            gap: 10px;
+            flex: 1;
         }
 
         button {
-            height: clamp(60px, 10vh, 76px);
+            height: clamp(60px, 11vh, 84px);
             border: none;
-            border-radius: 38px;
-            font-size: 1.6rem;
+            border-radius: 42px;
+            font-size: 1.5rem;
             font-weight: 500;
             background: var(--bg);
             color: var(--on-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s, background 0.2s;
+            transition: all 0.1s;
         }
 
         button:active {
-            transform: scale(0.92);
-            background: var(--pri-c);
+            transform: scale(0.9);
+            filter: brightness(0.9);
         }
 
         .k-op { background: var(--pri-c); color: var(--on-pri-c); }
-        .k-sci { background: var(--sci-bg); font-size: 1rem; height: 48px; border-radius: 24px; }
-        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.2rem; }
+        .k-sci { background: var(--sci-bg); font-size: 1.05rem; border-radius: 22px; height: 52px; }
+        .k-eq { background: var(--pri); color: var(--on-pri); font-size: 2.6rem; }
 
-        .more-menu {
+        @media (min-width: 850px) or (orientation: landscape) {
+            .sci-cluster { width: 36% !important; opacity: 1 !important; display: grid !important; }
+            #flask-btn { display: none; }
+            .input-panel { border-radius: 0; }
+        }
+
+        .overlay-menu {
             position: absolute;
             right: 24px;
-            bottom: 80px;
+            bottom: 110px;
             background: var(--bg);
-            border-radius: 20px;
+            border-radius: 28px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
             display: none;
             flex-direction: column;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-            z-index: 500;
-            min-width: 200px;
+            z-index: 5000;
             overflow: hidden;
+            min-width: 220px;
         }
 
-        .more-menu div {
-            padding: 18px 24px;
+        .overlay-menu div {
+            padding: 20px 24px;
             border-bottom: 1px solid var(--surf);
-            white-space: nowrap;
             cursor: pointer;
         }
 
-        .more-menu div:active { background: var(--pri-c); }
-
-        .sheet {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 1000;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            padding: calc(40px + env(safe-area-inset-top)) 32px 32px;
+        .vibe-slider {
+            padding: 16px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .sheet.active { transform: translateY(0); }
-
-        .history-card {
-            padding: 20px;
-            border-radius: 24px;
-            background: var(--surf);
-            margin-bottom: 16px;
-            text-align: right;
+        input[type="range"] {
+            accent-color: var(--pri);
             cursor: pointer;
-        }
-
-        @media (min-width: 600px) {
-            .sci-grid { height: auto !important; padding: 10px 24px !important; }
-            .action-bar span[onclick*="toggleSci"] { display: none; }
         }
     </style>
 </head>
-
 <body>
 
-    <div id="history-panel" class="sheet">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-            <h1 id="h-title" style="margin:0; font-size:1.8rem;">履歴</h1>
-            <div style="display:flex; gap:24px;">
-                <span class="material-symbols-outlined" onclick="clearLog()">delete</span>
-                <span class="material-symbols-outlined" onclick="location.hash='#home'">close</span>
-            </div>
-        </div>
-        <div id="history-list" style="overflow-y:auto; height:calc(100% - 120px); scrollbar-width: none;"></div>
-    </div>
+    <section class="display-container">
+        <div id="log-display"></div>
+        <div id="main-display">0</div>
+    </section>
 
-    <div class="display-layer">
-        <div id="log-view"></div>
-        <div id="main-view">0</div>
-    </div>
-
-    <div class="input-layer">
-        <div class="action-bar">
-            <div style="display:flex; gap:16px;">
-                <span class="material-symbols-outlined" onclick="toggleSci()">science</span>
-                <span class="material-symbols-outlined" onclick="location.hash='#history'">history</span>
+    <nav class="input-panel">
+        <div class="utility-bar">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span id="flask-btn" class="material-symbols-outlined" onclick="ui('sci')">flask</span>
+                <div id="mode-toggle" onclick="ui('unit')">deg</div>
             </div>
+
             <div style="position:relative;">
-                <span class="material-symbols-outlined" id="more-trigger" onclick="toggleMenu()">more_vert</span>
-                <div id="menu-box" class="more-menu">
-                    <div id="m-theme" onclick="cycleTheme()">テーマ: システム</div>
-                    <div id="m-lang" onclick="cycleLang()">Language: JP</div>
-                    <div id="m-copy" onclick="copyValue()">結果をコピー</div>
-                    <div onclick="press('AC')">すべてクリア</div>
+                <span class="material-symbols-outlined" id="menu-btn" onclick="ui('menu')">more_vert</span>
+                <div id="settings-menu" class="overlay-menu">
+                    <div onclick="sys('light')">ライトモード</div>
+                    <div onclick="sys('dark')">ダークモード</div>
+                    <div onclick="sys('system')">システム同期</div>
+                    <div onclick="sys('copy')">結果をコピー</div>
+                    <div class="vibe-slider">
+                        <span style="font-size:0.85rem">振動: <span id="v-val">50</span>%</span>
+                        <input type="range" id="v-range" min="0" max="100" value="50" oninput="sys('vibe', this.value)">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div id="sci-box" class="sci-grid">
-            <button class="k-sci" onclick="press('sin(')">sin</button>
-            <button class="k-sci" onclick="press('cos(')">cos</button>
-            <button class="k-sci" onclick="press('tan(')">tan</button>
-            <button class="k-sci" onclick="press('π')">π</button>
-            <button class="k-sci" onclick="press('sqrt(')">√</button>
-            <button class="k-sci" onclick="press('log(')">log</button>
-            <button class="k-sci" onclick="press('ln(')">ln</button>
-            <button class="k-sci" onclick="press('^')">xʸ</button>
-            <button class="k-sci" onclick="press('e')">e</button>
-            <button class="k-sci" onclick="press('!')">n!</button>
-        </div>
+        <div class="layout-engine">
+            <div id="sci-grid" class="sci-cluster">
+                <button class="k-sci" onclick="run('sin(')">sin</button>
+                <button class="k-sci" onclick="run('cos(')">cos</button>
+                <button class="k-sci" onclick="run('tan(')">tan</button>
+                <button class="k-sci" onclick="run('log(')">log</button>
+                <button class="k-sci" onclick="run('ln(')">ln</button>
+                <button class="k-sci" onclick="run('sqrt(')">√</button>
+                <button class="k-sci" onclick="run('inv(')">1/x</button>
+                <button class="k-sci" onclick="run('^')">xʸ</button>
+                <button class="k-sci" onclick="run('abs(')">|x|</button>
+                <button class="k-sci" onclick="run('π')">π</button>
+                <button class="k-sci" onclick="run('e')">e</button>
+                <button class="k-sci" onclick="run('!')">n!</button>
+            </div>
 
-        <div class="main-grid">
-            <button class="k-op" onclick="press('AC')">AC</button>
-            <button class="k-op" onclick="press('()')">( )</button>
-            <button class="k-op" onclick="press('%')">%</button>
-            <button class="k-op" onclick="press('÷')">÷</button>
-            
-            <button onclick="press('7')">7</button>
-            <button onclick="press('8')">8</button>
-            <button onclick="press('9')">9</button>
-            <button class="k-op" onclick="press('×')">×</button>
-            
-            <button onclick="press('4')">4</button>
-            <button onclick="press('5')">5</button>
-            <button onclick="press('6')">6</button>
-            <button class="k-op" onclick="press('-')">-</button>
-            
-            <button onclick="press('1')">1</button>
-            <button onclick="press('2')">2</button>
-            <button onclick="press('3')">3</button>
-            <button class="k-op" onclick="press('+')">+</button>
-            
-            <button onclick="press('0')">0</button>
-            <button onclick="press('.')">.</button>
-            <button onclick="press('DEL')"><span class="material-symbols-outlined">backspace</span></button>
-            <button class="k-eq" onclick="press('=')">=</button>
+            <div class="num-cluster">
+                <button class="k-op" onclick="run('AC')">AC</button>
+                <button class="k-op" onclick="run('DEL')">⌫</button>
+                <button class="k-op" onclick="run('(')">(</button>
+                <button class="k-op" onclick="run(')')">)</button>
+
+                <button onclick="run('7')">7</button>
+                <button onclick="run('8')">8</button>
+                <button onclick="run('9')">9</button>
+                <button class="k-op" onclick="run('÷')">÷</button>
+
+                <button onclick="run('4')">4</button>
+                <button onclick="run('5')">5</button>
+                <button onclick="run('6')">6</button>
+                <button class="k-op" onclick="run('×')">×</button>
+
+                <button onclick="run('1')">1</button>
+                <button onclick="run('2')">2</button>
+                <button onclick="run('3')">3</button>
+                <button class="k-op" onclick="run('-')">-</button>
+
+                <button onclick="run('0')">0</button>
+                <button onclick="run('.')">.</button>
+                <button class="k-eq" onclick="run('=')">=</button>
+                <button class="k-op" onclick="run('+')">+</button>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <script>
         let exp = "";
         let solved = false;
-        let logs = JSON.parse(localStorage.getItem('calc-log') || '[]');
-        let cfg = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","lang":"ja"}');
+        let p = JSON.parse(localStorage.getItem('calc-prefs') || '{"mode":"system","vibe":50,"unit":"deg"}');
 
-        const i18n = {
-            ja: { h: "履歴", empty: "履歴なし", err: "エラー", m_mode: "テーマ: ", m_copy: "結果をコピー", modes: {system:"システム", dark:"ダーク", light:"ライト"} },
-            en: { h: "History", empty: "No History", err: "Error", m_mode: "Theme: ", m_copy: "Copy Result", modes: {system:"System", dark:"Dark", light:"Light"} }
-        };
-
-        function sync() {
-            const h = window.location.hash;
-            document.getElementById('history-panel').classList.toggle('active', h === '#history');
-            if (h === '#history') buildLog();
-
-            const t = i18n[cfg.lang];
-            document.getElementById('h-title').innerText = t.h;
-            document.getElementById('m-theme').innerText = t.m_mode + t.modes[cfg.mode];
-            document.getElementById('m-lang').innerText = "Language: " + (cfg.lang === 'ja' ? 'JP' : 'EN');
-            document.getElementById('m-copy').innerText = t.m_copy;
+        function vib() {
+            if (navigator.vibrate && p.vibe > 0) {
+                navigator.vibrate(p.vibe / 4);
+            }
         }
 
-        function toggleSci() { document.getElementById('sci-box').classList.toggle('open'); }
-        function toggleMenu() { const m = document.getElementById('menu-box'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
-        function closeMenu() { document.getElementById('menu-box').style.display = 'none'; }
+        function ui(type) {
+            vib();
+            if (type === 'sci') {
+                const g = document.getElementById('sci-grid');
+                g.classList.toggle('active');
+                document.getElementById('flask-btn').style.fontVariationSettings = g.classList.contains('active') ? "'FILL' 1" : "'FILL' 0";
+            }
+            if (type === 'unit') {
+                p.unit = p.unit === 'deg' ? 'rad' : 'deg';
+                document.getElementById('mode-toggle').innerText = p.unit;
+                localStorage.setItem('calc-prefs', JSON.stringify(p));
+            }
+            if (type === 'menu') {
+                const m = document.getElementById('settings-menu');
+                m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+            }
+        }
 
-        function press(v) {
-            const mv = document.getElementById('main-view');
-            const lv = document.getElementById('log-view');
-            closeMenu();
+        function sys(cmd, val) {
+            vib();
+            if (cmd === 'vibe') {
+                p.vibe = val;
+                document.getElementById('v-val').innerText = val;
+                localStorage.setItem('calc-prefs', JSON.stringify(p));
+            }
+            if (['light', 'dark', 'system'].includes(cmd)) {
+                p.mode = cmd;
+                localStorage.setItem('calc-prefs', JSON.stringify(p));
+                location.reload();
+            }
+            if (cmd === 'copy') {
+                navigator.clipboard.writeText(exp || "0");
+                ui('menu');
+            }
+        }
 
-            if (v === 'AC') { exp = ""; lv.innerText = ""; solved = false; }
-            else if (v === 'DEL') { exp = exp.slice(0, -1); }
-            else if (v === '=') {
-                if (!exp) return;
+        function run(key) {
+            vib();
+            const m = document.getElementById('main-display');
+            const l = document.getElementById('log-display');
+
+            if (key === 'AC') {
+                exp = ""; l.innerText = ""; solved = false;
+            } else if (key === 'DEL') {
+                exp = exp.slice(0, -1);
+            } else if (key === '=') {
                 try {
                     let f = exp.replace(/÷/g, '/').replace(/×/g, '*')
-                               .replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E')
-                               .replace(/sin\(/g, 'Math.sin(').replace(/cos\(/g, 'Math.cos(')
-                               .replace(/tan\(/g, 'Math.tan(').replace(/log\(/g, 'Math.log10(')
-                               .replace(/ln\(/g, 'Math.log(').replace(/sqrt\(/g, 'Math.sqrt(')
-                               .replace(/\^/g, '**');
+                               .replace(/sin\(/g, p.unit === 'deg' ? 'Math.sin(Math.PI/180*' : 'Math.sin(')
+                               .replace(/cos\(/g, p.unit === 'deg' ? 'Math.cos(Math.PI/180*' : 'Math.cos(')
+                               .replace(/tan\(/g, p.unit === 'deg' ? 'Math.tan(Math.PI/180*' : 'Math.tan(')
+                               .replace(/log\(/g, 'Math.log10(').replace(/ln\(/g, 'Math.log(')
+                               .replace(/sqrt\(/g, 'Math.sqrt(').replace(/inv\(/g, '1/(')
+                               .replace(/abs\(/g, 'Math.abs(').replace(/π/g, 'Math.PI')
+                               .replace(/e/g, 'Math.E').replace(/\^/g, '**');
 
-                    const op = (f.match(/\(/g) || []).length, cp = (f.match(/\)/g) || []).length;
-                    if (op > cp) f += ')'.repeat(op - cp);
+                    const o = (f.match(/\(/g) || []).length;
+                    const c = (f.match(/\)/g) || []).length;
+                    if (o > c) f += ')'.repeat(o - c);
 
                     let res = eval(f);
-                    let out = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
-                    
-                    logs.unshift({q: exp, a: out});
-                    localStorage.setItem('calc-log', JSON.stringify(logs.slice(0, 30)));
-                    
-                    lv.innerText = exp + ' =';
-                    exp = out;
+                    l.innerText = exp + " =";
+                    exp = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(10)).toString();
                     solved = true;
-                } catch { mv.innerText = i18n[cfg.lang].err; setTimeout(render, 800); return; }
-            } else if (v === '()') {
-                const op = (exp.match(/\(/g) || []).length, cp = (exp.match(/\)/g) || []).length;
-                exp += (op > cp && /[0-9)]$/.test(exp.slice(-1))) ? ')' : '(';
+                } catch {
+                    m.innerText = "Error";
+                    setTimeout(() => m.innerText = exp || "0", 800);
+                    return;
+                }
             } else {
-                if (solved && /[0-9]/.test(v)) exp = "";
-                solved = false; exp += v;
+                if (solved && /[0-9]/.test(key)) exp = "";
+                solved = false; exp += key;
             }
-            render();
+
+            m.innerText = exp || "0";
+            m.scrollLeft = m.scrollWidth;
+            document.getElementById('settings-menu').style.display = 'none';
         }
 
-        function render() {
-            const mv = document.getElementById('main-view');
-            mv.innerText = exp || '0';
-            mv.scrollLeft = mv.scrollWidth;
-        }
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#menu-btn') && !e.target.closest('#settings-menu')) {
+                document.getElementById('settings-menu').style.display = 'none';
+            }
+        });
 
-        function copyValue() { navigator.clipboard.writeText(exp || '0'); closeMenu(); }
-
-        function buildLog() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = logs.length ? '' : `<div style="text-align:center; opacity:0.5; margin-top:60px;">${i18n[cfg.lang].empty}</div>`;
-            logs.forEach(i => {
-                const d = document.createElement('div');
-                d.className = 'history-card';
-                d.innerHTML = `<div style="opacity:0.6;font-size:0.9rem">${i.q}</div><div style="font-size:1.7rem;font-weight:500;">${i.a}</div>`;
-                d.onclick = () => { exp = i.a; render(); location.hash='#home'; };
-                list.appendChild(d);
-            });
-        }
-
-        function cycleTheme() {
-            const m = ['system', 'light', 'dark'];
-            cfg.mode = m[(m.indexOf(cfg.mode) + 1) % m.length];
-            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
-            location.reload();
-        }
-
-        function cycleLang() {
-            cfg.lang = cfg.lang === 'ja' ? 'en' : 'ja';
-            localStorage.setItem('calc-prefs', JSON.stringify(cfg));
-            sync(); closeMenu();
-        }
-
-        function clearLog() { logs = []; localStorage.setItem('calc-log', '[]'); buildLog(); }
-
-        window.onload = () => { render(); sync(); };
-        window.onhashchange = sync;
-        document.body.onclick = (e) => { if(!e.target.id.includes('more')) closeMenu(); };
+        window.onload = () => {
+            document.getElementById('v-range').value = p.vibe;
+            document.getElementById('v-val').innerText = p.vibe;
+            document.getElementById('mode-toggle').innerText = p.unit;
+        };
     </script>
 </body>
 </html>
