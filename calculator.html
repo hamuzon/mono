@@ -346,6 +346,14 @@
         }
 
 
+        function checkHash() {
+            if (window.location.hash === '#home') {
+                document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+                history.replaceState(null, null, ' ');
+            }
+        }
+
+
         function cmd(v) {
             hapt();
             const mv = document.getElementById('main-view');
@@ -430,7 +438,10 @@
             document.getElementById('v-range').value = prefs.vibe;
             v_upd();
             draw();
+            checkHash();
         };
+
+        window.onhashchange = checkHash;
     </script>
 </body>
 </html>
