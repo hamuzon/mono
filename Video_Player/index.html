@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Video Player</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent-color: #00bcd4;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --input-bg: rgba(0, 0, 0, 0.4);
+            --text-color: #f4ece2;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --accent-color: #d27d60;
+                --glass-bg: rgba(255, 248, 240, 0.8);
+                --glass-border: rgba(210, 125, 96, 0.3);
+                --input-bg: rgba(255, 255, 255, 0.9);
+                --text-color: #3b2f2f;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Potta One', serif;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text-color);
+            background-color: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #fff8f0;
+            }
+        }
+
+        section {
+            width: 100%;
+            max-width: 900px;
+            padding: 2.5rem;
+            border-radius: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            max-width: 650px;
+            padding: 16px;
+            border-radius: 15px;
+            border: 2px solid var(--glass-border);
+            background: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            margin-bottom: 1.2rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0 20px 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            background: var(--glass-border);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #player-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            margin-top: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            border: 2px solid var(--glass-border);
+            background: #000;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        #player, #nico-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <section>
+        <h1>🎬 Video Player 🎬</h1>
+
+        <input type="text" id="video-url" placeholder="YouTube / ニコニコ URL or 動画ID">
+
+        <div class="btn-group">
+            <button onclick="loadVideo()" style="background: var(--accent-color); color: #fff;">▶ 読み込み</button>
+            <button onclick="location.reload()">🔁 リセット</button>
+        </div>
+
+        <div id="player-wrapper">
+            <div id="player"></div>
+            <iframe id="nico-player" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <footer id="copyright"></footer>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        let player;
+
+        (function() {
+            const startYear = 2025;
+            const currentYear = new Date().getFullYear();
+            const yearDisplay = currentYear > startYear ? `${startYear} - ${currentYear}` : startYear;
+            
+            document.getElementById('copyright').innerHTML = 
+                `&copy; ${yearDisplay} Video Player | <a href="https://hamusata.f5.si" target="_blank">@hamusata</a>`;
+        })();
+
+        function extractVideoId(input) {
+            if (!input) return null;
+            input = input.trim();
+
+            const thumb = /(?:i\.ytimg\.com|img\.youtube\.com)\/vi\/([a-zA-Z0-9_-]{11})/.exec(input);
+            if (thumb) return { type: 'yt', id: thumb[1] };
+
+            const yt = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/.exec(input);
+            if (yt) return { type: 'yt', id: yt[1] };
+
+            const nc = /(?:nicovideo\.jp\/watch\/|embed\/|[?&]id=)?((sm|nm|so)\d+)/.exec(input);
+            if (nc) return { type: 'nico', id: nc[1] };
+
+            if (input.length === 11) return { type: 'yt', id: input };
+
+            return null;
+        }
+
+        function loadVideo() {
+            const inputField = document.getElementById('video-url');
+            const data = extractVideoId(inputField.value);
+
+            if (!data) {
+                if (inputField.value !== "") alert("有効なURLまた有効な動画IDを入力してください");
+                return;
+            }
+
+            const wrapper = document.getElementById('player-wrapper');
+            const ytDiv = document.getElementById('player');
+            const nicoIframe = document.getElementById('nico-player');
+
+            wrapper.style.display = 'block';
+
+            if (data.type === 'yt') {
+                nicoIframe.style.display = 'none';
+                ytDiv.style.display = 'block';
+
+                if (player && typeof player.loadVideoById === 'function') {
+                    player.loadVideoById(data.id);
+                } else {
+                    player = new YT.Player('player', {
+                        videoId: data.id,
+                        playerVars: {
+                            autoplay: 1,
+                            controls: 1,
+                            rel: 0,
+                            modestbranding: 1,
+                            origin: '*'
+                        }
+                    });
+                }
+            } else {
+                if (player && typeof player.stopVideo === 'function') player.stopVideo();
+                
+                ytDiv.style.display = 'none';
+                nicoIframe.src = `https://embed.nicovideo.jp/watch/${data.id}?autoplay=1`;
+                nicoIframe.style.display = 'block';
+            }
+        }
+
+        function onYouTubeIframeAPIReady() {
+            const params = new URLSearchParams(location.search);
+            const id = params.get("v") || params.get("id");
+            
+            if (id) {
+                document.getElementById('video-url').value = id;
+                loadVideo();
+            }
+        }
+    </script>
+</body>
+</html>
