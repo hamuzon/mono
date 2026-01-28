@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>御神籤(おみくじ) 配布サイト</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Potta One', 'Arial', 'Helvetica', sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            text-align: center;
+            position: relative;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            font-weight: 500;
+        }
+        body.light {
+            background:
+                radial-gradient(ellipse 80% 60% at 70% 20%, rgba(175,109,255,0.85), transparent 68%),
+                radial-gradient(ellipse 70% 60% at 20% 80%, rgba(255,100,180,0.75), transparent 68%),
+                radial-gradient(ellipse 60% 50% at 60% 65%, rgba(255,235,170,0.98), transparent 68%),
+                radial-gradient(ellipse 65% 40% at 50% 60%, rgba(120,190,255,0.3), transparent 68%),
+                linear-gradient(180deg, #f7eaff 0%, #fde2ea 100%);
+            color: #000;
+        }
+        body.dark {
+            background-color: #0a0a0a;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(56,189,248,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(139,92,246,0.3) 0%, transparent 70%),
+                radial-gradient(ellipse at 60% 20%, rgba(236,72,153,0.25) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, rgba(34,197,94,0.2) 0%, transparent 65%);
+            color: #fff;
+        }
+        a {
+            color: inherit;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        header {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: transparent;
+            position: relative;
+            z-index: 10;
+        }
+        .banner-link {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        .banner-link img {
+            display: block;
+            width: min(100%, 512px);
+            height: auto;
+            max-height: 120px;
+            object-fit: contain;
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(24px);
+            transition: background-color 0.3s;
+        }
+        h1 {
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            margin: 1rem auto;
+            line-height: 1.2;
+            font-weight: 600;
+        }
+        section {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(28px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            color: inherit;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        section h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        #profile {
+            background-color: transparent;
+            box-shadow: none;
+            padding: 0;
+        }
+        #profile .profile p {
+            text-align: center;
+            max-width: 700px;
+            margin: 0.5rem auto;
+            font-size: clamp(0.9rem, 1.2vw, 1rem);
+            font-weight: 500;
+        }
+        .works {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .work-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.25rem;
+            text-align: center;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(28px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+        }
+        .work-card img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .work-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 45px rgba(0,0,0,0.35);
+        }
+        .work-card a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.8rem 1.8rem;
+            border-radius: 18px;
+            background-color: rgba(0,188,212,0.15);
+            color: inherit;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: clamp(0.9rem, 1.2vw, 1rem);
+        }
+        .work-card a:hover {
+            background-color: #00bcd4;
+            color: #fff;
+        }
+        .work-card p.note {
+            margin-top: 0.5rem;
+            font-size: clamp(0.8rem, 1vw, 0.9rem);
+        }
+        #info p {
+            line-height: 2;
+            margin: 0 auto;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            font-size: clamp(0.8rem, 1vw, 0.9rem);
+            color: inherit;
+        }
+        @media (max-width: 480px) {
+            .work-card img {
+                width: 64px;
+                height: 64px;
+            }
+            h1 {
+                font-size: clamp(1.4rem, 6vw, 1.8rem);
+            }
+            section h2 {
+                font-size: clamp(1.2rem, 5vw, 1.6rem);
+            }
+            #profile .profile p {
+                font-size: clamp(0.85rem, 2vw, 0.95rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>御神籤(おみくじ) 配布サイト</h1>
+        <p>ブラウザ版・EXE版・Python版をまとめてダウンロードできます</p>
+    </header>
+    <section id="download">
+        <h2>ダウンロードリンク</h2>
+        <div class="works">
+            <div class="work-card">
+                <p>Windows EXE版</p>
+                <div>
+                    <a href="https://github.com/hamuzon/omikuji/releases/download/omikuji-Release-v.10.0/omikuji_App.exe" target="_blank">ダウンロード EXE</a>
+                    <p class="note">Python不要でそのまま起動できます</p>
+                </div>
+            </div>
+            <div class="work-card">
+                <p>Windows ZIP版</p>
+                <div>
+                    <a href="https://github.com/hamuzon/omikuji/releases/download/omikuji-Release-v.10.0/omikuji_App.zip" target="_blank">ダウンロード ZIP</a>
+                    <p class="note">ZIP解凍後に EXE を使えます</p>
+                </div>
+            </div>
+            <div class="work-card">
+                <p>Python版</p>
+                <div>
+                    <a href="https://github.com/hamuzon/omikuji/releases/download/omikuji-Release-v.10.0/omikuji_App.py" target="_blank">ダウンロード PY</a>
+                    <p class="note">Python 3.x が必要です<br>必要モジュール: requests, tkinter, datetime, threading, random</p>
+                </div>
+            </div>
+            <div class="work-card">
+                <p>ブラウザ版</p>
+                <div>
+                    <a href="https://omikuji.hamusata.f5.si/" target="_blank">アクセス ブラウザ版</a>
+                    <p class="note">インストール不要でブラウザから利用可能</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="info">
+        <h2>使い方</h2>
+        <p>
+            EXE版やZIP版はダウンロード後すぐに使えます<br>
+            Python版は Python 3.x 環境で実行してください<br>
+            ブラウザ版は上のリンクからアクセス可能です
+        </p>
+    </section>
+    <footer>
+        <p>&copy; <span id="year"></span> <a href="https://hamusata.f5.si/" target="_blank">@hamusata</a></p>
+    </footer>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const themeParam = urlParams.get('theme');
+
+      function applyTheme() {
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.body.className = isDarkMode ? 'dark' : 'light';
+      }
+
+      if (themeParam === 'dark' || themeParam === 'light') {
+          document.body.className = themeParam;
+      } else {
+          applyTheme();
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+      }
+
+      const baseYear = 2025;
+      const currentYear = new Date().getFullYear();
+      const yearElement = document.getElementById('year');
+      yearElement.textContent = currentYear > baseYear ? `${baseYear} - ${currentYear}` : baseYear;
+    </script>
+</body>
+</html>
