@@ -29,11 +29,17 @@
                 }
 
                 location.replace(url);
+            } else {
+                document.documentElement.classList.add('show-ui');
             }
         })();
     </script>
 
     <style>
+        html:not(.show-ui) body {
+            display: none !important;
+        }
+
         body {
             margin: 0;
             font-family: 'Roboto', sans-serif;
@@ -193,7 +199,6 @@
                         paramT = urlObj.searchParams.get("t") || "";
                     }
                 } else {
-                    // URLではない直接のID入力の場合（ID?t=... 形式も考慮）
                     const parts = input.split(/[?&]/);
                     v = parts[0];
                     const p = new URLSearchParams(parts[1] || "");
@@ -203,7 +208,6 @@
                 v = input; 
             }
 
-            // 動画IDが空だった場合の最終チェック
             if (!v) {
                 error.textContent = "⚠️ 有効な動画IDが見つかりません";
                 return;
