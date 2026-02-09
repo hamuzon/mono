@@ -16,7 +16,6 @@
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
                 let url;
-
                 if (type === "m") {
                     url = `https://music.youtube.com/watch?v=${v}`;
                 } else if (type === "s") {
@@ -70,11 +69,17 @@
             border: none;
             font-size: 1rem;
             box-sizing: border-box;
+            outline: none;
         }
 
         input {
             background: rgba(255,255,255,0.6);
             box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+
+        input:focus {
+            background: rgba(255,255,255,0.9);
         }
 
         button {
@@ -90,29 +95,30 @@
         }
 
         #output {
-            margin-top: 1rem;
+            margin-top: 1.2rem;
             word-break: break-all;
             font-weight: 700;
             color: #1a1a1a;
+            font-size: 0.9rem;
+            min-height: 1.2rem;
         }
 
         #output a {
             color: #6200ee;
             text-decoration: none;
-        }
-
-        #output a:hover {
-            text-decoration: underline;
+            border-bottom: 2px solid #6200ee;
         }
 
         #copyBtn {
-            margin-top: 0.5rem;
+            margin-top: 1rem;
             padding: 0.6rem;
             border-radius: 10px;
             background-color: #03dac5;
             color: #000;
             font-weight: 700;
             cursor: pointer;
+            border: none;
+            display: none;
         }
 
         #copyBtn:hover {
@@ -123,6 +129,7 @@
             color: #b00020;
             font-weight: 700;
             margin-top: 0.5rem;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -133,12 +140,12 @@
 
         <div id="form-content">
             <input type="text" id="videoInput" placeholder="動画IDまたはURLを入力" />
-            <input type="text" id="t" placeholder="再生開始時間 t=xx（任意）" />
+            <input type="text" id="t" placeholder="再生開始時間 t=xx (任意)" />
             <button id="generate">リンク生成</button>
 
             <div id="error"></div>
             <div id="output"></div>
-            <button id="copyBtn" style="display:none;">📋 コピー</button>
+            <button id="copyBtn">📋 コピー</button>
         </div>
     </div>
 
@@ -163,41 +170,44 @@
                 return;
             }
 
-            let v = input;
+            let v = "";
             let type = "";
             let paramT = "";
 
             try {
-                if (input.startsWith("http")) {
+                if (input.includes("http")) {
                     const urlObj = new URL(input);
                     const host = urlObj.hostname;
 
-                    if (host.includes("youtube.com") || host.includes("m.youtube.com") || host.includes("music.youtube.com")) {
+                    if (host.includes("youtube.com") || host.includes("music.youtube.com")) {
                         if (urlObj.pathname.startsWith("/watch")) {
                             v = urlObj.searchParams.get("v") || "";
                             if (host.includes("music.youtube.com")) type = "m";
-                        }
-
-                        if (urlObj.pathname.startsWith("/shorts/")) {
-                            v = urlObj.pathname.split("/shorts/")[1].split("/")[0];
+                        } else if (urlObj.pathname.startsWith("/shorts/")) {
+                            v = urlObj.pathname.split("/shorts/")[1].split(/[?#/]/)[0];
                             type = "s";
                         }
-
                         paramT = urlObj.searchParams.get("t") || "";
-
                     } else if (host === "youtu.be") {
-                        v = urlObj.pathname.replace("/", "");
+                        v = urlObj.pathname.replace("/", "").split(/[?#/]/)[0];
                         paramT = urlObj.searchParams.get("t") || "";
                     }
-
-                } else if (input.includes("?")) {
-                    const [id, query] = input.split("?");
-                    v = id;
-                    const p = new URLSearchParams(query);
+                } else {
+                    // URLではない直接のID入力の場合（ID?t=... 形式も考慮）
+                    const parts = input.split(/[?&]/);
+                    v = parts[0];
+                    const p = new URLSearchParams(parts[1] || "");
                     if (p.get("t")) paramT = p.get("t");
                 }
+            } catch(e) {
+                v = input; 
+            }
 
-            } catch(e) {}
+            // 動画IDが空だった場合の最終チェック
+            if (!v) {
+                error.textContent = "⚠️ 有効な動画IDが見つかりません";
+                return;
+            }
 
             let finalT = time || paramT;
             const base = location.origin + location.pathname;
@@ -212,13 +222,13 @@
 
         copyBtn.addEventListener("click", () => {
             const a = output.querySelector("a");
-
             if (a && a.href) {
                 navigator.clipboard.writeText(a.href).then(() => {
+                    const originalText = copyBtn.textContent;
                     copyBtn.textContent = "✅ コピーしました";
-                    setTimeout(() => copyBtn.textContent = "📋 コピー", 2000);
+                    setTimeout(() => copyBtn.textContent = originalText, 2000);
                 }).catch(() => {
-                    copyBtn.textContent = "❌ コピー失敗";
+                    copyBtn.textContent = "❌ 失敗";
                     setTimeout(() => copyBtn.textContent = "📋 コピー", 2000);
                 });
             }
