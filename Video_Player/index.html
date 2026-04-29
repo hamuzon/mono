@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
-
+<link id="favicon-light" rel="icon" href="../icon-light.svg" media="(prefers-color-scheme: light)" />
+<link id="favicon-dark" rel="icon" href="../icon-dark.svg" media="(prefers-color-scheme: dark)" />
     <style>
         :root {
             --accent-color: #00bcd4;
@@ -57,8 +58,8 @@
             padding: 2.5rem;
             border-radius: 30px;
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -116,6 +117,11 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
+        .btn-primary {
+            background: var(--accent-color);
+            color: #fff;
+        }
+
         #player-wrapper {
             position: relative;
             width: 100%;
@@ -160,7 +166,7 @@
         <input type="text" id="video-url" placeholder="YouTube / ニコニコ URL or 動画ID">
 
         <div class="btn-group">
-            <button onclick="loadVideo()" style="background: var(--accent-color); color: #fff;">▶ 読み込み</button>
+            <button onclick="loadVideo()" class="btn-primary">▶ 読み込み</button>
             <button onclick="location.reload()">🔁 リセット</button>
         </div>
 
@@ -170,21 +176,30 @@
         </div>
     </section>
 
-    <footer id="copyright"></footer>
+    <footer id="footer-copy"></footer>
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
         let player;
 
-        (function() {
-            const startYear = 2025;
-            const currentYear = new Date().getFullYear();
-            const yearDisplay = currentYear > startYear ? `${startYear} - ${currentYear}` : startYear;
-            
-            document.getElementById('copyright').innerHTML = 
-                `&copy; ${yearDisplay} Video Player | <a href="https://hamusata.f5.si" target="_blank">@hamusata</a>`;
-        })();
+        const footer = document.getElementById("footer-copy");
+        const baseYear = 2025;
+        const currentYear = new Date().getFullYear();
+        const yearString = `${baseYear}${currentYear > baseYear ? "~" + currentYear : ""}`;
+        const hostname = location.hostname;
+        let footerHTML = "";
+
+        if (hostname === "hamuzon.github.io") {
+            footerHTML = `&copy; ${yearString} <a class="link" href="https://hamuzon.github.io" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+        } else if (hostname.includes("hamuzon-jp.f5.si")) {
+            footerHTML = `&copy; ${yearString} <a class="link" href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+        } else if (hostname.includes("hamusata.f5.si")) {
+            footerHTML = `&copy; ${yearString} <a class="link" href="https://hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>`;
+        } else {
+            footerHTML = `&copy; ${yearString} Video Player HUB`;
+        }
+        footer.innerHTML = footerHTML;
 
         function extractVideoId(input) {
             if (!input) return null;
@@ -196,7 +211,7 @@
             const yt = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/.exec(input);
             if (yt) return { type: 'yt', id: yt[1] };
 
-            const nc = /(?:nicovideo\.jp\/watch\/|embed\/|[?&]id=)?((sm|nm|so)\d+)/.exec(input);
+            const nc = /(?:nicovideo\.jp\/(?:watch|shorts)\/|nico\.ms\/|embed\/|[?&]id=)?((sm|nm|so|ss)\d+)/.exec(input);
             if (nc) return { type: 'nico', id: nc[1] };
 
             if (input.length === 11) return { type: 'yt', id: input };
@@ -209,7 +224,7 @@
             const data = extractVideoId(inputField.value);
 
             if (!data) {
-                if (inputField.value !== "") alert("有効なURLまた有効な動画IDを入力してください");
+                if (inputField.value !== "") alert("有効なURLまたは動画IDを入力してください");
                 return;
             }
 
@@ -233,13 +248,13 @@
                             controls: 1,
                             rel: 0,
                             modestbranding: 1,
-                            origin: '*'
+                            origin: location.origin
                         }
                     });
                 }
             } else {
                 if (player && typeof player.stopVideo === 'function') player.stopVideo();
-                
+
                 ytDiv.style.display = 'none';
                 nicoIframe.src = `https://embed.nicovideo.jp/watch/${data.id}?autoplay=1`;
                 nicoIframe.style.display = 'block';
@@ -249,7 +264,7 @@
         function onYouTubeIframeAPIReady() {
             const params = new URLSearchParams(location.search);
             const id = params.get("v") || params.get("id");
-            
+
             if (id) {
                 document.getElementById('video-url').value = id;
                 loadVideo();
