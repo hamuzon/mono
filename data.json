@@ -5,31 +5,29 @@
       "text": "Battery API を使った情報取得・表示ページ / Battery status viewer using the Battery API",
       "url": "/battery/"
     },
-    
+
     {
       "title": "画像ジェネレーター",
       "text": "グラデーション & 単色画像ジェネレーター / Gradient & Solid Color Image Generator",
       "url": "/image/"
     },
-    
+
     {
       "title": "ビデオプレーヤー",
       "text": "YouTube とニコニコ動画に対応した動画再生ツール / Video player compatible with YouTube and Niconico",
       "url": "/Video_Player/"
     },
-    
+
     {
       "title": "御神籤(おみくじ)HUB",
       "text": "御神籤(おみくじ)配布サイト / Omikuji (Japanese Fortune) Distribution Site",
       "url": "/omikuji-hub/"
     },
-    
+
     {
       "title": "image-Generator",
       "text": "グラデーション & 単色画像ジェネレーター / Gradient & Solid Color Image Generator",
       "url": "/image-Generator/"
     }
-    
   ]
 }
-
