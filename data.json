@@ -6,7 +6,6 @@
       "url": "/battery/"
     },
 
-
     {
       "title": "ビデオプレーヤー",
       "text": "YouTube とニコニコ動画に対応した動画再生ツール / Video player compatible with YouTube and Niconico",
@@ -20,9 +19,21 @@
     },
 
     {
-      "title": "image-Generator",
+      "title": "Image Generator",
       "text": "グラデーション & 単色画像ジェネレーター / Gradient & Solid Color Image Generator",
       "url": "/image-Generator/"
+    },
+
+    {
+      "title": "遊び文字",
+      "text": "文字の中に文字を隠す、ユニコードの遊びツール / Unicode play to hide characters within characters",
+      "url": "/asobi-mozi/"
+    },
+
+    {
+      "title": "Canvas",
+      "text": "ブラウザで自由にお絵描きができるツール / Simple drawing tool in your browser",
+      "url": "/Canvas/"
     }
   ]
 }

@@ -86,21 +86,26 @@ body.dark .battery-info {
     background-color: #4CAF50;
     color: #fff;
 }
+
+#title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
+#charging { font-size: 1.1rem; margin-bottom: 0.5rem; }
+#level-text { font-size: 1.1rem; margin-bottom: 1rem; }
+.btn-container { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; }
 </style>
 </head>
 <body>
 
 <div class="battery-info">
 
-    <h1 id="title" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">
+    <h1 id="title">
         バッテリー残量チェック
     </h1>
 
-    <p id="charging" style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+    <p id="charging">
         充電中?: Loading...
     </p>
 
-    <p id="level-text" style="font-size: 1.1rem; margin-bottom: 1rem;">
+    <p id="level-text">
         残量: Loading...
     </p>
 
@@ -108,7 +113,7 @@ body.dark .battery-info {
         <div id="level-bar-fill" class="level-fill">0%</div>
     </div>
 
-    <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+    <div class="btn-container">
         <button class="lang-btn" onclick="setLang('ja')">日本語</button>
         <button class="lang-btn" onclick="setLang('en')">English</button>
     </div>

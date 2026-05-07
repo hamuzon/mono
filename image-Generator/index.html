@@ -145,16 +145,16 @@ canvas {
 </div>
 
 <label>角度
-<input type="number" id="angle" min="0" max="360">
+<input type="number" id="angle" min="0" max="360" title="グラデーションの角度">
 </label>
 
 <div class="toggle">
-    <input type="checkbox" id="singleColor">
+    <input type="checkbox" id="singleColor" title="単色モード" aria-label="単色モード">
     <span>単色モード</span>
 </div>
 
 <div class="toggle">
-    <input type="checkbox" id="randomMode">
+    <input type="checkbox" id="randomMode" aria-label="ランダム（プレビュー時のみ）">
     <span>ランダム（プレビュー時のみ）</span>
 </div>
 </fieldset>
@@ -176,8 +176,8 @@ canvas {
 </select>
 </label>
 
-<label>幅(px)<input type="number" id="width"></label>
-<label>高さ(px)<input type="number" id="height"></label>
+<label>幅(px)<input type="number" id="width" title="画像の幅"></label>
+<label>高さ(px)<input type="number" id="height" title="画像の高さ"></label>
 </fieldset>
 
 <fieldset>
@@ -192,7 +192,7 @@ canvas {
 </label>
 
 <label>画質
-<input type="number" id="quality" min="0.1" max="1" step="0.01">
+<input type="number" id="quality" min="0.1" max="1" step="0.01" title="画像の画質 (0.1 - 1.0)">
 </label>
 </fieldset>
 
@@ -200,17 +200,17 @@ canvas {
 <legend>ファイル名</legend>
 
 <label>名前
-<input type="text" id="nameInput">
+<input type="text" id="nameInput" placeholder="画像の名前" title="ファイル名のベーステキスト">
 </label>
 
-<div class="toggle"><input type="checkbox" id="tY" checked><span>年</span></div>
-<div class="toggle"><input type="checkbox" id="tM" checked><span>月</span></div>
-<div class="toggle"><input type="checkbox" id="tD" checked><span>日</span></div>
-<div class="toggle"><input type="checkbox" id="tH" checked><span>時</span></div>
-<div class="toggle"><input type="checkbox" id="tm" checked><span>分</span></div>
-<div class="toggle"><input type="checkbox" id="ts" checked><span>秒</span></div>
+<div class="toggle"><input type="checkbox" id="tY" checked title="年を含める" aria-label="年"><span>年</span></div>
+<div class="toggle"><input type="checkbox" id="tM" checked title="月を含める" aria-label="月"><span>月</span></div>
+<div class="toggle"><input type="checkbox" id="tD" checked title="日を含める" aria-label="日"><span>日</span></div>
+<div class="toggle"><input type="checkbox" id="tH" checked title="時を含める" aria-label="時"><span>時</span></div>
+<div class="toggle"><input type="checkbox" id="tm" checked title="分を含める" aria-label="分"><span>分</span></div>
+<div class="toggle"><input type="checkbox" id="ts" checked title="秒を含める" aria-label="秒"><span>秒</span></div>
 
-<div class="toggle"><input type="checkbox" id="tW" checked><span>曜日</span></div>
+<div class="toggle"><input type="checkbox" id="tW" checked aria-label="曜日"><span>曜日</span></div>
 
 <label>曜日言語
 <select id="weekdayLang">
@@ -219,7 +219,7 @@ canvas {
 </select>
 </label>
 
-<div class="toggle"><input type="checkbox" id="tID" checked><span>ランダムID</span></div>
+<div class="toggle"><input type="checkbox" id="tID" checked title="ランダムIDを含める" aria-label="ランダムID"><span>ランダムID</span></div>
 
 <div id="filenamePreview"></div>
 </fieldset>
@@ -228,7 +228,7 @@ canvas {
 <legend>保存 / 復元</legend>
 
 <div class="toggle">
-    <input type="checkbox" id="jsonExport" checked>
+    <input type="checkbox" id="jsonExport" checked title="画像保存時に設定JSONも保存" aria-label="画像保存時 JSON も出力">
     <span>画像保存時 JSON も出力</span>
 </div>
 

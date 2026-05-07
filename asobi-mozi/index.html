@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Encoder - Expressive Edition</title>
+    <style>
+        :root {
+            --m3-surface: rgba(255, 255, 255, 0.4);
+            --m3-on-surface: #1C1B1F;
+            --m3-primary: #6750A4;
+            --m3-primary-container: #EADDFF;
+            --m3-outline: rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* 指定のバックグラウンド */
+            background:
+                radial-gradient(ellipse 80% 60% at 70% 20%, rgba(175,109,255,0.85), transparent 68%),
+                radial-gradient(ellipse 70% 60% at 20% 80%, rgba(255,100,180,0.75), transparent 68%),
+                radial-gradient(ellipse 60% 50% at 60% 65%, rgba(255,235,170,0.98), transparent 68%),
+                radial-gradient(ellipse 65% 40% at 50% 60%, rgba(120,190,255,0.3), transparent 68%),
+                linear-gradient(180deg, #f7eaff 0%, #fde2ea 100%);
+            background-attachment: fixed;
+            color: var(--m3-on-surface);
+        }
+
+        .glass-card {
+            width: 100%;
+            max-width: 480px;
+            margin: 20px;
+            padding: 32px;
+            /* Liquid Glass 効果 */
+            background: var(--m3-surface);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 28px; /* M3 Expressive: 大きめの角丸 */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 24px 0;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding-left: 4px;
+            opacity: 0.8;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--m3-outline);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        textarea:focus, input:focus {
+            border-color: var(--m3-primary);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.1);
+        }
+
+        .output-box {
+            position: relative;
+            background: var(--m3-primary-container);
+            color: var(--m3-primary);
+            padding: 20px;
+            border-radius: 20px;
+            min-height: 60px;
+            word-break: break-all;
+            cursor: pointer;
+            transition: transform 0.1s;
+            font-weight: 500;
+            border: 1px solid rgba(103, 80, 164, 0.1);
+        }
+
+        .output-box:active {
+            transform: scale(0.98);
+        }
+
+        .output-box::after {
+            content: "クリックでコピー";
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 11px;
+            opacity: 0.6;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--m3-outline);
+            margin: 32px 0;
+        }
+
+        .decoded-area {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px dashed var(--m3-primary);
+            padding: 16px;
+            border-radius: 16px;
+            min-height: 24px;
+            font-weight: 700;
+            color: var(--m3-primary);
+        }
+
+        /* アニメーション */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card fade-in">
+    <h1>Emoji Encoder</h1>
+
+    <div class="input-group">
+        <label>ベーステキスト</label>
+        <input type="text" id="pubIn" value="🚩" placeholder="例: お疲れ様！">
+    </div>
+
+    <div class="input-group">
+        <label>変換するテキスト</label>
+        <textarea id="secIn" rows="2" placeholder="エンコードする内容を入力..."></textarea>
+    </div>
+
+    <div class="input-group">
+        <label>生成結果</label>
+        <div id="encOut" class="output-box" onclick="copy()"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="input-group">
+        <label>デコード (貼り付けて解析)</label>
+        <input type="text" id="decIn" placeholder="ここに貼り付け">
+    </div>
+
+    <div id="decResultGroup" class="input-group hidden">
+        <label>デコードされた内容</label>
+        <div id="decOut" class="decoded-area"></div>
+    </div>
+</div>
+
+<script>
+    const VS_START = 0xE0100;
+
+    function encode(t) {
+        if (!t) return "";
+        const b = new TextEncoder().encode(t);
+        let bin = "";
+        for (let x of b) bin += x.toString(2).padStart(8, '0');
+        let res = "";
+        for (let i = 0; i < bin.length; i += 7) {
+            let c = bin.slice(i, i + 7);
+            if (c.length < 7) c = c.padEnd(7, '0');
+            res += String.fromCodePoint(VS_START + parseInt(c, 2));
+        }
+        return res;
+    }
+
+    function decode(t) {
+        const cp = Array.from(t).map(c => c.codePointAt(0));
+        const f = cp.filter(x => x >= VS_START && x < VS_START + 128);
+        if (f.length === 0) return "";
+        let bin = "";
+        for (let x of f) bin += (x - VS_START).toString(2).padStart(7, '0');
+        const b = [];
+        for (let i = 0; i + 8 <= bin.length; i += 8) b.push(parseInt(bin.slice(i, i + 8), 2));
+        return new TextDecoder().decode(new Uint8Array(b));
+    }
+
+    const pI = document.getElementById('pubIn'), sI = document.getElementById('secIn'), 
+          eO = document.getElementById('encOut'), dI = document.getElementById('decIn'),
+          dO = document.getElementById('decOut'), dG = document.getElementById('decResultGroup');
+
+    function refreshEnc() { eO.innerText = pI.value + encode(sI.value); }
+    function refreshDec() {
+        const r = decode(dI.value);
+        if (r) { dO.innerText = r; dG.classList.remove('hidden'); }
+        else { dG.classList.add('hidden'); }
+    }
+
+    function copy() {
+        navigator.clipboard.writeText(eO.innerText);
+        const tmp = eO.innerText;
+        eO.innerText = "コピーしました！";
+        setTimeout(() => eO.innerText = tmp, 800);
+    }
+
+    pI.oninput = refreshEnc; sI.oninput = refreshEnc; dI.oninput = refreshDec;
+    refreshEnc();
+</script>
+
+</body>
+</html>
