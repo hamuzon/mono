@@ -395,15 +395,15 @@ const app = {
 };
 
 const ui = {
-    openProjects() { this.renderProjects(); document.getElementById('project-modal').style.display = 'flex'; },
-    closeProjects() { document.getElementById('project-modal').style.display = 'none'; },
+    openProjects() { this.renderProjects(); document.getElementById('project-modal').classList.remove('hidden'); },
+    closeProjects() { document.getElementById('project-modal').classList.add('hidden'); },
     showCreate() {
         const cats = Object.keys(randomNames);
         const names = randomNames[cats[Math.floor(Math.random() * cats.length)]];
         document.getElementById('art-name-input').value = names[Math.floor(Math.random() * names.length)];
-        document.getElementById('create-modal').style.display = 'flex';
+        document.getElementById('create-modal').classList.remove('hidden');
     },
-    closeCreate() { document.getElementById('create-modal').style.display = 'none'; },
+    closeCreate() { document.getElementById('create-modal').classList.add('hidden'); },
     onPresetChange() { document.getElementById('custom-fields').style.display = document.getElementById('res-preset').value === 'custom' ? 'flex' : 'none'; },
     toggleTheme() {
         const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
