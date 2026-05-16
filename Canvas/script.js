@@ -436,6 +436,10 @@
             }
         };
 
+        window.app = app;
+        window.ui = ui;
+        window.layers = layers;
+
         document.getElementById('size-slider').oninput = (e) => { 
             document.getElementById('sz-num').innerText = e.target.value; 
             app.updateCursor();
