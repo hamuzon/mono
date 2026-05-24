@@ -60,7 +60,7 @@ function getState() {
 
 function applyState(s) {
     colorList.innerHTML = "";
-    s.colors.forEach(c => addColor(c));
+    s.colors.forEach(c => addColorItem(c));
     angle.value = s.angle;
     singleColor.checked = s.singleColor;
     randomMode.checked = s.randomMode;
@@ -81,7 +81,7 @@ function applyState(s) {
     jsonExport.checked = s.jsonExport;
 }
 
-function addColor(val = "#ffffff") {
+function addColorItem(val = "#ffffff") {
     const d = document.createElement("div");
     d.className = "color-item";
     d.innerHTML = `
@@ -162,7 +162,7 @@ previewBtn.onclick = () => {
     if (randomMode.checked) {
         colorList.innerHTML = "";
         for (let i = 0; i < 3; i += 1) {
-            addColor(`#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`);
+            addColorItem(`#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`);
         }
     }
     draw();
@@ -224,11 +224,14 @@ preset.onchange = () => {
     height.value = h;
 };
 
-addColor.onclick = () => {
-    if (colorList.children.length < 10) addColor();
+const addColorButton = document.getElementById("addColor");
+const removeColorButton = document.getElementById("removeColor");
+
+addColorButton.onclick = () => {
+    if (colorList.children.length < 10) addColorItem();
 };
 
-removeColor.onclick = () => {
+removeColorButton.onclick = () => {
     if (colorList.children.length > 2) {
         colorList.lastElementChild.remove();
     }
