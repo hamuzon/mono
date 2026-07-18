@@ -2,37 +2,37 @@
   "cards": [
     {
       "title": "Battery API",
-      "text": "Battery API を使った情報取得・表示ページ / Battery status viewer using the Battery API",
+      "text": "Battery 🔋 API を使った情報取得・表示ページ / Battery status 🔋 viewer using the Battery API",
       "url": "/battery/"
     },
     {
       "title": "ビデオプレーヤー",
-      "text": "YouTube とニコニコ動画に対応した動画再生ツール / Video player compatible with YouTube and Niconico",
+      "text": "YouTube ▶️ とニコニコ動画 📺 に対応した動画再生ツール / Video player compatible with YouTube ▶️ and Niconico 📺",
       "url": "/Video_Player/"
     },
     {
       "title": "御神籤(おみくじ)HUB",
-      "text": "御神籤(おみくじ)配布サイト / Omikuji (Japanese Fortune) Distribution Site",
+      "text": "御神籤(おみくじ) 🎴 配布サイト / Omikuji 🎴 (Japanese Fortune) Distribution Site",
       "url": "/omikuji-hub/"
     },
     {
       "title": "Image Generator",
-      "text": "グラデーション & 単色画像ジェネレーター / Gradient & Solid Color Image Generator",
+      "text": "グラデーション 🌈 & 単色画像 🖼️ ジェネレーター / Gradient 🌈 & Solid Color 🖼️ Image Generator",
       "url": "/image-Generator/"
     },
     {
       "title": "遊び文字",
-      "text": "文字の中に文字を隠す、ユニコードの遊びツール / Unicode play to hide characters within characters",
+      "text": "文字の中に文字 🔤 を隠す、ユニコードの遊びツール 🪄 / Unicode play 🪄 to hide characters 🔤 within characters",
       "url": "/asobi-mozi/"
     },
     {
       "title": "Canvas",
-      "text": "ブラウザで自由にお絵描きができるツール / Simple drawing tool in your browser",
+      "text": "ブラウザで自由にお絵描き 🎨 ができるツール / Simple drawing 🎨 tool in your browser",
       "url": "/Canvas/"
     },
     {
       "title": "オンライン花火🎇大会",
-      "text": "ブラウザで楽しめるオンライン花火 / Online fireworks display you can enjoy in your browser",
+      "text": "ブラウザで楽しめる 🎇 オンライン花火 🎆 / Enjoy an online 🎇 fireworks 🎆 display in your browser",
       "url": "/hanabi/"
     }
   ]
