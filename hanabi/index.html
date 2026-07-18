@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>花火 | ブラウザで楽しめるオンライン花火</title>
+
+<meta name="description" content="ブラウザで楽しめるオンライン花火。色々な種類の花火をPCやスマートフォンで鑑賞できます。">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#000000">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at bottom,#102850 0%,#000 75%);
+  font-family:system-ui,sans-serif;
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  display:block;
+  cursor: pointer;
+}
+
+/* 開始時のタイトル表示 */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  z-index: 20;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 1.5s ease-out 1s; /* 1秒後に1.5秒かけてフェードアウト */
+}
+
+.splash-screen.hidden {
+  opacity: 0;
+}
+
+.splash-screen h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="splash-screen" id="splash-screen">
+  <h1>オンライン花火大会</h1>
+</div>
+
+<canvas id="canvas"></canvas>
+
+
+<script>
+
+// --- 初期設定 ---
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+// 画面リサイズ処理
+function resize(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener(
+  "resize",
+  resize
+);
+
+// クリック/タップで花火を打ち上げ
+canvas.addEventListener('click', (e) => {
+  // スターマインと千輪菊以外のランダムな花火を打ち上げ
+  const type = Math.floor(Math.random() * (Object.keys(FIREWORK_TYPES).length - 2));
+  createFirework(e.clientX, e.clientY, type);
+});
+
+// --- グローバル変数 ---
+const particles=[];
+
+// 花火の種類を定数で管理
+const FIREWORK_TYPES = {
+  NORMAL: 0,
+  WILLOW: 1, // 柳
+  STAR: 2,   // 星
+  PEONY: 3,  // 大玉（牡丹）
+  STARMINE: 4, // スターマイン
+  CHRYSANTHEMUM: 5, // 菊（変色）
+  CRACKLING: 6, // 蜂（パチパチ）
+  HEART: 7, // ハート
+  THOUSAND_RING: 8, // 千輪菊
+};
+
+// 花火の種類ごとの設定
+const FIREWORK_CONFIG = {
+  [FIREWORK_TYPES.NORMAL]:       { count: 160, speed: [2, 8],   gravity: 0.04, size: 2.3, effect: null },
+  [FIREWORK_TYPES.WILLOW]:       { count: 160, speed: [1, 5],   gravity: 0.06, size: 2.3, effect: null },
+  [FIREWORK_TYPES.STAR]:         { count: 160, speed: [3, 8],   gravity: 0.04, size: 2.3, effect: null },
+  [FIREWORK_TYPES.PEONY]:        { count: 350, speed: [2, 8],   gravity: 0.04, size: 3.0, effect: null },
+  [FIREWORK_TYPES.CHRYSANTHEMUM]:{ count: 200, speed: [2, 8],   gravity: 0.04, size: 2.3, effect: 'hue-shift' },
+  [FIREWORK_TYPES.CRACKLING]:    { count: 160, speed: [2, 8],   gravity: 0.04, size: 2.3, effect: 'crackle' },
+  [FIREWORK_TYPES.HEART]:        { count: 120, speed: [0.5, 1], gravity: 0.03, size: 2.3, effect: null },
+  // スターマインと千輪菊は launchFirework で特別処理
+};
+
+// --- ユーティリティ関数 ---
+function random(min,max){
+  return Math.random()*(max-min)+min;
+}
+
+// --- 花火生成関数 ---
+
+// 個々の花火パーティクルを生成
+function createFirework(x,y,type){
+
+  const config = FIREWORK_CONFIG[type];
+  if (!config) return;
+
+  const hue = random(0, 360);
+  const color = `hsl(${hue}, 100%, 65%)`;
+  const count = config.count;
+
+  // 花火の種類に応じてパーティクルの動きを計算
+  for(let i = 0; i < count; i++){
+    let angle;
+    let speed;
+    let vx, vy;
+
+    switch(type){
+      case FIREWORK_TYPES.STAR:
+        angle = (Math.PI * 2 / count) * i;
+        speed = random(config.speed[0], config.speed[1]);
+        vx = Math.cos(angle) * speed;
+        vy = Math.sin(angle) * speed;
+        break;
+
+      case FIREWORK_TYPES.HEART:
+        const t = (Math.PI * 2 / count) * i;
+        const scale = random(config.speed[0], config.speed[1]) * 0.2;
+        // ハートの数式
+        vx = scale * (16 * Math.pow(Math.sin(t), 3));
+        vy = -scale * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+        break;
+
+      default: // NORMAL, WILLOW, PEONY, etc.
+        angle = random(0, Math.PI * 2);
+        speed = random(config.speed[0], config.speed[1]);
+        vx = Math.cos(angle) * speed;
+        vy = Math.sin(angle) * speed;
+    }
+
+    particles.push({
+      x: x,
+      y: y,
+      vx: vx,
+      vy: vy,
+      alpha: 1,
+      color: color,
+      hue: hue,
+      type: type,
+    });
+  }
+}
+
+// スターマインを打ち上げ
+function launchStarmine() {
+  const launchCount = 5;
+  for (let i = 1; i <= launchCount; i++) {
+    setTimeout(() => {
+      const x = random(canvas.width * 0.2, canvas.width * 0.8);
+      const y = random(100, canvas.height * 0.45);
+      // スターマインの中身は通常〜大玉まで
+      const starmineType = Math.floor(Math.random() * 4);
+      createFirework(x, y, starmineType);
+    }, i * 250);
+  }
+}
+
+// 千輪菊を打ち上げ
+function launchThousandRing(x, y) {
+  const coreHue = random(0, 360);
+  const smallFireworkCount = 15;
+
+  for (let i = 0; i < smallFireworkCount; i++) {
+    const angle = random(0, Math.PI * 2);
+    const speed = random(1, 4);
+    const travelTime = random(200, 500);
+
+    setTimeout(() => {
+      const targetX = x + Math.cos(angle) * speed * 30;
+      const targetY = y + Math.sin(angle) * speed * 30;
+      // 小さな花火を作成
+      createFirework(targetX, targetY, FIREWORK_TYPES.CRACKLING);
+    }, travelTime);
+  }
+}
+
+// --- メイン処理 ---
+
+// 自動で花火を打ち上げるメインの関数
+function launchFirework() {
+  const x = random(canvas.width * 0.1, canvas.width * 0.9);
+  const y = random(100, canvas.height * 0.55);
+
+  // 打ち上げる花火の種類を決定
+  const type = Math.floor(Math.random() * Object.keys(FIREWORK_TYPES).length);
+
+  if (type === FIREWORK_TYPES.STARMINE) {
+    launchStarmine();
+  } else if (type === FIREWORK_TYPES.THOUSAND_RING) {
+    launchThousandRing(x, y);
+  } else {
+    createFirework(x, y, type);
+  }
+
+  // 次の打ち上げをランダムな間隔で予約
+  setTimeout(launchFirework, random(1200, 2800));
+}
+
+// 最初の花火を打ち上げ
+launchFirework();
+
+// 描画ループ
+function animate(){
+
+  // 次のフレームを予約
+  requestAnimationFrame(animate);
+
+  // 画面を少し暗くして残像効果を出す
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 全てのパーティクルを更新・描画
+  for(let i = particles.length - 1; i >= 0; i--){
+    const p = particles[i];
+    const config = FIREWORK_CONFIG[p.type] || FIREWORK_CONFIG[FIREWORK_TYPES.NORMAL];
+
+    // 座標を更新
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // 重力を適用
+    p.vy += config.gravity;
+
+    // 透明度を下げていく
+    p.alpha -= 0.012;
+
+    // 花火の種類に応じた特殊効果を適用
+    switch (config.effect) {
+  case 'hue-shift':
+    // 徐々に色相が変わる（菊）
+    p.hue = (p.hue + 0.8) % 360;
+    p.color = `hsl(${p.hue}, 100%, 65%)`;
+    break;
+  case 'crackle':
+    // ランダムに点滅（蜂）
+    if (Math.random() < 0.1) {
+      p.alpha = Math.min(1, p.alpha + 0.5);
+    }
+    break;
+}
+
+    // パーティクルを描画
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, config.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 透明度が0になったらパーティクルを削除
+    if(p.alpha <= 0){
+      particles.splice(i, 1);
+    }
+  }
+
+  // 次の描画のために透明度をリセット
+  ctx.globalAlpha = 1;
+}
+
+// アニメーションを開始
+animate();
+
+// 開始時のタイトルをフェードアウトさせる
+window.addEventListener('load', () => {
+  const splash = document.getElementById('splash-screen');
+  splash.classList.add('hidden');
+});
+
+</script>
+
+</body>
+</html>
