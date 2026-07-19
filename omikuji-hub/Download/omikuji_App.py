@@ -10,8 +10,8 @@ import random
 API_BASE = "https://api.hamusata.f5.si"
 APP_NAME = "omikuji_app"
 
-# USER_ID の最後3桁をランダムに生成
-random_suffix = f"{random.randint(0, 999):03d}"  # 000～999
+# USER_ID の最後5桁をランダムに生成
+random_suffix = f"{random.randint(0, 99999):05d}"  # 00000～99999
 USER_ID = f"omikuji_user_otp_{random_suffix}"
 
 WAIT_LIMIT = 10  # 秒単位
