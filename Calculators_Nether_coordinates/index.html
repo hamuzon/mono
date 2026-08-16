@@ -204,44 +204,6 @@
       box-shadow: 0 0 0 2px rgba(152, 115, 157, 0.12);
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 15px;
-      border-top: 1px solid var(--border);
-      background: var(--surface-soft);
-    }
-
-    button {
-      min-height: 39px;
-      padding: 7px 15px;
-      border: 1px solid var(--button);
-      border-radius: 5px;
-      background: var(--button);
-      color: #fff;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, border-color 0.2s;
-    }
-
-    button:hover {
-      background: var(--button-hover);
-      border-color: var(--button-hover);
-    }
-
-    button.secondary {
-      border-color: var(--border);
-      background: #fff;
-      color: var(--text);
-    }
-
-    button.secondary:hover {
-      background: var(--surface-soft);
-    }
-
     .notice {
       margin-top: 22px;
       padding: 18px 20px;
@@ -424,15 +386,6 @@
 
       </div>
 
-      <div class="actions">
-        <button id="copy" type="button">
-          座標をコピー
-        </button>
-        <button id="clear" class="secondary" type="button">
-          クリア
-        </button>
-      </div>
-
     </section>
 
     <section class="notice">
@@ -464,12 +417,9 @@
       const overworldZ = document.getElementById("overworldZ");
       const netherX = document.getElementById("netherX");
       const netherZ = document.getElementById("netherZ");
-      const copyButton = document.getElementById("copy");
-      const clearButton = document.getElementById("clear");
       const footerCopy = document.getElementById("footer-copy");
       const RATIO = 8;
       let isUpdating = false;
-      let lastResult = null;
       function toInteger(value) {
         return Number.isFinite(value) ? Math.trunc(value) : "";
       }
@@ -487,46 +437,6 @@
         } finally {
           isUpdating = false;
         }
-
-        updateLastResult();
-      }
-
-      function updateLastResult() {
-        if (overworldX.value !== "" && overworldZ.value !== "") {
-          lastResult = { x: overworldX.value, z: overworldZ.value };
-        } else if (netherX.value !== "" && netherZ.value !== "") {
-          lastResult = { x: netherX.value, z: netherZ.value };
-        } else {
-          lastResult = null;
-        }
-      }
-
-      async function copyCoordinates() {
-        if (!lastResult) return;
-
-        const text = `${lastResult.x} ${lastResult.z}`;
-        try {
-          await navigator.clipboard.writeText(text);
-          const originalText = copyButton.textContent;
-          copyButton.textContent = "コピーしました";
-          setTimeout(() => {
-            copyButton.textContent = originalText;
-          }, 1400);
-        } catch (err) {
-          console.error("コピーに失敗しました。", err);
-          alert("コピーに失敗しました。");
-        }
-      }
-
-      function clearAll() {
-        isUpdating = true;
-        overworldX.value = "";
-        overworldZ.value = "";
-        netherX.value = "";
-        netherZ.value = "";
-        isUpdating = false;
-        lastResult = null;
-        overworldX.focus();
       }
 
       function initializeFooter() {
@@ -563,8 +473,6 @@
         overworldZ.addEventListener("input", () => updateCoordinates(overworldX, overworldZ, netherX, netherZ));
         netherX.addEventListener("input", () => updateCoordinates(netherX, netherZ, overworldX, overworldZ, true));
         netherZ.addEventListener("input", () => updateCoordinates(netherX, netherZ, overworldX, overworldZ, true));
-        copyButton.addEventListener("click", copyCoordinates);
-        clearButton.addEventListener("click", clearAll);
       }
 
       initializeEventListeners();
