@@ -34,6 +34,11 @@
       "title": "オンライン花火🎇大会",
       "text": "ブラウザで楽しめる 🎇 オンライン花火 🎆 / Enjoy an online 🎇 fireworks 🎆 display in your browser",
       "url": "/hanabi/"
+    },
+        {
+      "title": "ネザー座標変換 / Nether Coordinate Transformation ",
+      "text": "MC Tools / マインクラフトのネザーとオーバーワルドの座標の計算をします。/This calculates the coordinates of the Nether and Overworld in Minecraft./",
+      "url": "/Calculators_Nether_coordinates/"
     }
   ]
 }
