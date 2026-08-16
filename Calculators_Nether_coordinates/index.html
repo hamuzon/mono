@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ネザー座標変換 | MC Tools</title>
+  <meta name="description" content="MinecraftのオーバーワールドとネザーのX・Z座標を簡単に変換できる計算機です。">
+  <meta name="keywords" content="Minecraft,マインクラフト,マイクラ,ネザー,座標,座標変換,計算,ツール">
+
+  <!-- OGP / Social Meta Tags -->
+  <meta property="og:title" content="ネザー座標変換 | MC Tools">
+  <meta property="og:description" content="MinecraftのオーバーワールドとネザーのX・Z座標を簡単に変換できる計算機です。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MC Tools">
+  <meta property="og:url" content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/">
+  <!-- <meta property="og:image" content="https://example.com/og-image.png"> -->
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary">
+  <!-- <meta name="twitter:site" content="@your_twitter_handle"> -->
+  <meta name="twitter:title" content="ネザー座標変換 | MC Tools">
+  <meta name="twitter:description" content="MinecraftのオーバーワールドとネザーのX・Z座標を簡単に変換できる計算機です。">
+  <!-- <meta name="twitter:image" content="https://example.com/twitter-card-image.png"> -->
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --background: #f7f5f0;
+      --surface: #fffefa;
+      --surface-soft: #faf9f5;
+      --border: #dddcd2;
+      --text: #403f39;
+      --muted: #77776e;
+
+      --overworld: #718f68;
+      --overworld-soft: #edf3e9;
+
+      --nether: #98739d;
+      --nether-soft: #f3ebf4;
+
+      --button: #718f68;
+      --button-hover: #5e7c56;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        Meiryo,
+        sans-serif;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(100% - 24px, 760px);
+      margin: 0 auto;
+      padding: 42px 0 48px;
+    }
+
+    header {
+      margin-bottom: 25px;
+    }
+
+    .brand {
+      margin: 0 0 4px;
+      color: var(--overworld);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 29px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .lead {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .calculator {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      box-shadow: 0 5px 18px rgba(80, 75, 60, 0.05);
+    }
+
+    .calculator-title {
+      padding: 13px 17px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-soft);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .table {
+      width: 100%;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 190px 1fr 1fr;
+      min-height: 68px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      padding: 11px 14px;
+      border-right: 1px solid var(--border);
+    }
+
+    .cell:last-child {
+      border-right: 0;
+    }
+
+    .header-row {
+      min-height: 43px;
+      background: var(--surface-soft);
+    }
+
+    .header-row .cell {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .dimension {
+      display: block;
+      font-weight: 600;
+    }
+
+    .dimension-name {
+      display: block;
+    }
+
+    .overworld-row {
+      background: #fbfcf9;
+    }
+
+    .overworld-row .dimension-name {
+      color: var(--overworld);
+    }
+
+    .nether-row {
+      background: #fdfafd;
+    }
+
+    .nether-row .dimension-name {
+      color: var(--nether);
+    }
+
+    .axis {
+      margin-right: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      height: 40px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+      font-size: 16px;
+      text-align: right;
+      transition:
+        border-color 0.15s,
+        box-shadow 0.15s;
+    }
+
+    .overworld-input:focus {
+      border-color: var(--overworld);
+      box-shadow: 0 0 0 2px rgba(113, 143, 104, 0.12);
+    }
+
+    .nether-input:focus {
+      border-color: var(--nether);
+      box-shadow: 0 0 0 2px rgba(152, 115, 157, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 15px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-soft);
+    }
+
+    button {
+      min-height: 39px;
+      padding: 7px 15px;
+      border: 1px solid var(--button);
+      border-radius: 5px;
+      background: var(--button);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+      border-color: var(--button-hover);
+    }
+
+    button.secondary {
+      border-color: var(--border);
+      background: #fff;
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background: var(--surface-soft);
+    }
+
+    .notice {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .notice h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .notice p {
+      margin: 5px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .formula {
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 5px;
+      background: var(--overworld-soft);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    footer p {
+      margin: 0 0 8px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: min(100% - 16px, 760px);
+        padding-top: 28px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .row {
+        grid-template-columns: 125px 1fr 1fr;
+        min-height: 63px;
+      }
+
+      .cell {
+        padding: 8px;
+      }
+
+      .dimension-name {
+        font-size: 13px;
+      }
+
+      .dimension-sub {
+        display: none;
+      }
+
+      .axis {
+        display: none;
+      }
+
+      input {
+        height: 38px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .row {
+        grid-template-columns: 105px 1fr 1fr;
+      }
+
+      .cell {
+        padding: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <header>
+      <p class="brand">MC Tools</p>
+      <h1>ネザー座標変換</h1>
+      <p class="lead">
+        オーバーワールドとネザーのX・Z座標を変換します。
+      </p>
+    </header>
+
+    <section class="calculator">
+
+      <div class="calculator-title">
+        ディメンション XZ
+      </div>
+
+      <div class="table">
+
+        <div class="row header-row">
+          <div class="cell">ディメンション</div>
+          <div class="cell">X</div>
+          <div class="cell">Z</div>
+        </div>
+
+        <div class="row overworld-row">
+          <div class="cell dimension">
+            <span class="dimension-name">
+              オーバーワールド
+            </span>
+          </div>
+
+          <div class="cell">
+            <span class="axis">X</span>
+            <input
+              id="overworldX"
+              class="overworld-input"
+              type="number"
+              inputmode="numeric"
+              placeholder="0"
+            >
+          </div>
+
+          <div class="cell">
+            <span class="axis">Z</span>
+            <input
+              id="overworldZ"
+              class="overworld-input"
+              type="number"
+              inputmode="numeric"
+              placeholder="0"
+            >
+          </div>
+        </div>
+
+        <div class="row nether-row">
+          <div class="cell dimension">
+            <span class="dimension-name">
+              ネザー
+            </span>
+          </div>
+
+          <div class="cell">
+            <span class="axis">X</span>
+            <input
+              id="netherX"
+              class="nether-input"
+              type="number"
+              inputmode="numeric"
+              placeholder="0"
+            >
+          </div>
+
+          <div class="cell">
+            <span class="axis">Z</span>
+            <input
+              id="netherZ"
+              class="nether-input"
+              type="number"
+              inputmode="numeric"
+              placeholder="0"
+            >
+          </div>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button id="copy" type="button">
+          座標をコピー
+        </button>
+        <button id="clear" class="secondary" type="button">
+          クリア
+        </button>
+      </div>
+
+    </section>
+
+    <section class="notice">
+      <h2>ネザー座標の計算方法</h2>
+
+      <p>
+        オーバーワールドとネザーでは、X・Z座標が8:1の比率になります。
+      </p>
+
+      <div class="formula">
+        オーバーワールド → ネザー　X・Z ÷ 8<br>
+        ネザー → オーバーワールド　X・Z × 8
+      </div>
+
+    </section>
+
+    <footer>
+      <p>
+        Minecraft は Mojang AB の登録商標です。当サイトは非公式のツールであり、Mojang AB とは関係ありません。
+      </p>
+      <span id="footer-copy"></span>
+    </footer>
+
+  </main>
+
+  <script>
+    (function() {
+      const overworldX = document.getElementById("overworldX");
+      const overworldZ = document.getElementById("overworldZ");
+      const netherX = document.getElementById("netherX");
+      const netherZ = document.getElementById("netherZ");
+      const copyButton = document.getElementById("copy");
+      const clearButton = document.getElementById("clear");
+      const footerCopy = document.getElementById("footer-copy");
+      const RATIO = 8;
+      let isUpdating = false;
+      let lastResult = null;
+      function toInteger(value) {
+        return Number.isFinite(value) ? Math.trunc(value) : "";
+      }
+      function updateCoordinates(sourceX, sourceZ, destX, destZ, toOverworld = false) {
+        if (isUpdating) return;
+
+        isUpdating = true;
+        try {
+          const x = Number(sourceX.value);
+          const z = Number(sourceZ.value);
+          const operation = (coord) => toOverworld ? coord * RATIO : coord / RATIO;
+
+          destX.value = sourceX.value === "" ? "" : toInteger(operation(x));
+          destZ.value = sourceZ.value === "" ? "" : toInteger(operation(z));
+        } finally {
+          isUpdating = false;
+        }
+
+        updateLastResult();
+      }
+
+      function updateLastResult() {
+        if (overworldX.value !== "" && overworldZ.value !== "") {
+          lastResult = { x: overworldX.value, z: overworldZ.value };
+        } else if (netherX.value !== "" && netherZ.value !== "") {
+          lastResult = { x: netherX.value, z: netherZ.value };
+        } else {
+          lastResult = null;
+        }
+      }
+
+      async function copyCoordinates() {
+        if (!lastResult) return;
+
+        const text = `${lastResult.x} ${lastResult.z}`;
+        try {
+          await navigator.clipboard.writeText(text);
+          const originalText = copyButton.textContent;
+          copyButton.textContent = "コピーしました";
+          setTimeout(() => {
+            copyButton.textContent = originalText;
+          }, 1400);
+        } catch (err) {
+          console.error("コピーに失敗しました。", err);
+          alert("コピーに失敗しました。");
+        }
+      }
+
+      function clearAll() {
+        isUpdating = true;
+        overworldX.value = "";
+        overworldZ.value = "";
+        netherX.value = "";
+        netherZ.value = "";
+        isUpdating = false;
+        lastResult = null;
+        overworldX.focus();
+      }
+
+      function initializeFooter() {
+        if (!footerCopy) return;
+
+        const baseYear = 2026;
+        const currentYear = new Date().getFullYear();
+        const hostname = location.hostname;
+
+        let copyrightYear;
+        if (currentYear < baseYear) {
+          copyrightYear = `${currentYear}~${baseYear}`;
+        } else if (currentYear > baseYear) {
+          copyrightYear = `${baseYear}~${currentYear}`;
+        } else {
+          copyrightYear = baseYear;
+        }
+
+        let footerHTML = `&copy; ${copyrightYear} `;
+        if (hostname.includes("hamuzon.github.io")) {
+          footerHTML += `<a href="https://hamuzon.github.io" target="_blank" rel="noopener">@hamuzon</a>`;
+        } else if (hostname.includes("hamusata.f5.si")) {
+          footerHTML += `<a href="https://hamusata.f5.si" target="_blank" rel="noopener">@hamusata</a>`;
+        } else if (hostname.includes("hamuzon-jp.f5.si")) {
+          footerHTML += `<a href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener">@hamuzon</a>`;
+        } else {
+          footerHTML += `MC Tools`;
+        }
+        footerCopy.innerHTML = footerHTML;
+      }
+
+      function initializeEventListeners() {
+        overworldX.addEventListener("input", () => updateCoordinates(overworldX, overworldZ, netherX, netherZ));
+        overworldZ.addEventListener("input", () => updateCoordinates(overworldX, overworldZ, netherX, netherZ));
+        netherX.addEventListener("input", () => updateCoordinates(netherX, netherZ, overworldX, overworldZ, true));
+        netherZ.addEventListener("input", () => updateCoordinates(netherX, netherZ, overworldX, overworldZ, true));
+        copyButton.addEventListener("click", copyCoordinates);
+        clearButton.addEventListener("click", clearAll);
+      }
+
+      initializeEventListeners();
+      initializeFooter();
+    })();
+  </script>
+</body>
+</html>
