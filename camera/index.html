@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera App</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app-container">
+  <div id="viewfinder">
+    <video id="video" autoplay muted></video>
+    <div class="overlay">
+      <div class="top-bar">
+        <div class="controls-row">
+          <button id="btnSettings" title="Settings"><span class="material-symbols-outlined">settings</span></button>
+          <button id="btnPower" data-translate-title="turnCameraOffTitle" title="Turn Camera Off"><span class="material-symbols-outlined">power_settings_new</span></button>
+        </div>
+        <div class="controls-row">
+          <button id="btnTorch" class="hidden" title="Toggle Flashlight"><span class="material-symbols-outlined">lightbulb</span></button>
+          <button id="btnTimer" title="Set Timer"><span class="material-symbols-outlined">timer</span></button>
+        </div>
+      </div>
+      
+      <div class="recording-ui" id="recordingUI">
+        <div class="rec-dot"></div>
+        <span>REC</span><span id="recordTimer">00:00</span>
+      </div>
+
+      <div class="sliders">
+        <div class="slider-container hidden" id="zoomSliderContainer">
+          <input type="range" id="zoomRange" min="1" max="1" step="0.1" value="1" aria-label="Zoom" title="Zoom">
+          <button id="resetZoomBtn" title="Reset Zoom"><span class="material-symbols-outlined">restart_alt</span></button>
+        </div>
+        <div class="slider-container hidden" id="exposureSliderContainer">
+          <input type="range" id="exposureRange" min="0" max="0" step="1" value="0" aria-label="Exposure" title="Exposure">
+          <button id="resetExposureBtn" title="Reset Exposure"><span class="material-symbols-outlined">restart_alt</span></button>
+        </div>
+      </div>
+
+      <div class="zoom-toast" id="zoomToast">1.0x</div>
+
+      <div class="bottom-bar">
+        <div id="galleryPreview"></div>
+        <button id="shutterBtn" title="Take Photo / Record Video"></button>
+        <button id="btnSwitch" title="Switch Camera"><span class="material-symbols-outlined">cameraswitch</span></button>
+      </div>
+
+      <div class="mode-switch">
+        <button class="mode-btn active" onclick="switchMode('photo')" id="modePhoto">Photo</button>
+        <button class="mode-btn" onclick="switchMode('video')" id="modeVideo">Video</button>
+      </div>
+    </div>
+    <div id="cameraOffOverlay" class="camera-off-overlay">
+      <button id="btnPowerOn" class="btn-power-on" title="Turn Camera On"><span class="material-symbols-outlined">power_settings_new</span></button>
+    </div>
+    <div id="flashOverlay" class="flash-effect"></div>
+  </div>
+  <footer id="footer-copy">&copy; 2025 Camera App</footer>
+</div>
+
+<div id="settingsPanel">
+  <div class="settings-header">
+    <h2 data-translate="settingsTitle">Settings</h2>
+    <button onclick="closeSettings()" class="btn-inline"><span class="material-symbols-outlined">check</span><span data-translate="done">Done</span></button>
+  </div>
+  
+  <div class="setting-item">
+    <label for="selLang" data-translate="language">Language</label>
+    <select id="selLang">
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selResolution" data-translate="resolution">Resolution</label>
+    <select id="selResolution">
+      <option value="4k" data-translate="resolutionIdeal">4K (Ideal)</option>
+      <option value="fhd" selected data-translate="resolutionFHD">Full HD</option>
+      <option value="hd" data-translate="resolutionHD">HD</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selAspect" data-translate="aspectRatio">Aspect Ratio</label>
+    <select id="selAspect">
+      <option value="auto" data-translate="aspectAuto">Auto (Device)</option>
+      <option value="sensor" data-translate="aspectSensor">Sensor (Native)</option>
+      <option value="16:9">16:9</option>
+      <option value="4:3">4:3</option>
+      <option value="3:2">3:2</option>
+      <option value="1:1">1:1</option>
+      <option value="9:16">9:16</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selFilter" data-translate="filter">Filter</label>
+    <select id="selFilter">
+      <option value="none" data-translate="filterNone">None</option>
+      <option value="grayscale(1)" data-translate="filterBW">B&W</option>
+      <option value="sepia(1)" data-translate="filterSepia">Sepia</option>
+      <option value="contrast(1.5)" data-translate="filterHighContrast">High Contrast</option>
+      <option value="saturate(2)" data-translate="filterVivid">Vivid</option>
+      <option value="invert(1)" data-translate="filterInvert">Invert</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selTimer" data-translate="timer">Timer (seconds)</label>
+    <select id="selTimer">
+      <option value="0" data-translate="timerOff">Off</option>
+      <option value="3">3s</option>
+      <option value="5">5s</option>
+      <option value="10">10s</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selMirror" data-translate="mirrorFrontCamera">Mirror Front Camera</label>
+    <select id="selMirror">
+      <option value="yes" data-translate="yes">Yes</option>
+      <option value="no" data-translate="no">No</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selFormat" data-translate="format">Format</label>
+    <select id="selFormat">
+      <option value="image/jpeg">JPEG</option>
+      <option value="image/png">PNG</option>
+      <option value="image/webp">WebP</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label for="selRecordAudio" data-translate="recordAudio">Record audio in video mode</label>
+    <select id="selRecordAudio">
+      <option value="on" data-translate="on">On</option>
+      <option value="off" selected data-translate="off">Off</option>
+    </select>
+  </div>
+
+  <div class="setting-item">
+    <label data-translate="permissionStatus">Permissions status</label>
+    <small id="permissionStatus" class="permission-status-text" data-translate="permissionUnknown">Camera: unknown / Mic: unknown</small>
+    <button id="btnRetryCameraPermission" class="btn-block" data-translate="retryCameraPermission">Retry camera permission</button>
+    <button id="btnRetryMicPermission" class="btn-block" data-translate="retryMicPermission">Retry microphone permission</button>
+  </div>
+
+  <div class="setting-item">
+    <label for="txtFilePrefix" data-translate="filePrefix">Saved file name prefix</label>
+    <input type="text" id="txtFilePrefix" maxlength="40" placeholder="CameraApp">
+  </div>
+
+  <div class="setting-item">
+    <label data-translate="saveLocation">Save location (supported browsers only)</label>
+    <button id="btnPickSaveDir" class="btn-block" data-translate="chooseFolder">Choose folder</button>
+    <button id="btnClearSaveDir" class="btn-block" data-translate="clearFolder">Clear folder</button>
+    <small id="saveDirStatus" class="save-dir-status-text" data-translate="saveDirNotSet">Folder: not selected</small>
+  </div>
+
+  <div class="setting-item">
+    <label for="filePicker" data-translate="filePreview">File preview</label>
+    <button id="btnPickPreviewFile" class="btn-block" data-translate="choosePreviewFile">Choose image / video</button>
+    <input type="file" id="filePicker" accept="image/*,video/*" aria-label="Choose preview file">
+  </div>
+
+  <div class="setting-item">
+    <button class="btn-block btn-danger" onclick="resetApp()" data-translate="resetAllSettings">Reset All Settings</button>
+  </div>
+
+  <div class="setting-item">
+    <button class="btn-block" onclick="openAboutPanel()" data-translate="aboutAndLicenses">About & Licenses</button>
+  </div>
+
+  <div class="setting-item setting-footer">
+    <small data-translate="title">Camera App</small>
+  </div>
+</div>
+
+<canvas id="captureCanvas" hidden></canvas>
+
+<div id="aboutPanel">
+  <div class="settings-header">
+    <h2 data-translate="aboutAndLicenses">About & Licenses</h2>
+    <button onclick="closeAboutPanel()" class="btn-inline"><span class="material-symbols-outlined">check</span><span data-translate="done">Done</span></button>
+  </div>
+  
+  <div class="setting-item">
+    <h3 data-translate="title">Camera App</h3>
+    <p id="about-footer-copy" class="text-muted"></p>
+    <p data-translate="appDescription">A simple camera web application.</p>
+  </div>
+</div>
+
+<div id="previewModal" class="preview-modal">
+  <div class="preview-header">
+    <h2 data-translate="filePreview">File preview</h2>
+    <button id="btnClosePreview" class="btn-inline"><span class="material-symbols-outlined">check</span><span data-translate="done">Done</span></button>
+  </div>
+  <div class="preview-file-list" id="previewFileList"></div>
+  <div class="preview-content" id="previewContent"></div>
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>
