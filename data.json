@@ -36,7 +36,7 @@
       "url": "/hanabi/"
     },
     {
-      "title": "ネザー座標変換 / Nether Coordinate Transformation ",
+      "title": "ネザー座標変換 / Nether Coordinate Transformation",
       "text": "MC Tools / マインクラフトのネザーとオーバーワルドの座標の計算をします。/This calculates the coordinates of the Nether and Overworld in Minecraft./",
       "url": "/Calculators_Nether_coordinates/"
     },
@@ -44,6 +44,11 @@
       "title": "標準銀河アルファベット変換 / Standard Galactic Alphabet Converter",
       "text": "MC Tools / Minecraftのエンチャントテーブルで使われる標準銀河アルファベット（SGA）と英字を相互変換できるツールです。/ A tool to convert between the Standard Galactic Alphabet (SGA) used on Minecraft enchanting tables and English letters.",
       "url": "/Calculators_Standard_Galactic_Alphabet/"
+    },
+    {
+      "title": "カウンター / Counter",
+      "text": "シンプルなカウンターツール / Simple counter tool",
+      "url": "/Counter/"
     }
   ]
 }
