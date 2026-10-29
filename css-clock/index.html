@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Time CSS Clock | CSSだけで動く時計</title>
+    <meta name="description" content="現在時刻を表示する時計です。時刻は Public Time API (time.css) の --timestamp から取得し、CSSアニメーションだけで動きます。" />
+    <meta property="og:title" content="Time CSS Clock | CSSだけで動く時計" />
+    <meta property="og:description" content="CSSだけで動く全画面時計。時刻は Public Time API の --timestamp から取得しています。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:url" content="https://mono.hamusata.f5.si/css-clock/" />
+    <link rel="canonical" href="https://mono.hamusata.f5.si/css-clock/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://public-api.siyukatu.com/time.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        color: #fff;
+        font-family: 'Potta One', ui-sans-serif, system-ui, sans-serif;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        overflow: hidden;
+      }
+
+      @keyframes slide {
+        from { transform: translateY(0); }
+        to { transform: translateY(-100%); }
+      }
+
+      #app {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #clock {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      #center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 4vw;
+        font-size: min(17vw, 28vh);
+      }
+
+      #time {
+        display: flex;
+        line-height: 1;
+        white-space: nowrap;
+        text-shadow: 0 0 0.06em rgb(255 255 255 / 30%);
+      }
+
+      #time > .hours,
+      #time > .minutes,
+      #time > .seconds {
+        display: flex;
+        overflow: hidden;
+        height: 1em;
+      }
+
+      #time > .hours > div,
+      #time > .minutes > div,
+      #time > .seconds > div {
+        display: flex;
+        flex-direction: column;
+        height: max-content;
+      }
+
+      #time > .hours > div > div,
+      #time > .minutes > div > div,
+      #time > .seconds > div > div {
+        height: 1em;
+        width: 0.62em;
+        text-align: center;
+      }
+
+      .colon {
+        margin: auto 0.03em;
+      }
+
+      .h-tens,
+      .h-units {
+        animation: slide 86400s steps(24)
+          calc(-86400s - mod(var(--time) / 3600000, 24) * 3600s) infinite;
+      }
+
+      .m-tens {
+        animation: slide 3600s steps(6) calc(-3600s - mod(var(--time) / 60000, 60) * 60s) infinite;
+      }
+
+      .m-units {
+        animation: slide 600s steps(10) calc(-600s - mod(var(--time) / 60000, 10) * 60s) infinite;
+      }
+
+      .s-tens {
+        animation: slide 60s steps(6) calc(-60s - mod(var(--time) / 1000, 60) * 1s) infinite;
+      }
+
+      .s-units {
+        animation: slide 10s steps(10) calc(-10s - mod(var(--time) / 1000, 10) * 1s) infinite;
+      }
+    </style>
+  </head>
+  <body style="--time: calc(var(--timestamp) + calc(9 * 60 * 60 * 1000))">
+    <div id="app">
+      <div id="clock">
+        <div id="center">
+          <div id="time">
+            <div class="hours">
+              <div class="h-tens">
+                <div>0</div><div>0</div><div>0</div><div>0</div><div>0</div><div>0</div><div>0</div><div>0</div><div>0</div><div>0</div>
+                <div>1</div><div>1</div><div>1</div><div>1</div><div>1</div><div>1</div><div>1</div><div>1</div><div>1</div><div>1</div>
+                <div>2</div><div>2</div><div>2</div><div>2</div>
+              </div>
+              <div class="h-units">
+                <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div>
+                <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div>
+                <div>0</div><div>1</div><div>2</div><div>3</div>
+              </div>
+            </div>
+            <div class="colon">:</div>
+            <div class="minutes">
+              <div class="m-tens">
+                <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
+              </div>
+              <div class="m-units">
+                <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div>
+              </div>
+            </div>
+            <div class="colon">:</div>
+            <div class="seconds">
+              <div class="s-tens">
+                <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
+              </div>
+              <div class="s-units">
+                <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
