@@ -49,6 +49,11 @@
       "title": "標準銀河アルファベット変換 / Standard Galactic Alphabet Converter",
       "text": "MC Tools / Minecraftのエンチャントテーブルで使われる標準銀河アルファベット（SGA）と英字を相互変換できるツールです。/ A tool to convert between the Standard Galactic Alphabet (SGA) used on Minecraft enchanting tables and English letters.",
       "url": "/Calculators_Standard_Galactic_Alphabet/"
+    },
+    {
+      "title": "Time CSS Clock",
+      "text": "CSSだけで動く時計です ※ siyukatu様のAPIより時間取得 / A clock that runs entirely on CSS. Time is fetched from siyukatu's API.",
+      "url": "/css-clock/"
     }
   ]
 }
