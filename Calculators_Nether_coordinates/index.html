@@ -1,602 +1,690 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>ネザー座標変換 | MC Tools</title>
+    <title>ネザー座標変換 | MC Tools</title>
 
-  <meta
-    name="description"
-    content="Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機 / A Minecraft coordinate converter and calculator for converting X and Z coordinates between the Overworld and the Nether."
-  >
+    <meta name="description" content="Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機 / A Minecraft coordinate converter and calculator for converting X and Z coordinates between the Overworld and the Nether." />
 
-  <meta
-    name="keywords"
-    content="Minecraft,マインクラフト,マイクラ,ネザー,座標,座標変換,計算,ツール,Minecraft coordinate converter,Nether coordinate calculator"
-  >
+    <meta
+      name="keywords"
+      content="
+        Minecraft, マインクラフト, マイクラ, ネザー, ネザー座標変換, ネザー 座標 計算, ネザー 座標 変換, ネザー 座標, マイクラ ネザーゲート 計算, ネザー座標計算ツール, ネザー座標計算, ネザー 計算ツール, ネザーゲート 計算ツール, マイクラ ネザー座標変換, マイクラ ネザー座標計算ツール, ネザー計算, ネザー 計算, ネザー座標 計算, マイクラ ネザー 座標変換, マイクラネザー座標変換, ネザー 計算機, ネザー 移動 計算, 座標, 座標変換, 計算, ツール,
+        Minecraft coordinate converter, Nether coordinate calculator, Minecraft Nether coordinate conversion, Minecraft Nether coordinates calculator, Nether coordinate converter, Nether coordinates calculator, Overworld to Nether coordinate converter, Nether to Overworld coordinate converter, Minecraft Nether portal calculator, Nether portal linking calculator, Nether coordinate tool, Minecraft Nether travel calculator, Nether calculator
+      "
+    />
 
-  <!-- Canonical -->
-  <link
-    rel="canonical"
-    href="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/"
-  >
+    <!-- Canonical -->
+    <link rel="canonical" href="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/" />
 
-  <!-- OGP / Social Meta Tags -->
-  <meta property="og:title" content="ネザー座標変換 | MC Tools">
-  <meta
-    property="og:description"
-    content="Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機 / A Minecraft coordinate converter and calculator for converting X and Z coordinates between the Overworld and the Nether."
-  >
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="MC Tools">
-  <meta
-    property="og:url"
-    content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/"
-  >
-  <meta
-    property="og:image"
-    content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/og-Image.png"
-  >
-  <meta property="og:locale" content="ja_JP">
+    <!-- OGP / Social Meta Tags -->
+    <meta property="og:title" content="ネザー座標変換 | MC Tools" />
+    <meta property="og:description" content="Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機 / A Minecraft coordinate converter and calculator for converting X and Z coordinates between the Overworld and the Nether." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MC Tools" />
+    <meta property="og:url" content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/" />
+    <meta property="og:image" content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/og-Image.png" />
+    <meta property="og:locale" content="ja_JP" />
 
-  <!-- Twitter Card Tags -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="ネザー座標変換 | MC Tools">
-  <meta
-    name="twitter:description"
-    content="Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機 / A Minecraft coordinate converter and calculator for converting X and Z coordinates between the Overworld and the Nether."
-  >
-  <meta
-    name="twitter:image"
-    content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/og-Image.png"
-  >
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ネザー座標変換 | MC Tools" />
+    <meta name="twitter:description" content="Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機 / A Minecraft coordinate converter and calculator for converting X and Z coordinates between the Overworld and the Nether." />
+    <meta name="twitter:image" content="https://mono.hamusata.f5.si/Calculators_Nether_coordinates/og-Image.png" />
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-    :root {
-      --background: #f7f5f0;
-      --surface: #fffefa;
-      --surface-soft: #faf9f5;
-      --border: #dddcd2;
-      --text: #403f39;
-      --muted: #77776e;
+      :root {
+        --background: #f7f5f0;
+        --surface: #fffefa;
+        --surface-soft: #faf9f5;
+        --border: #dddcd2;
+        --text: #403f39;
+        --muted: #77776e;
 
-      --overworld: #718f68;
-      --overworld-soft: #edf3e9;
+        --overworld: #718f68;
+        --overworld-soft: #edf3e9;
 
-      --nether: #98739d;
-      --nether-soft: #f3ebf4;
+        --nether: #98739d;
+        --nether-soft: #f3ebf4;
 
-      --button: #718f68;
-      --button-hover: #5e7c56;
-    }
+        --button: #718f68;
+        --button-hover: #5e7c56;
+      }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--background);
-      color: var(--text);
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        "Hiragino Kaku Gothic ProN",
-        "Yu Gothic",
-        Meiryo,
-        sans-serif;
-      line-height: 1.6;
-    }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--background);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+        line-height: 1.6;
+      }
 
-    .container {
-      width: min(100% - 24px, 760px);
-      margin: 0 auto;
-      padding: 42px 0 48px;
-    }
-
-    header {
-      margin-bottom: 25px;
-    }
-
-    .brand {
-      margin: 0 0 4px;
-      color: var(--overworld);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 29px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .lead {
-      margin: 7px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .calculator {
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      background: var(--surface);
-      box-shadow: 0 5px 18px rgba(80, 75, 60, 0.05);
-    }
-
-    .calculator-title {
-      padding: 13px 17px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface-soft);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .table {
-      width: 100%;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 190px 1fr 1fr;
-      min-height: 68px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .row:last-child {
-      border-bottom: 0;
-    }
-
-    .cell {
-      display: flex;
-      align-items: center;
-      padding: 11px 14px;
-      border-right: 1px solid var(--border);
-    }
-
-    .cell:last-child {
-      border-right: 0;
-    }
-
-    .header-row {
-      min-height: 43px;
-      background: var(--surface-soft);
-    }
-
-    .header-row .cell {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .dimension {
-      display: block;
-      font-weight: 600;
-    }
-
-    .dimension-name {
-      display: block;
-    }
-
-    .overworld-row {
-      background: #fbfcf9;
-    }
-
-    .overworld-row .dimension-name {
-      color: var(--overworld);
-    }
-
-    .nether-row {
-      background: #fdfafd;
-    }
-
-    .nether-row .dimension-name {
-      color: var(--nether);
-    }
-
-    .axis {
-      margin-right: 7px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    input {
-      width: 100%;
-      height: 40px;
-      padding: 7px 10px;
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      outline: none;
-      background: #fff;
-      color: var(--text);
-      font-size: 16px;
-      text-align: right;
-      transition:
-        border-color 0.15s,
-        box-shadow 0.15s;
-    }
-
-    .overworld-input:focus {
-      border-color: var(--overworld);
-      box-shadow: 0 0 0 2px rgba(113, 143, 104, 0.12);
-    }
-
-    .nether-input:focus {
-      border-color: var(--nether);
-      box-shadow: 0 0 0 2px rgba(152, 115, 157, 0.12);
-    }
-
-    .notice {
-      margin-top: 22px;
-      padding: 18px 20px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-    }
-
-    .notice h2 {
-      margin: 0 0 8px;
-      font-size: 16px;
-    }
-
-    .notice p {
-      margin: 5px 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .formula {
-      margin-top: 12px;
-      padding: 11px 13px;
-      border-radius: 5px;
-      background: var(--overworld-soft);
-      color: var(--text);
-      font-size: 13px;
-    }
-
-    footer {
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-    }
-
-    footer p {
-      margin: 0 0 8px;
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    footer a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
       .container {
-        width: min(100% - 16px, 760px);
-        padding-top: 28px;
+        width: min(100% - 24px, 760px);
+        margin: 0 auto;
+        padding: 42px 0 48px;
+      }
+
+      header {
+        margin-bottom: 25px;
+      }
+
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .brand {
+        margin: 0;
+        color: var(--overworld);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      .language-toggle {
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .language-toggle:hover {
+        background: var(--surface-soft);
+      }
+
+      .language-toggle:focus-visible {
+        outline: 2px solid var(--overworld);
+        outline-offset: 2px;
       }
 
       h1 {
-        font-size: 25px;
+        margin: 0;
+        font-size: 29px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .lead {
+        margin: 7px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .calculator {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--surface);
+        box-shadow: 0 5px 18px rgba(80, 75, 60, 0.05);
+      }
+
+      .calculator-title {
+        padding: 13px 17px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface-soft);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .table {
+        width: 100%;
       }
 
       .row {
-        grid-template-columns: 125px 1fr 1fr;
-        min-height: 63px;
+        display: grid;
+        grid-template-columns: 190px 1fr 1fr;
+        min-height: 68px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .row:last-child {
+        border-bottom: 0;
       }
 
       .cell {
-        padding: 8px;
+        display: flex;
+        align-items: center;
+        padding: 11px 14px;
+        border-right: 1px solid var(--border);
+      }
+
+      .cell:last-child {
+        border-right: 0;
+      }
+
+      .header-row {
+        min-height: 43px;
+        background: var(--surface-soft);
+      }
+
+      .header-row .cell {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .dimension {
+        display: block;
+        font-weight: 600;
       }
 
       .dimension-name {
-        font-size: 13px;
+        display: block;
       }
 
-      .dimension-sub {
-        display: none;
+      .overworld-row {
+        background: #fbfcf9;
+      }
+
+      .overworld-row .dimension-name {
+        color: var(--overworld);
+      }
+
+      .nether-row {
+        background: #fdfafd;
+      }
+
+      .nether-row .dimension-name {
+        color: var(--nether);
       }
 
       .axis {
-        display: none;
+        margin-right: 7px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
       }
 
       input {
-        height: 38px;
-        font-size: 15px;
-      }
-    }
-
-    @media (max-width: 390px) {
-      .row {
-        grid-template-columns: 105px 1fr 1fr;
-      }
-
-      .cell {
-        padding: 6px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="container">
-
-    <header>
-      <p class="brand">MC Tools</p>
-
-      <h1>ネザー座標変換</h1>
-
-      <p class="lead">
-        オーバーワールドとネザーのX・Z座標を変換します。
-      </p>
-    </header>
-
-    <section class="calculator" aria-label="ネザー座標変換計算機">
-
-      <div class="calculator-title">
-        ディメンション XZ
-      </div>
-
-      <div class="table">
-
-        <div class="row header-row">
-          <div class="cell">ディメンション</div>
-          <div class="cell">X</div>
-          <div class="cell">Z</div>
-        </div>
-
-        <div class="row overworld-row">
-
-          <div class="cell dimension">
-            <span class="dimension-name">
-              オーバーワールド
-            </span>
-          </div>
-
-          <div class="cell">
-            <span class="axis">X</span>
-
-            <input
-              id="overworldX"
-              class="overworld-input"
-              type="number"
-              inputmode="numeric"
-              placeholder="0"
-              aria-label="オーバーワールド X座標"
-            >
-          </div>
-
-          <div class="cell">
-            <span class="axis">Z</span>
-
-            <input
-              id="overworldZ"
-              class="overworld-input"
-              type="number"
-              inputmode="numeric"
-              placeholder="0"
-              aria-label="オーバーワールド Z座標"
-            >
-          </div>
-
-        </div>
-
-        <div class="row nether-row">
-
-          <div class="cell dimension">
-            <span class="dimension-name">
-              ネザー
-            </span>
-          </div>
-
-          <div class="cell">
-            <span class="axis">X</span>
-
-            <input
-              id="netherX"
-              class="nether-input"
-              type="number"
-              inputmode="numeric"
-              placeholder="0"
-              aria-label="ネザー X座標"
-            >
-          </div>
-
-          <div class="cell">
-            <span class="axis">Z</span>
-
-            <input
-              id="netherZ"
-              class="nether-input"
-              type="number"
-              inputmode="numeric"
-              placeholder="0"
-              aria-label="ネザー Z座標"
-            >
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <section class="notice">
-
-      <h2>ネザー座標の計算方法</h2>
-
-      <p>
-        オーバーワールドとネザーでは、X・Z座標が8:1の比率になります。
-      </p>
-
-      <div class="formula">
-        オーバーワールド → ネザー　X・Z ÷ 8<br>
-        ネザー → オーバーワールド　X・Z × 8
-      </div>
-
-    </section>
-
-    <footer>
-
-      <p>
-        Minecraft は Mojang AB の登録商標です。
-        当サイトは非公式のツールであり、Mojang AB とは関係ありません。
-      </p>
-
-      <span id="footer-copy"></span>
-
-    </footer>
-
-  </main>
-
-  <script>
-    (function() {
-      "use strict";
-
-      const overworldX = document.getElementById("overworldX");
-      const overworldZ = document.getElementById("overworldZ");
-      const netherX = document.getElementById("netherX");
-      const netherZ = document.getElementById("netherZ");
-      const footerCopy = document.getElementById("footer-copy");
-
-      const RATIO = 8;
-      let isUpdating = false;
-
-      function toInteger(value) {
-        return Number.isFinite(value) ? Math.trunc(value) : "";
+        width: 100%;
+        height: 40px;
+        padding: 7px 10px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        outline: none;
+        background: #fff;
+        color: var(--text);
+        font-size: 16px;
+        text-align: right;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
       }
 
-      function updateCoordinates(
-        sourceX,
-        sourceZ,
-        destX,
-        destZ,
-        toOverworld = false
-      ) {
-        if (isUpdating) return;
+      .overworld-input:focus {
+        border-color: var(--overworld);
+        box-shadow: 0 0 0 2px rgba(113, 143, 104, 0.12);
+      }
 
-        isUpdating = true;
+      .nether-input:focus {
+        border-color: var(--nether);
+        box-shadow: 0 0 0 2px rgba(152, 115, 157, 0.12);
+      }
 
-        try {
-          const x = Number(sourceX.value);
-          const z = Number(sourceZ.value);
+      .notice {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+      }
 
-          const operation = (coordinate) => {
-            return toOverworld
-              ? coordinate * RATIO
-              : coordinate / RATIO;
-          };
+      .notice h2 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
 
-          destX.value =
-            sourceX.value === ""
-              ? ""
-              : toInteger(operation(x));
+      .notice p {
+        margin: 5px 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
 
-          destZ.value =
-            sourceZ.value === ""
-              ? ""
-              : toInteger(operation(z));
+      .formula {
+        margin-top: 12px;
+        padding: 11px 13px;
+        border-radius: 5px;
+        background: var(--overworld-soft);
+        color: var(--text);
+        font-size: 13px;
+      }
 
-        } finally {
-          isUpdating = false;
+      footer {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      footer p {
+        margin: 0 0 8px;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      footer a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          width: min(100% - 16px, 760px);
+          padding-top: 28px;
+        }
+
+        h1 {
+          font-size: 25px;
+        }
+
+        .row {
+          grid-template-columns: 125px 1fr 1fr;
+          min-height: 63px;
+        }
+
+        .cell {
+          padding: 8px;
+        }
+
+        .dimension-name {
+          font-size: 13px;
+        }
+
+        .dimension-sub {
+          display: none;
+        }
+
+        .axis {
+          display: none;
+        }
+
+        input {
+          height: 38px;
+          font-size: 15px;
         }
       }
 
-      function initializeFooter() {
-        if (!footerCopy) return;
-
-        const baseYear = 2026;
-        const currentYear = new Date().getFullYear();
-        const hostname = location.hostname;
-
-        let copyrightYear;
-
-        if (currentYear < baseYear) {
-          copyrightYear = `${currentYear}~${baseYear}`;
-        } else if (currentYear > baseYear) {
-          copyrightYear = `${baseYear}~${currentYear}`;
-        } else {
-          copyrightYear = baseYear;
+      @media (max-width: 390px) {
+        .row {
+          grid-template-columns: 105px 1fr 1fr;
         }
 
-        let footerHTML = `&copy; ${copyrightYear} `;
+        .cell {
+          padding: 6px;
+        }
+      }
+    </style>
+  </head>
 
-        if (hostname.includes("hamuzon.github.io")) {
-          footerHTML +=
-            `<a href="https://hamuzon.github.io" target="_blank" rel="noopener">@hamuzon</a>`;
-        } else if (hostname.includes("hamusata.f5.si")) {
-          footerHTML +=
-            `<a href="https://hamusata.f5.si" target="_blank" rel="noopener">@hamusata</a>`;
-        } else if (hostname.includes("hamuzon-jp.f5.si")) {
-          footerHTML +=
-            `<a href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener">@hamuzon</a>`;
-        } else {
-          footerHTML += "MC Tools";
+  <body>
+    <main class="container">
+      <header>
+        <div class="header-top">
+          <p class="brand">MC Tools</p>
+          <button
+            id="language-toggle"
+            class="language-toggle"
+            type="button"
+            aria-label="英語に切り替え"
+          >
+            English
+          </button>
+        </div>
+
+        <h1 data-ja="ネザー座標変換" data-en="Nether Coordinate Converter">
+          ネザー座標変換
+        </h1>
+
+        <p
+          class="lead"
+          data-ja="オーバーワールドとネザーのX・Z座標を変換します。"
+          data-en="Convert X and Z coordinates between the Overworld and the Nether."
+        >
+          オーバーワールドとネザーのX・Z座標を変換します。
+        </p>
+      </header>
+
+      <section
+        class="calculator"
+        aria-label="ネザー座標変換計算機"
+        data-aria-ja="ネザー座標変換計算機"
+        data-aria-en="Nether coordinate converter"
+      >
+        <div
+          class="calculator-title"
+          data-ja="ディメンション XZ"
+          data-en="Dimension XZ"
+        >
+          ディメンション XZ
+        </div>
+
+        <div class="table">
+          <div class="row header-row">
+            <div class="cell" data-ja="ディメンション" data-en="Dimension">
+              ディメンション
+            </div>
+            <div class="cell">X</div>
+            <div class="cell">Z</div>
+          </div>
+
+          <div class="row overworld-row">
+            <div class="cell dimension">
+              <span
+                class="dimension-name"
+                data-ja="オーバーワールド"
+                data-en="Overworld"
+              >
+                オーバーワールド
+              </span>
+            </div>
+
+            <div class="cell">
+              <span class="axis">X</span>
+
+              <input
+                id="overworldX"
+                class="overworld-input"
+                type="number"
+                inputmode="numeric"
+                placeholder="0"
+                aria-label="オーバーワールド X座標"
+                data-aria-ja="オーバーワールド X座標"
+                data-aria-en="Overworld X coordinate"
+              />
+            </div>
+
+            <div class="cell">
+              <span class="axis">Z</span>
+
+              <input
+                id="overworldZ"
+                class="overworld-input"
+                type="number"
+                inputmode="numeric"
+                placeholder="0"
+                aria-label="オーバーワールド Z座標"
+                data-aria-ja="オーバーワールド Z座標"
+                data-aria-en="Overworld Z coordinate"
+              />
+            </div>
+          </div>
+
+          <div class="row nether-row">
+            <div class="cell dimension">
+              <span class="dimension-name" data-ja="ネザー" data-en="Nether">
+                ネザー
+              </span>
+            </div>
+
+            <div class="cell">
+              <span class="axis">X</span>
+
+              <input
+                id="netherX"
+                class="nether-input"
+                type="number"
+                inputmode="numeric"
+                placeholder="0"
+                aria-label="ネザー X座標"
+                data-aria-ja="ネザー X座標"
+                data-aria-en="Nether X coordinate"
+              />
+            </div>
+
+            <div class="cell">
+              <span class="axis">Z</span>
+
+              <input
+                id="netherZ"
+                class="nether-input"
+                type="number"
+                inputmode="numeric"
+                placeholder="0"
+                aria-label="ネザー Z座標"
+                data-aria-ja="ネザー Z座標"
+                data-aria-en="Nether Z coordinate"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="notice">
+        <h2
+          data-ja="ネザー座標の計算方法"
+          data-en="How Nether Coordinates Work"
+        >
+          ネザー座標の計算方法
+        </h2>
+
+        <p
+          data-ja="オーバーワールドとネザーでは、X・Z座標が8:1の比率になります。"
+          data-en="The Overworld and Nether use an 8:1 ratio for X and Z coordinates."
+        >
+          オーバーワールドとネザーでは、X・Z座標が8:1の比率になります。
+        </p>
+
+        <div class="formula">
+          <span
+            data-ja="オーバーワールド → ネザー　X・Z ÷ 8"
+            data-en="Overworld → Nether: X, Z ÷ 8"
+            >オーバーワールド → ネザー　X・Z ÷ 8</span
+          ><br />
+          <span
+            data-ja="ネザー → オーバーワールド　X・Z × 8"
+            data-en="Nether → Overworld: X, Z × 8"
+            >ネザー → オーバーワールド　X・Z × 8</span
+          >
+        </div>
+      </section>
+
+      <footer>
+        <p
+          data-ja="Minecraft は Mojang AB の登録商標です。当サイトは非公式のツールであり、Mojang AB とは関係ありません。"
+          data-en="Minecraft is a registered trademark of Mojang AB. This is an unofficial tool and is not affiliated with Mojang AB."
+        >
+          Minecraft は Mojang AB の登録商標です。
+          当サイトは非公式のツールであり、Mojang AB とは関係ありません。
+        </p>
+
+        <span id="footer-copy"></span>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const overworldX = document.getElementById("overworldX");
+        const overworldZ = document.getElementById("overworldZ");
+        const netherX = document.getElementById("netherX");
+        const netherZ = document.getElementById("netherZ");
+        const footerCopy = document.getElementById("footer-copy");
+        const languageToggle = document.getElementById("language-toggle");
+
+        const RATIO = 8;
+        let isUpdating = false;
+        function getLanguageFromUrl() {
+          const url = new URL(location.href);
+          const selectedLanguage = url.searchParams.get("lang");
+
+          if (selectedLanguage === "ja") {
+            url.searchParams.delete("lang");
+            history.replaceState(history.state, "", url);
+          }
+
+          return selectedLanguage === "en" ? "en" : "ja";
         }
 
-        footerCopy.innerHTML = footerHTML;
-      }
+        let language = getLanguageFromUrl();
 
-      function initializeEventListeners() {
+        function updateLanguage() {
+          document.documentElement.lang = language;
 
-        overworldX.addEventListener("input", () => {
-          updateCoordinates(
-            overworldX,
-            overworldZ,
-            netherX,
-            netherZ
+          document.querySelectorAll("[data-ja][data-en]").forEach((element) => {
+            element.textContent = element.dataset[language];
+          });
+
+          document
+            .querySelectorAll("[data-aria-ja][data-aria-en]")
+            .forEach((element) => {
+              element.setAttribute(
+                "aria-label",
+                element.dataset[`aria${language === "ja" ? "Ja" : "En"}`],
+              );
+            });
+
+          languageToggle.textContent = language === "ja" ? "English" : "日本語";
+          languageToggle.setAttribute(
+            "aria-label",
+            language === "ja" ? "英語に切り替え" : "Switch to Japanese",
           );
-        });
 
-        overworldZ.addEventListener("input", () => {
-          updateCoordinates(
-            overworldX,
-            overworldZ,
-            netherX,
-            netherZ
-          );
-        });
+          const isEnglish = language === "en";
+          const pageTitle = isEnglish
+            ? "Nether Coordinate Converter | MC Tools"
+            : "ネザー座標変換 | MC Tools";
+          const pageDescription = isEnglish
+            ? "Convert X and Z coordinates between the Minecraft Overworld and Nether with this coordinate calculator."
+            : "Minecraft (マイクラ) のオーバーワールドとネザーのX・Z座標を変換できるネザー・オーバーワールド座標計算機。";
 
-        netherX.addEventListener("input", () => {
-          updateCoordinates(
-            netherX,
-            netherZ,
-            overworldX,
-            overworldZ,
-            true
-          );
-        });
+          document.title = pageTitle;
+          document.querySelector('meta[name="description"]').content =
+            pageDescription;
+          document.querySelector('meta[property="og:title"]').content =
+            pageTitle;
+          document.querySelector('meta[property="og:description"]').content =
+            pageDescription;
+          document.querySelector('meta[name="twitter:title"]').content =
+            pageTitle;
+          document.querySelector('meta[name="twitter:description"]').content =
+            pageDescription;
+          document.querySelector('meta[property="og:locale"]').content =
+            isEnglish ? "en_US" : "ja_JP";
+        }
 
-        netherZ.addEventListener("input", () => {
-          updateCoordinates(
-            netherX,
-            netherZ,
-            overworldX,
-            overworldZ,
-            true
-          );
-        });
-      }
+        function toInteger(value) {
+          return Number.isFinite(value) ? Math.trunc(value) : "";
+        }
 
-      initializeEventListeners();
-      initializeFooter();
+        function updateCoordinates(
+          sourceX,
+          sourceZ,
+          destX,
+          destZ,
+          toOverworld = false,
+        ) {
+          if (isUpdating) return;
 
-    })();
-  </script>
+          isUpdating = true;
 
-</body>
+          try {
+            const x = Number(sourceX.value);
+            const z = Number(sourceZ.value);
+
+            const operation = (coordinate) => {
+              return toOverworld ? coordinate * RATIO : coordinate / RATIO;
+            };
+
+            destX.value = sourceX.value === "" ? "" : toInteger(operation(x));
+
+            destZ.value = sourceZ.value === "" ? "" : toInteger(operation(z));
+          } finally {
+            isUpdating = false;
+          }
+        }
+
+        function initializeFooter() {
+          if (!footerCopy) return;
+
+          const baseYear = 2026;
+          const currentYear = new Date().getFullYear();
+          const hostname = location.hostname;
+
+          let copyrightYear;
+
+          if (currentYear < baseYear) {
+            copyrightYear = `${currentYear}~${baseYear}`;
+          } else if (currentYear > baseYear) {
+            copyrightYear = `${baseYear}~${currentYear}`;
+          } else {
+            copyrightYear = baseYear;
+          }
+
+          let footerHTML = `&copy; ${copyrightYear} `;
+
+          if (hostname.includes("hamuzon.github.io")) {
+            footerHTML += `<a href="https://hamuzon.github.io" target="_blank" rel="noopener">@hamuzon</a>`;
+          } else if (hostname.includes("hamusata.f5.si")) {
+            footerHTML += `<a href="https://hamusata.f5.si" target="_blank" rel="noopener">@hamusata</a>`;
+          } else if (hostname.includes("hamuzon-jp.f5.si")) {
+            footerHTML += `<a href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener">@hamuzon</a>`;
+          } else {
+            footerHTML += "MC Tools";
+          }
+
+          footerCopy.innerHTML = footerHTML;
+        }
+
+        function initializeEventListeners() {
+          languageToggle.addEventListener("click", () => {
+            language = language === "ja" ? "en" : "ja";
+            const url = new URL(location.href);
+            if (language === "en") {
+              url.searchParams.set("lang", "en");
+            } else {
+              url.searchParams.delete("lang");
+            }
+            history.pushState({ language }, "", url);
+            updateLanguage();
+          });
+
+          window.addEventListener("popstate", () => {
+            language = getLanguageFromUrl();
+            updateLanguage();
+          });
+
+          overworldX.addEventListener("input", () => {
+            updateCoordinates(overworldX, overworldZ, netherX, netherZ);
+          });
+
+          overworldZ.addEventListener("input", () => {
+            updateCoordinates(overworldX, overworldZ, netherX, netherZ);
+          });
+
+          netherX.addEventListener("input", () => {
+            updateCoordinates(netherX, netherZ, overworldX, overworldZ, true);
+          });
+
+          netherZ.addEventListener("input", () => {
+            updateCoordinates(netherX, netherZ, overworldX, overworldZ, true);
+          });
+        }
+
+        initializeEventListeners();
+        initializeFooter();
+        updateLanguage();
+      })();
+    </script>
+  </body>
 </html>

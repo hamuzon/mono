@@ -1,986 +1,1007 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>標準銀河アルファベット変換 | MC Tools</title>
 
-    <meta name="description"
-        content="Minecraftのエンチャントテーブルで使われる標準銀河アルファベット（Standard Galactic Alphabet / SGA）と英字を相互変換できるツールです。">
+    <meta name="description" content="Minecraftのエンチャントテーブルで使われる標準銀河アルファベット（Standard Galactic Alphabet / SGA）と英字を相互変換できるツールです。" />
 
-    <meta name="keywords"
-        content="Minecraft,マインクラフト,マイクラ,標準銀河アルファベット,銀河標準語,SGA,エンチャントテーブル,変換,翻訳,ツール,Standard Galactic Alphabet">
+    <meta
+      name="keywords"
+      content="
+        Minecraft, マインクラフト, マイクラ, 標準銀河系アルファベット, 銀河標準語 変換 サイト, 標準銀河アルファベット, 標準銀河文字, 標準銀河アルファベット変換, 標準銀河文字変換, 銀河標準語変換, 英字から標準銀河アルファベット変換, 標準銀河アルファベットから英字変換, SGA変換, エンチャントテーブル文字, エンチャントテーブル翻訳, 変換, 翻訳, ツール,
+        Standard Galactic Alphabet, Standard Galactic Alphabet translator, Standard Galactic Alphabet translator online, English to Standard Galactic Alphabet converter, Standard Galactic Alphabet to English converter, Latin to SGA converter, SGA to Latin converter, SGA translator, SGA converter, Minecraft Standard Galactic Alphabet, Minecraft enchantment table language, Minecraft enchantment table translator, Galactic alphabet translator, Galactic alphabet converter
+      "
+    />
 
-    <link rel="canonical" href="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/">
+    <link rel="canonical" href="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/" />
 
-    <meta property="og:title" content="標準銀河アルファベット変換 | MC Tools">
+    <meta property="og:title" content="標準銀河アルファベット変換 | MC Tools" />
 
-    <meta property="og:description" content="Minecraftのエンチャントテーブルで使われる標準銀河アルファベットと英字を相互変換できます。">
+    <meta property="og:description" content="Minecraftのエンチャントテーブルで使われる標準銀河アルファベットと英字を相互変換できます。" />
 
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="MC Tools">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MC Tools" />
 
-    <meta property="og:url" content="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/">
+    <meta property="og:url" content="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/" />
 
-    <meta property="og:image" content="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/og-Image.png">
+    <meta property="og:image" content="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/og-Image.png" />
 
-    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale" content="ja_JP" />
 
-    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="summary_large_image" />
 
-    <meta name="twitter:title" content="標準銀河アルファベット変換 | MC Tools">
+    <meta name="twitter:title" content="標準銀河アルファベット変換 | MC Tools" />
 
-    <meta name="twitter:description" content="Minecraftのエンチャントテーブルで使われる標準銀河アルファベットと英字を相互変換できます。">
+    <meta name="twitter:description" content="Minecraftのエンチャントテーブルで使われる標準銀河アルファベットと英字を相互変換できます。" />
 
-    <meta name="twitter:image"
-        content="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/og-Image.png">
+    <meta name="twitter:image" content="https://mono.hamusata.f5.si/Calculators_Standard_Galactic_Alphabet/og-Image.png" />
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+      * {
+        box-sizing: border-box;
+      }
 
-        :root {
-            --background: #f7f5f0;
-            --surface: #fffefa;
-            --surface-soft: #faf9f5;
-            --border: #dddcd2;
-            --text: #403f39;
-            --muted: #77776e;
+      :root {
+        --background: #f7f5f0;
+        --surface: #fffefa;
+        --surface-soft: #faf9f5;
+        --border: #dddcd2;
+        --text: #403f39;
+        --muted: #77776e;
 
-            --english: #718f68;
-            --english-soft: #edf3e9;
+        --english: #718f68;
+        --english-soft: #edf3e9;
 
-            --galactic: #98739d;
-            --galactic-soft: #f3ebf4;
+        --galactic: #98739d;
+        --galactic-soft: #f3ebf4;
 
-            --button: #718f68;
-            --button-hover: #5e7c56;
-        }
+        --button: #718f68;
+        --button-hover: #5e7c56;
+      }
 
+      body {
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        background: var(--background);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+        line-height: 1.6;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: min(100% - 24px, 1200px);
+        margin: 0 auto;
+        padding: 20px 0 16px;
+      }
+
+      header {
+        margin-bottom: 14px;
+        flex-shrink: 0;
+      }
+
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2px;
+      }
+
+      .brand {
+        margin: 0;
+        color: var(--english);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      .language-toggle {
+        padding: 5px 9px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .language-toggle:hover {
+        background: var(--surface-soft);
+      }
+
+      .language-toggle:focus-visible {
+        outline: 2px solid var(--english);
+        outline-offset: 2px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .lead {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 16px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .converter {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--surface);
+        box-shadow: 0 5px 18px rgba(80, 75, 60, 0.05);
+      }
+
+      .converter-title {
+        padding: 10px 17px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface-soft);
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .mode {
+        display: flex;
+        gap: 8px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+
+      .mode button {
+        flex: 1;
+        height: 34px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--surface-soft);
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+
+      .mode button:hover {
+        border-color: var(--english);
+      }
+
+      .mode button.active {
+        border-color: var(--english);
+        background: var(--english-soft);
+        color: var(--english);
+      }
+
+      .input-section {
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .input-label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      textarea {
+        display: block;
+        width: 100%;
+        flex: 1;
+        min-height: 60px;
+        padding: 9px 12px;
+        resize: none;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        outline: none;
+        background: #fff;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 15px;
+        line-height: 1.7;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+
+      textarea:focus {
+        border-color: var(--english);
+        box-shadow: 0 0 0 2px rgba(113, 143, 104, 0.12);
+      }
+
+      textarea.galactic {
+        background: var(--galactic-soft);
+        font-size: 18px;
+      }
+
+      .result {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .result-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        flex-shrink: 0;
+      }
+
+      .result-actions button {
+        height: 34px;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--surface-soft);
+        color: var(--text);
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .result-actions button:hover {
+        border-color: var(--english);
+      }
+
+      .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .notice {
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+
+      .notice h2 {
+        margin: 0 0 5px;
+        font-size: 14px;
+      }
+
+      .notice p {
+        margin: 3px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .formula {
+        margin-top: 8px;
+        padding: 8px 10px;
+        border-radius: 5px;
+        background: var(--galactic-soft);
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      .alphabet {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .alphabet-title {
+        padding: 10px 17px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface-soft);
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .alphabet-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .alphabet-item {
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        align-items: center;
+        min-height: 38px;
+        padding: 4px 8px;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .alphabet-item:nth-child(2n) {
+        border-right: 0;
+      }
+
+      .alphabet-item:nth-last-child(-n + 2) {
+        border-bottom: 0;
+      }
+
+      .alphabet-letter {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .alphabet-symbol {
+        color: var(--galactic);
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      footer {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 11px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      footer p {
+        margin: 0 0 4px;
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      footer a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 800px) {
         body {
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            background: var(--background);
-            color: var(--text);
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                "Hiragino Kaku Gothic ProN",
-                "Yu Gothic",
-                Meiryo,
-                sans-serif;
-            line-height: 1.6;
+          height: auto;
+          overflow: auto;
         }
 
         .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: min(100% - 24px, 1200px);
-            margin: 0 auto;
-            padding: 20px 0 16px;
+          height: auto;
+          width: min(100% - 16px, 760px);
+          padding: 24px 0 32px;
         }
 
-
-        header {
-            margin-bottom: 14px;
-            flex-shrink: 0;
-        }
-
-        .brand {
-            margin: 0 0 2px;
-            color: var(--english);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
+        .main-grid {
+          grid-template-columns: 1fr;
         }
 
         h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .lead {
-            margin: 4px 0 0;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 16px;
-            flex: 1;
-            min-height: 0;
-        }
-
-
-
-        .converter {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            background: var(--surface);
-            box-shadow: 0 5px 18px rgba(80, 75, 60, 0.05);
-        }
-
-        .converter-title {
-            padding: 10px 17px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface-soft);
-            font-size: 13px;
-            font-weight: 700;
-            flex-shrink: 0;
+          font-size: 22px;
         }
 
         .mode {
-            display: flex;
-            gap: 8px;
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-            flex-shrink: 0;
+          flex-direction: column;
         }
 
         .mode button {
-            flex: 1;
-            height: 34px;
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            background: var(--surface-soft);
-            color: var(--muted);
-            cursor: pointer;
-            font: inherit;
-            font-size: 13px;
-            font-weight: 700;
-            transition:
-                background 0.15s,
-                color 0.15s,
-                border-color 0.15s;
-        }
-
-        .mode button:hover {
-            border-color: var(--english);
-        }
-
-        .mode button.active {
-            border-color: var(--english);
-            background: var(--english-soft);
-            color: var(--english);
-        }
-
-        .input-section {
-            display: flex;
-            flex-direction: column;
-            padding: 14px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 700;
-            flex-shrink: 0;
+          flex: none;
         }
 
         textarea {
-            display: block;
-            width: 100%;
-            flex: 1;
-            min-height: 60px;
-            padding: 9px 12px;
-            resize: none;
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            outline: none;
-            background: #fff;
-            color: var(--text);
-            font-family: inherit;
-            font-size: 15px;
-            line-height: 1.7;
-            transition:
-                border-color 0.15s,
-                box-shadow 0.15s;
-        }
-
-        textarea:focus {
-            border-color: var(--english);
-            box-shadow: 0 0 0 2px rgba(113, 143, 104, 0.12);
-        }
-
-        textarea.galactic {
-            background: var(--galactic-soft);
-            font-size: 18px;
+          min-height: 100px;
+          flex: none;
         }
 
         .result {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            flex-shrink: 0;
-        }
-
-        .result-actions button {
-            height: 34px;
-            padding: 0 14px;
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            background: var(--surface-soft);
-            color: var(--text);
-            cursor: pointer;
-            font: inherit;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .result-actions button:hover {
-            border-color: var(--english);
-        }
-
-
-
-        .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            min-height: 0;
-        }
-
-        .notice {
-            padding: 14px 16px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--surface);
-            flex-shrink: 0;
-        }
-
-        .notice h2 {
-            margin: 0 0 5px;
-            font-size: 14px;
-        }
-
-        .notice p {
-            margin: 3px 0;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .formula {
-            margin-top: 8px;
-            padding: 8px 10px;
-            border-radius: 5px;
-            background: var(--galactic-soft);
-            color: var(--text);
-            font-size: 12px;
-        }
-
-
-
-        .alphabet {
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--surface);
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .alphabet-title {
-            padding: 10px 17px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface-soft);
-            font-size: 13px;
-            font-weight: 700;
-            flex-shrink: 0;
+          flex: none;
         }
 
         .alphabet-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            overflow-y: auto;
-            flex: 1;
-            min-height: 0;
+          overflow-y: visible;
         }
-
-        .alphabet-item {
-            display: grid;
-            grid-template-columns: 36px 1fr;
-            align-items: center;
-            min-height: 38px;
-            padding: 4px 8px;
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .alphabet-item:nth-child(2n) {
-            border-right: 0;
-        }
-
-        .alphabet-item:nth-last-child(-n + 2) {
-            border-bottom: 0;
-        }
-
-        .alphabet-letter {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .alphabet-symbol {
-            color: var(--galactic);
-            font-size: 18px;
-            line-height: 1;
-        }
-
-
-
-        footer {
-            margin-top: 10px;
-            color: var(--muted);
-            font-size: 11px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        footer p {
-            margin: 0 0 4px;
-            font-size: 10px;
-            line-height: 1.4;
-        }
-
-        footer a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-
-
-        @media (max-width: 800px) {
-
-            body {
-                height: auto;
-                overflow: auto;
-            }
-
-            .container {
-                height: auto;
-                width: min(100% - 16px, 760px);
-                padding: 24px 0 32px;
-            }
-
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            .mode {
-                flex-direction: column;
-            }
-
-            .mode button {
-                flex: none;
-            }
-
-            textarea {
-                min-height: 100px;
-                flex: none;
-            }
-
-            .result {
-                flex: none;
-            }
-
-            .alphabet-grid {
-                overflow-y: visible;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <main class="container">
-
-        <header>
-            <p class="brand">MC Tools</p>
-
-            <h1>標準銀河アルファベット変換</h1>
-
-            <p class="lead">
-                英字と標準銀河アルファベットを相互に変換します。
-            </p>
-        </header>
-
-        <div class="main-grid">
-
-            <section class="converter" aria-label="標準銀河アルファベット変換ツール">
-
-                <div class="converter-title">
-                    Standard Galactic Alphabet
-                </div>
-
-                <div class="mode">
-
-                    <button id="englishMode" class="active" type="button">
-                        英字 → 標準銀河
-                    </button>
-
-                    <button id="galacticMode" type="button">
-                        標準銀河 → 英字
-                    </button>
-
-                </div>
-
-                <div class="input-section">
-
-                    <label id="inputLabel" class="input-label" for="inputText">
-                        英字
-                    </label>
-
-                    <textarea id="inputText" placeholder="Hello Minecraft!" spellcheck="false" autocomplete="off"
-                        aria-label="変換元のテキスト"></textarea>
-
-                    <div class="result">
-
-                        <label id="outputLabel" class="input-label" for="resultText">
-                            標準銀河アルファベット（変換結果）
-                        </label>
-
-                        <textarea id="resultText" class="galactic" placeholder="ᔑ" spellcheck="false" autocomplete="off"
-                            aria-label="変換結果のテキスト"></textarea>
-
-                        <div class="result-actions">
-
-                            <button id="copyButton" type="button">
-                                結果をコピー
-                            </button>
-
-                            <button id="clearButton" type="button">
-                                クリア
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <div class="right-column">
-
-                <section class="notice">
-
-                    <h2>標準銀河アルファベットとは？</h2>
-
-                    <p>
-                        Minecraftのエンチャントテーブルなどで使われている
-                        文字体系です。英字A〜Zを別の記号に置き換えます。
-                    </p>
-
-                    <div class="formula">
-                        英字 → 標準銀河：A〜Zを対応する記号へ変換<br>
-                        標準銀河 → 英字：対応する記号をA〜Zへ変換
-                    </div>
-
-                </section>
-
-                <section class="alphabet">
-
-                    <div class="alphabet-title">
-                        標準銀河アルファベット対応表
-                    </div>
-
-                    <div id="alphabetGrid" class="alphabet-grid"></div>
-
-                </section>
-
-            </div>
-
+      <header>
+        <div class="header-top">
+          <p class="brand">MC Tools</p>
+          <button
+            id="language-toggle"
+            class="language-toggle"
+            type="button"
+            aria-label="英語に切り替え"
+          >
+            English
+          </button>
         </div>
 
-        <footer>
+        <h1
+          data-ja="標準銀河アルファベット変換"
+          data-en="Standard Galactic Alphabet Translator"
+        >
+          標準銀河アルファベット変換
+        </h1>
 
-            <p>
-                Minecraft は Mojang AB の登録商標です。
-                当サイトは非公式のツールであり、Mojang ABとは関係ありません。
+        <p
+          class="lead"
+          data-ja="英字と標準銀河アルファベットを相互に変換します。"
+          data-en="Convert text between the Latin alphabet and the Standard Galactic Alphabet."
+        >
+          英字と標準銀河アルファベットを相互に変換します。
+        </p>
+      </header>
+
+      <div class="main-grid">
+        <section
+          class="converter"
+          aria-label="標準銀河アルファベット変換ツール"
+          data-aria-ja="標準銀河アルファベット変換ツール"
+          data-aria-en="Standard Galactic Alphabet translator"
+        >
+          <div
+            class="converter-title"
+            data-ja="Standard Galactic Alphabet"
+            data-en="Standard Galactic Alphabet"
+          >
+            Standard Galactic Alphabet
+          </div>
+
+          <div class="mode">
+            <button id="englishMode" class="active" type="button">
+              <span data-ja="英字 → 標準銀河" data-en="Latin → Galactic"
+                >英字 → 標準銀河</span
+              >
+            </button>
+
+            <button id="galacticMode" type="button">
+              <span data-ja="標準銀河 → 英字" data-en="Galactic → Latin"
+                >標準銀河 → 英字</span
+              >
+            </button>
+          </div>
+
+          <div class="input-section">
+            <label
+              id="inputLabel"
+              class="input-label"
+              for="inputText"
+              data-ja-encode="英字"
+              data-en-encode="Latin text"
+              data-ja-decode="標準銀河アルファベット"
+              data-en-decode="Standard Galactic Alphabet"
+            >
+              英字
+            </label>
+
+            <textarea
+              id="inputText"
+              placeholder="Hello Minecraft!"
+              spellcheck="false"
+              autocomplete="off"
+              aria-label="変換元のテキスト"
+              data-aria-ja="変換元のテキスト"
+              data-aria-en="Input text"
+            ></textarea>
+
+            <div class="result">
+              <label
+                id="outputLabel"
+                class="input-label"
+                for="resultText"
+                data-ja-encode="標準銀河アルファベット（変換結果）"
+                data-en-encode="Standard Galactic Alphabet (result)"
+                data-ja-decode="英字（変換結果）"
+                data-en-decode="Latin text (result)"
+              >
+                標準銀河アルファベット（変換結果）
+              </label>
+
+              <textarea
+                id="resultText"
+                class="galactic"
+                placeholder="ᔑ"
+                spellcheck="false"
+                autocomplete="off"
+                aria-label="変換結果のテキスト"
+                data-aria-ja="変換結果のテキスト"
+                data-aria-en="Converted text"
+              ></textarea>
+
+              <div class="result-actions">
+                <button
+                  id="copyButton"
+                  type="button"
+                  data-ja="結果をコピー"
+                  data-en="Copy result"
+                >
+                  結果をコピー
+                </button>
+
+                <button
+                  id="clearButton"
+                  type="button"
+                  data-ja="クリア"
+                  data-en="Clear"
+                >
+                  クリア
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="right-column">
+          <section class="notice">
+            <h2
+              data-ja="標準銀河アルファベットとは？"
+              data-en="What is the Standard Galactic Alphabet?"
+            >
+              標準銀河アルファベットとは？
+            </h2>
+
+            <p
+              data-ja="Minecraftのエンチャントテーブルなどで使われている文字体系です。英字A〜Zを別の記号に置き換えます。"
+              data-en="This writing system appears on Minecraft enchantment tables. It substitutes symbols for the Latin letters A–Z."
+            >
+              Minecraftのエンチャントテーブルなどで使われている
+              文字体系です。英字A〜Zを別の記号に置き換えます。
             </p>
 
-            <span id="footer-copy"></span>
+            <div class="formula">
+              <span
+                data-ja="英字 → 標準銀河：A〜Zを対応する記号へ変換"
+                data-en="Latin → Galactic: Convert A–Z to their corresponding symbols"
+                >英字 → 標準銀河：A〜Zを対応する記号へ変換</span
+              ><br />
+              <span
+                data-ja="標準銀河 → 英字：対応する記号をA〜Zへ変換"
+                data-en="Galactic → Latin: Convert symbols back to A–Z"
+                >標準銀河 → 英字：対応する記号をA〜Zへ変換</span
+              >
+            </div>
+          </section>
 
-        </footer>
+          <section class="alphabet">
+            <div
+              class="alphabet-title"
+              data-ja="標準銀河アルファベット対応表"
+              data-en="Standard Galactic Alphabet chart"
+            >
+              標準銀河アルファベット対応表
+            </div>
 
+            <div id="alphabetGrid" class="alphabet-grid"></div>
+          </section>
+        </div>
+      </div>
+
+      <footer>
+        <p
+          data-ja="Minecraft は Mojang AB の登録商標です。当サイトは非公式のツールであり、Mojang ABとは関係ありません。"
+          data-en="Minecraft is a registered trademark of Mojang AB. This is an unofficial tool and is not affiliated with Mojang AB."
+        >
+          Minecraft は Mojang AB の登録商標です。
+          当サイトは非公式のツールであり、Mojang ABとは関係ありません。
+        </p>
+
+        <span id="footer-copy"></span>
+      </footer>
     </main>
 
     <script>
-        (function () {
-            "use strict";
+      (function () {
+        "use strict";
 
+        const englishMode = document.getElementById("englishMode");
 
-            const englishMode =
-                document.getElementById("englishMode");
+        const galacticMode = document.getElementById("galacticMode");
 
-            const galacticMode =
-                document.getElementById("galacticMode");
+        const inputLabel = document.getElementById("inputLabel");
 
-            const inputLabel =
-                document.getElementById("inputLabel");
+        const outputLabel = document.getElementById("outputLabel");
 
-            const outputLabel =
-                document.getElementById("outputLabel");
+        const inputText = document.getElementById("inputText");
 
-            const inputText =
-                document.getElementById("inputText");
+        const resultText = document.getElementById("resultText");
 
-            const resultText =
-                document.getElementById("resultText");
+        const copyButton = document.getElementById("copyButton");
 
-            const copyButton =
-                document.getElementById("copyButton");
+        const clearButton = document.getElementById("clearButton");
 
-            const clearButton =
-                document.getElementById("clearButton");
+        const alphabetGrid = document.getElementById("alphabetGrid");
 
-            const alphabetGrid =
-                document.getElementById("alphabetGrid");
+        const footerCopy = document.getElementById("footer-copy");
 
-            const footerCopy =
-                document.getElementById("footer-copy");
+        const languageToggle = document.getElementById("language-toggle");
 
+        const alphabet = [
+          ["A", "ᔑ"],
+          ["B", "ʖ"],
+          ["C", "ᓵ"],
+          ["D", "↸"],
+          ["E", "ᒷ"],
+          ["F", "⎓"],
+          ["G", "⊣"],
+          ["H", "⍑"],
+          ["I", "╎"],
+          ["J", "⋮"],
+          ["K", "ꖌ"],
+          ["L", "ꖎ"],
+          ["M", "ᒲ"],
+          ["N", "リ"],
+          ["O", "𝙹"],
+          ["P", "!¡"],
+          ["Q", "ᑑ"],
+          ["R", "∷"],
+          ["S", "ᓭ"],
+          ["T", "ℸ"],
+          ["U", "⚍"],
+          ["V", "⍊"],
+          ["W", "∴"],
+          ["X", "̇/"],
+          ["Y", "||"],
+          ["Z", "⨅"],
+        ];
 
-            const alphabet = [
-                ["A", "ᔑ"],
-                ["B", "ʖ"],
-                ["C", "ᓵ"],
-                ["D", "↸"],
-                ["E", "ᒷ"],
-                ["F", "⎓"],
-                ["G", "⊣"],
-                ["H", "⍑"],
-                ["I", "╎"],
-                ["J", "⋮"],
-                ["K", "ꖌ"],
-                ["L", "ꖎ"],
-                ["M", "ᒲ"],
-                ["N", "リ"],
-                ["O", "𝙹"],
-                ["P", "!¡"],
-                ["Q", "ᑑ"],
-                ["R", "∷"],
-                ["S", "ᓭ"],
-                ["T", "ℸ"],
-                ["U", "⚍"],
-                ["V", "⍊"],
-                ["W", "∴"],
-                ["X", "̇/"],
-                ["Y", "||"],
-                ["Z", "⨅"]
-            ];
+        const encodeMap = new Map();
+        const decodeMap = new Map();
 
+        alphabet.forEach(([letter, symbol]) => {
+          encodeMap.set(letter, symbol);
+          decodeMap.set(symbol, letter);
+        });
 
-            const encodeMap = new Map();
-            const decodeMap = new Map();
+        const decodeSymbols = [...decodeMap.keys()].sort(
+          (a, b) => b.length - a.length,
+        );
 
-            alphabet.forEach(([letter, symbol]) => {
-                encodeMap.set(letter, symbol);
-                decodeMap.set(symbol, letter);
+        let mode = "encode";
+        function getLanguageFromUrl() {
+          const url = new URL(location.href);
+          const selectedLanguage = url.searchParams.get("lang");
+
+          if (selectedLanguage === "ja") {
+            url.searchParams.delete("lang");
+            history.replaceState(history.state, "", url);
+          }
+
+          return selectedLanguage === "en" ? "en" : "ja";
+        }
+
+        let language = getLanguageFromUrl();
+        let copyResetTimeout;
+        let copySucceeded = false;
+
+        function updateLanguage() {
+          document.documentElement.lang = language;
+
+          document.querySelectorAll("[data-ja][data-en]").forEach((element) => {
+            element.textContent = element.dataset[language];
+          });
+
+          document
+            .querySelectorAll("[data-aria-ja][data-aria-en]")
+            .forEach((element) => {
+              element.setAttribute(
+                "aria-label",
+                element.dataset[`aria${language === "ja" ? "Ja" : "En"}`],
+              );
             });
 
-            const decodeSymbols =
-                [...decodeMap.keys()]
-                    .sort((a, b) => b.length - a.length);
+          languageToggle.textContent = language === "ja" ? "English" : "日本語";
+          languageToggle.setAttribute(
+            "aria-label",
+            language === "ja" ? "英語に切り替え" : "Switch to Japanese",
+          );
 
-            let mode = "encode";
+          const isEnglish = language === "en";
+          const pageTitle = isEnglish
+            ? "Standard Galactic Alphabet Translator | MC Tools"
+            : "標準銀河アルファベット変換 | MC Tools";
+          const pageDescription = isEnglish
+            ? "Translate text between the Standard Galactic Alphabet used in Minecraft enchantment tables and the Latin alphabet."
+            : "Minecraftのエンチャントテーブルで使われる標準銀河アルファベット（Standard Galactic Alphabet / SGA）と英字を相互変換できるツールです。";
 
+          document.title = pageTitle;
+          document.querySelector('meta[name="description"]').content =
+            pageDescription;
+          document.querySelector('meta[property="og:title"]').content =
+            pageTitle;
+          document.querySelector('meta[property="og:description"]').content =
+            pageDescription;
+          document.querySelector('meta[name="twitter:title"]').content =
+            pageTitle;
+          document.querySelector('meta[name="twitter:description"]').content =
+            pageDescription;
+          document.querySelector('meta[property="og:locale"]').content =
+            isEnglish ? "en_US" : "ja_JP";
 
-            function encode(text) {
+          updateModeLabels();
+          copyButton.textContent = copySucceeded
+            ? isEnglish
+              ? "Copied!"
+              : "コピーしました！"
+            : copyButton.dataset[language];
+        }
 
-                return [...text]
-                    .map(char => {
+        function updateModeLabels() {
+          const isEnglish = language === "en";
+          const isEncode = mode === "encode";
 
-                        const upper =
-                            char.toUpperCase();
+          inputLabel.textContent = isEncode
+            ? isEnglish
+              ? "Latin text"
+              : "英字"
+            : isEnglish
+              ? "Standard Galactic Alphabet"
+              : "標準銀河アルファベット";
 
-                        return encodeMap.get(upper) || char;
+          outputLabel.textContent = isEncode
+            ? isEnglish
+              ? "Standard Galactic Alphabet (result)"
+              : "標準銀河アルファベット（変換結果）"
+            : isEnglish
+              ? "Latin text (result)"
+              : "英字（変換結果）";
 
-                    })
-                    .join("");
+          inputText.placeholder = isEncode
+            ? "Hello Minecraft!"
+            : "⍑ᒷꖎꖎ𝙹 ᒲ╎リᒷᓵ∷ᔑ⎓ℸ!";
+          resultText.placeholder = isEncode
+            ? "⍑ᒷꖎꖎ𝙹 ᒲ╎リᒷᓵ∷ᔑ⎓ℸ!"
+            : "HELLO MINECRAFT!";
+        }
 
+        function encode(text) {
+          return [...text]
+            .map((char) => {
+              const upper = char.toUpperCase();
+
+              return encodeMap.get(upper) || char;
+            })
+            .join("");
+        }
+
+        function decode(text) {
+          let result = "";
+          let index = 0;
+
+          while (index < text.length) {
+            let matched = false;
+
+            for (const symbol of decodeSymbols) {
+              if (text.startsWith(symbol, index)) {
+                result += decodeMap.get(symbol);
+                index += symbol.length;
+                matched = true;
+                break;
+              }
             }
 
-
-            function decode(text) {
-
-                let result = "";
-                let index = 0;
-
-                while (index < text.length) {
-
-                    let matched = false;
-
-                    for (const symbol of decodeSymbols) {
-
-                        if (
-                            text.startsWith(
-                                symbol,
-                                index
-                            )
-                        ) {
-                            result += decodeMap.get(symbol);
-                            index += symbol.length;
-                            matched = true;
-                            break;
-                        }
-
-                    }
-
-                    if (!matched) {
-                        result += text[index];
-                        index++;
-                    }
-
-                }
-
-                return result;
-
+            if (!matched) {
+              result += text[index];
+              index++;
             }
+          }
 
+          return result;
+        }
 
-            function updateFromResult() {
+        function updateFromResult() {
+          if (mode === "encode") {
+            resultText.value = encode(inputText.value);
+          } else {
+            resultText.value = decode(inputText.value);
+          }
+        }
 
-                if (mode === "encode") {
-                    resultText.value =
-                        encode(inputText.value);
-                } else {
-                    resultText.value =
-                        decode(inputText.value);
-                }
+        function updateFromInput() {
+          if (mode === "encode") {
+            inputText.value = decode(resultText.value);
+          } else {
+            inputText.value = encode(resultText.value);
+          }
+        }
 
-            }
+        function setMode(nextMode) {
+          if (mode === nextMode) return;
 
+          const oldInput = inputText.value;
+          const oldResult = resultText.value;
+          inputText.value = oldResult;
+          resultText.value = oldInput;
 
-            function updateFromInput() {
+          mode = nextMode;
 
-                if (mode === "encode") {
-                    inputText.value =
-                        decode(resultText.value);
-                } else {
-                    inputText.value =
-                        encode(resultText.value);
-                }
+          const isEncode = mode === "encode";
 
-            }
+          englishMode.classList.toggle("active", isEncode);
 
+          galacticMode.classList.toggle("active", !isEncode);
 
-            function setMode(nextMode) {
+          updateModeLabels();
 
-                if (mode === nextMode) return;
+          inputText.focus();
+        }
 
-                const oldInput = inputText.value;
-                const oldResult = resultText.value;
-                inputText.value = oldResult;
-                resultText.value = oldInput;
+        function createAlphabetTable() {
+          alphabet.forEach(([letter, symbol]) => {
+            const item = document.createElement("div");
 
-                mode = nextMode;
+            item.className = "alphabet-item";
 
-                const isEncode =
-                    mode === "encode";
+            const letterEl = document.createElement("span");
 
-                englishMode.classList.toggle(
-                    "active",
-                    isEncode
-                );
+            letterEl.className = "alphabet-letter";
 
-                galacticMode.classList.toggle(
-                    "active",
-                    !isEncode
-                );
+            letterEl.textContent = letter;
 
+            const symbolEl = document.createElement("span");
 
-                if (isEncode) {
+            symbolEl.className = "alphabet-symbol";
 
-                    inputLabel.textContent =
-                        "英字";
+            symbolEl.textContent = symbol;
 
-                    outputLabel.textContent =
-                        "標準銀河アルファベット（変換結果）";
+            item.appendChild(letterEl);
+            item.appendChild(symbolEl);
 
-                    inputText.placeholder =
-                        "Hello Minecraft!";
+            alphabetGrid.appendChild(item);
+          });
+        }
 
-                    resultText.placeholder =
-                        "⍑ᒷꖎꖎ𝙹 ᒲ╎リᒷᓵ∷ᔑ⎓ℸ!";
+        async function copyResult() {
+          const text = resultText.value;
 
-                } else {
+          if (!text) {
+            return;
+          }
 
-                    inputLabel.textContent =
-                        "標準銀河アルファベット";
+          try {
+            await navigator.clipboard.writeText(text);
 
-                    outputLabel.textContent =
-                        "英字（変換結果）";
+            copySucceeded = true;
+            copyButton.textContent =
+              language === "ja" ? "コピーしました！" : "Copied!";
 
-                    inputText.placeholder =
-                        "⍑ᒷꖎꖎ𝙹 ᒲ╎リᒷᓵ∷ᔑ⎓ℸ!";
+            clearTimeout(copyResetTimeout);
+            copyResetTimeout = setTimeout(() => {
+              copySucceeded = false;
+              copyButton.textContent = copyButton.dataset[language];
+            }, 1200);
+          } catch {
+            resultText.select();
 
-                    resultText.placeholder =
-                        "HELLO MINECRAFT!";
+            document.execCommand("copy");
+          }
+        }
 
-                }
+        function initializeFooter() {
+          if (!footerCopy) {
+            return;
+          }
 
-                inputText.focus();
+          const baseYear = 2026;
 
-            }
+          const currentYear = new Date().getFullYear();
 
+          const hostname = location.hostname;
 
-            function createAlphabetTable() {
+          let copyrightYear;
 
-                alphabet.forEach(([letter, symbol]) => {
+          if (currentYear < baseYear) {
+            copyrightYear = `${currentYear}~${baseYear}`;
+          } else if (currentYear > baseYear) {
+            copyrightYear = `${baseYear}~${currentYear}`;
+          } else {
+            copyrightYear = baseYear;
+          }
 
-                    const item =
-                        document.createElement("div");
+          let footerHTML = `&copy; ${copyrightYear} `;
 
-                    item.className =
-                        "alphabet-item";
-
-
-                    const letterEl =
-                        document.createElement("span");
-
-                    letterEl.className =
-                        "alphabet-letter";
-
-                    letterEl.textContent =
-                        letter;
-
-
-                    const symbolEl =
-                        document.createElement("span");
-
-                    symbolEl.className =
-                        "alphabet-symbol";
-
-                    symbolEl.textContent =
-                        symbol;
-
-
-                    item.appendChild(letterEl);
-                    item.appendChild(symbolEl);
-
-                    alphabetGrid.appendChild(item);
-
-                });
-
-            }
-
-
-            async function copyResult() {
-
-                const text =
-                    resultText.value;
-
-                if (!text) {
-                    return;
-                }
-
-                try {
-
-                    await navigator.clipboard.writeText(
-                        text
-                    );
-
-                    const originalText =
-                        copyButton.textContent;
-
-                    copyButton.textContent =
-                        "コピーしました！";
-
-                    setTimeout(() => {
-
-                        copyButton.textContent =
-                            originalText;
-
-                    }, 1200);
-
-                } catch {
-
-                    resultText.select();
-
-                    document.execCommand("copy");
-
-                }
-
-            }
-
-
-            function initializeFooter() {
-
-                if (!footerCopy) {
-                    return;
-                }
-
-                const baseYear = 2026;
-
-                const currentYear =
-                    new Date().getFullYear();
-
-                const hostname =
-                    location.hostname;
-
-
-                let copyrightYear;
-
-                if (currentYear < baseYear) {
-
-                    copyrightYear =
-                        `${currentYear}~${baseYear}`;
-
-                } else if (currentYear > baseYear) {
-
-                    copyrightYear =
-                        `${baseYear}~${currentYear}`;
-
-                } else {
-
-                    copyrightYear =
-                        baseYear;
-
-                }
-
-
-                let footerHTML =
-                    `&copy; ${copyrightYear} `;
-
-
-                if (
-                    hostname.includes(
-                        "hamuzon.github.io"
-                    )
-                ) {
-
-                    footerHTML +=
-                        `<a
+          if (hostname.includes("hamuzon.github.io")) {
+            footerHTML += `<a
                     href="https://hamuzon.github.io"
                     target="_blank"
                     rel="noopener"
                 >@hamuzon</a>`;
-
-                } else if (
-                    hostname.includes(
-                        "hamusata.f5.si"
-                    )
-                ) {
-
-                    footerHTML +=
-                        `<a
+          } else if (hostname.includes("hamusata.f5.si")) {
+            footerHTML += `<a
                     href="https://hamusata.f5.si"
                     target="_blank"
                     rel="noopener"
                 >@hamusata</a>`;
-
-                } else if (
-                    hostname.includes(
-                        "hamuzon-jp.f5.si"
-                    )
-                ) {
-
-                    footerHTML +=
-                        `<a
+          } else if (hostname.includes("hamuzon-jp.f5.si")) {
+            footerHTML += `<a
                     href="https://hamuzon-jp.f5.si"
                     target="_blank"
                     rel="noopener"
                 >@hamuzon</a>`;
+          } else {
+            footerHTML += "MC Tools";
+          }
 
-                } else {
+          footerCopy.innerHTML = footerHTML;
+        }
 
-                    footerHTML +=
-                        "MC Tools";
+        englishMode.addEventListener("click", () => {
+          setMode("encode");
+        });
 
-                }
+        galacticMode.addEventListener("click", () => {
+          setMode("decode");
+        });
 
-                footerCopy.innerHTML =
-                    footerHTML;
+        inputText.addEventListener("input", updateFromResult);
 
-            }
+        resultText.addEventListener("input", updateFromInput);
 
+        copyButton.addEventListener("click", copyResult);
 
-            englishMode.addEventListener(
-                "click",
-                () => {
-                    setMode("encode");
-                }
-            );
+        clearButton.addEventListener("click", () => {
+          inputText.value = "";
+          resultText.value = "";
+          inputText.focus();
+        });
 
-            galacticMode.addEventListener(
-                "click",
-                () => {
-                    setMode("decode");
-                }
-            );
+        languageToggle.addEventListener("click", () => {
+          language = language === "ja" ? "en" : "ja";
+          const url = new URL(location.href);
+          if (language === "en") {
+            url.searchParams.set("lang", "en");
+          } else {
+            url.searchParams.delete("lang");
+          }
+          history.pushState({ language }, "", url);
+          updateLanguage();
+        });
 
-            inputText.addEventListener(
-                "input",
-                updateFromResult
-            );
+        window.addEventListener("popstate", () => {
+          language = getLanguageFromUrl();
+          updateLanguage();
+        });
 
-            resultText.addEventListener(
-                "input",
-                updateFromInput
-            );
-
-            copyButton.addEventListener(
-                "click",
-                copyResult
-            );
-
-            clearButton.addEventListener(
-                "click",
-                () => {
-
-                    inputText.value = "";
-                    resultText.value = "";
-                    inputText.focus();
-
-                }
-            );
-
-
-            createAlphabetTable();
-            initializeFooter();
-
-        })();
+        createAlphabetTable();
+        initializeFooter();
+        updateLanguage();
+      })();
     </script>
-
-</body>
-
+  </body>
 </html>
