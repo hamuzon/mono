@@ -46,6 +46,11 @@
       "url": "/css-clock/"
     },
     {
+      "title": "日本円お釣り計算",
+      "text": "日本円の紙幣・硬貨を使って、支払い後の手持ちが少なくなるお釣りの計算ツールです。",
+      "url": "/otsuri-calculator/"
+    },
+    {
       "title": "ネザー座標変換 / Nether Coordinate Transformation",
       "text": "MC Tools / マインクラフトのネザーとオーバーワルドの座標の計算をします。/This calculates the coordinates of the Nether and Overworld in Minecraft./",
       "url": "/Calculators_Nether_coordinates/"

@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7eaff">
+  <meta name="description" content="財布の中身から、支払い後の硬貨・紙幣が少なくなる払い方を計算します。">
+  <title>最小お釣り硬貨計算</title>
+  <link href="https://fonts.googleapis.com/css2?family=Potta+One&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202735;
+      --muted: #6d7787;
+      --line: #e5e9ef;
+      --blue: #3569e8;
+      --background: #f5f7fb;
+      --green: #16845b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: 'Potta One', system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .aurora-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 20%, rgba(175, 109, 255, 0.85), transparent 68%),
+        radial-gradient(ellipse 70% 60% at 20% 80%, rgba(255, 100, 180, 0.75), transparent 68%),
+        radial-gradient(ellipse 60% 50% at 60% 65%, rgba(255, 235, 170, 0.98), transparent 68%),
+        radial-gradient(ellipse 65% 40% at 50% 60%, rgba(120, 190, 255, 0.3), transparent 68%),
+        linear-gradient(180deg, #f7eaff 0%, #fde2ea 100%);
+      animation: auroraMove 20s linear infinite alternate;
+    }
+
+    @keyframes auroraMove {
+      0% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(10px, -10px) scale(1.05); }
+      50% { transform: translate(-10px, 10px) scale(1.02); }
+      75% { transform: translate(5px, -5px) scale(1.03); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: min(720px, 100%);
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      color: #fff;
+      font-size: clamp(24px, 5vw, 32px);
+      letter-spacing: -0.04em;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      margin: 14px 0;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: 18px;
+      background:
+        radial-gradient(ellipse at 8% 0%, rgba(255, 255, 255, 0.92), transparent 48%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48));
+      box-shadow:
+        0 12px 32px rgba(70, 53, 105, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.42);
+      color: var(--ink);
+      -webkit-backdrop-filter: blur(22px) saturate(175%);
+      backdrop-filter: blur(22px) saturate(175%);
+    }
+
+    .panel::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.38),
+        transparent 38%,
+        rgba(255, 255, 255, 0.08) 72%,
+        rgba(255, 255, 255, 0.2)
+      );
+      content: "";
+      pointer-events: none;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 16px;
+    }
+
+    .price-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .price-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .yen {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(208, 211, 224, 0.88);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow:
+        inset 0 1px 3px rgba(56, 49, 79, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.8);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    input[type="number"] {
+      padding: 11px 12px;
+    }
+
+    input:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(53, 105, 232, 0.3);
+      outline-offset: 2px;
+    }
+
+    #price {
+      flex: 1;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .coin {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.96);
+      border-radius: 12px;
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(255, 255, 255, 0.98), transparent 68%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(238, 231, 255, 0.32));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.62),
+        0 6px 16px rgba(70, 53, 105, 0.09);
+      -webkit-backdrop-filter: blur(18px) saturate(185%);
+      backdrop-filter: blur(18px) saturate(185%);
+    }
+
+    .coin::before,
+    .stat::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: linear-gradient(
+        125deg,
+        rgba(255, 255, 255, 0.62),
+        rgba(255, 255, 255, 0.08) 42%,
+        transparent 60%,
+        rgba(255, 255, 255, 0.28)
+      );
+      content: "";
+      pointer-events: none;
+    }
+
+    .coin label {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .coin input {
+      position: relative;
+      z-index: 1;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      flex: 1;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: #2857ca;
+    }
+
+    .secondary {
+      background: #eef2f8;
+      color: #475267;
+    }
+
+    #result[hidden] {
+      display: none;
+    }
+
+    .result-top {
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 13px;
+      background: linear-gradient(135deg, rgba(232, 240, 255, 0.86), rgba(255, 255, 255, 0.54));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        0 4px 14px rgba(70, 95, 155, 0.06);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      backdrop-filter: blur(14px) saturate(160%);
+    }
+
+    .caption,
+    .stat span {
+      color: #5c6e91;
+      font-size: 12px;
+    }
+
+    .result-top strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 29px;
+    }
+
+    .result-top .change {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .stat {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.96);
+      border-radius: 12px;
+      background:
+        radial-gradient(ellipse at 10% 0%, rgba(255, 255, 255, 0.96), transparent 70%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(238, 231, 255, 0.3));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.58),
+        0 5px 14px rgba(70, 53, 105, 0.07);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      backdrop-filter: blur(18px) saturate(180%);
+    }
+
+    .stat span {
+      position: relative;
+      z-index: 1;
+      display: block;
+      color: var(--muted);
+    }
+
+    .stat b {
+      position: relative;
+      z-index: 1;
+      font-size: 20px;
+    }
+
+    .coins-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid rgba(255, 255, 255, 0.94);
+      padding: 8px 10px;
+      border-radius: 9px;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(255, 255, 255, 0.98), transparent 72%),
+        linear-gradient(140deg, rgba(255, 255, 255, 0.7), rgba(226, 218, 249, 0.42));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.98),
+        0 3px 10px rgba(70, 53, 105, 0.08);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      backdrop-filter: blur(14px) saturate(180%);
+      font-size: 13px;
+    }
+
+    .error {
+      margin: 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff1f0;
+      color: #b42318;
+      font-size: 14px;
+    }
+
+    @media (max-width: 440px) {
+      main {
+        padding: 22px 14px 36px;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .actions {
+        align-items: stretch;
+      }
+
+      .primary {
+        min-height: 48px;
+      }
+
+      .secondary {
+        min-height: 48px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aurora-background {
+        animation: none;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="aurora-background" aria-hidden="true"></div>
+  <main>
+    <h1>最小お釣り硬貨計算</h1>
+
+    <form id="calculator">
+      <section class="panel">
+        <h2>お会計金額</h2>
+        <label class="price-label" for="price">支払う金額</label>
+        <div class="price-wrap">
+          <span class="yen" aria-hidden="true">¥</span>
+          <input id="price" name="price" type="number" min="1" step="1" inputmode="numeric" placeholder="680" required>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>いま財布にある枚数</h2>
+        <div class="grid" id="wallet"></div>
+        <div class="actions">
+          <button class="primary" type="submit">計算する</button>
+          <button class="secondary" id="reset" type="reset">リセット</button>
+        </div>
+      </section>
+    </form>
+
+    <section class="panel" id="result" aria-live="polite" hidden></section>
+  </main>
+
+  <script>
+    const denominations = [
+      { value: 10000, label: "10,000円札" },
+      { value: 5000, label: "5,000円札" },
+      { value: 2000, label: "2,000円札" },
+      { value: 1000, label: "1,000円札" },
+      { value: 500, label: "500円玉" },
+      { value: 100, label: "100円玉" },
+      { value: 50, label: "50円玉" },
+      { value: 10, label: "10円玉" },
+      { value: 5, label: "5円玉" },
+      { value: 1, label: "1円玉" }
+    ];
+
+    const form = document.getElementById("calculator");
+    const priceInput = document.getElementById("price");
+    const wallet = document.getElementById("wallet");
+    const result = document.getElementById("result");
+    const format = new Intl.NumberFormat("ja-JP");
+    const storageKey = "minimum-change-calculator:v1";
+
+    wallet.innerHTML = denominations.map((denomination, index) => `
+      <div class="coin">
+        <label for="coin-${index}">${denomination.label}</label>
+        <input id="coin-${index}" name="coin-${index}" type="number" min="0" max="99" step="1" inputmode="numeric" value="0">
+      </div>
+    `).join("");
+
+    function saveInputs() {
+      const saved = {
+        price: priceInput.value,
+        counts: denominations.map((_, index) =>
+          document.getElementById(`coin-${index}`).value
+        )
+      };
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(saved));
+      } catch (error) {
+        console.error("入力内容を保存できませんでした。", error);
+      }
+    }
+
+    function restoreInputs() {
+      let saved;
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored === null) return;
+        saved = JSON.parse(stored);
+      } catch (error) {
+        console.error("保存した入力内容を読み込めませんでした。", error);
+        return;
+      }
+
+      if (
+        saved === null ||
+        typeof saved !== "object" ||
+        typeof saved.price !== "string" ||
+        !Array.isArray(saved.counts) ||
+        saved.counts.length !== denominations.length ||
+        saved.counts.some((count) => typeof count !== "string")
+      ) {
+        console.error("保存した入力内容の形式が正しくありません。");
+        return;
+      }
+
+      priceInput.value = saved.price;
+      saved.counts.forEach((count, index) => {
+        document.getElementById(`coin-${index}`).value = count;
+      });
+    }
+
+    restoreInputs();
+    form.addEventListener("input", saveInputs);
+
+    function countChange(amount) {
+      let pieces = 0;
+      let remaining = amount;
+      for (const { value } of denominations) {
+        const count = Math.floor(remaining / value);
+        pieces += count;
+        remaining -= count * value;
+      }
+      return pieces;
+    }
+
+    function findBestPayment(price, counts) {
+      const maxAmount = counts.reduce(
+        (sum, count, index) => sum + count * denominations[index].value,
+        0
+      );
+      if (maxAmount < price) return null;
+
+      let previous = new Int32Array(maxAmount + 1);
+      previous.fill(-1);
+      previous[0] = 0;
+      const choices = [];
+
+      denominations.forEach(({ value }, index) => {
+        const current = new Int32Array(maxAmount + 1);
+        current.fill(-1);
+        const choice = new Uint8Array(maxAmount + 1);
+        const limit = counts[index];
+
+        for (let remainder = 0; remainder < value && remainder <= maxAmount; remainder += 1) {
+          const positions = Math.floor((maxAmount - remainder) / value) + 1;
+          const queue = new Int32Array(positions);
+          let head = 0;
+          let tail = 0;
+
+          for (let k = 0; k < positions; k += 1) {
+            const amount = remainder + k * value;
+            if (previous[amount] >= 0) {
+              const score = previous[amount] - k;
+              while (tail > head) {
+                const last = queue[tail - 1];
+                const lastAmount = remainder + last * value;
+                if (previous[lastAmount] - last > score) break;
+                tail -= 1;
+              }
+              queue[tail] = k;
+              tail += 1;
+            }
+
+            while (tail > head && queue[head] < k - limit) head += 1;
+            if (tail === head) continue;
+
+            const previousK = queue[head];
+            current[amount] = previous[remainder + previousK * value] + k - previousK;
+            choice[amount] = k - previousK;
+          }
+        }
+
+        previous = current;
+        choices.push(choice);
+      });
+
+      let best = null;
+      for (let amount = price; amount <= maxAmount; amount += 1) {
+        if (previous[amount] < 0) continue;
+        const change = amount - price;
+        const remainingPieces = counts.reduce((sum, count) => sum + count, 0)
+          - previous[amount]
+          + countChange(change);
+        if (
+          best === null ||
+          (change === 0 && best.change !== 0) ||
+          (
+            (change === 0) === (best.change === 0) &&
+            (
+              remainingPieces < best.remainingPieces ||
+              (remainingPieces === best.remainingPieces && change < best.change) ||
+              (remainingPieces === best.remainingPieces && change === best.change && previous[amount] < best.paidPieces)
+            )
+          )
+        ) {
+          best = {
+            amount,
+            change,
+            paidPieces: previous[amount],
+            remainingPieces,
+            tender: Array(denominations.length).fill(0)
+          };
+        }
+      }
+
+      if (best === null) return null;
+      let amount = best.amount;
+      for (let index = denominations.length - 1; index >= 0; index -= 1) {
+        const count = choices[index][amount];
+        best.tender[index] = count;
+        amount -= count * denominations[index].value;
+      }
+      return best;
+    }
+
+    function addCoinList(parent, counts) {
+      const list = document.createElement("div");
+      list.className = "coins-list";
+      const selected = counts
+        .map((count, index) => ({ count, label: denominations[index].label }))
+        .filter(({ count }) => count > 0);
+
+      if (selected.length === 0) {
+        const none = document.createElement("span");
+        none.className = "chip";
+        none.textContent = "なし";
+        list.append(none);
+      } else {
+        for (const { count, label } of selected) {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = `${label} × ${count}`;
+          list.append(chip);
+        }
+      }
+      parent.append(list);
+    }
+
+    function showError(message) {
+      result.replaceChildren();
+      const error = document.createElement("p");
+      error.className = "error";
+      error.textContent = message;
+      result.append(error);
+      result.hidden = false;
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const price = Number(priceInput.value);
+      const counts = denominations.map((_, index) =>
+        Number(document.getElementById(`coin-${index}`).value)
+      );
+
+      if (!Number.isSafeInteger(price) || price < 1) {
+        showError("金額は1円以上で入力してください。");
+        priceInput.focus();
+        return;
+      }
+      if (counts.some((count) => !Number.isSafeInteger(count) || count < 0 || count > 99)) {
+        showError("枚数は0〜99の整数で入力してください。");
+        return;
+      }
+      if (counts.every((count) => count === 0)) {
+        showError("財布にある枚数を入力してください。");
+        return;
+      }
+
+      const best = findBestPayment(price, counts);
+      if (best === null) {
+        showError("この財布の中身では支払えません。");
+        return;
+      }
+
+      result.replaceChildren();
+      const heading = document.createElement("h2");
+      heading.textContent = "おすすめ";
+
+      const summary = document.createElement("div");
+      summary.className = "result-top";
+      const amountCaption = document.createElement("span");
+      amountCaption.className = "caption";
+      amountCaption.textContent = "財布から出す金額";
+      const amount = document.createElement("strong");
+      amount.textContent = `¥${format.format(best.amount)}`;
+      const change = document.createElement("span");
+      change.className = "caption change";
+      change.textContent = `おつり：¥${format.format(best.change)}`;
+      summary.append(amountCaption, amount, change);
+
+      const stats = document.createElement("div");
+      stats.className = "stats";
+      const walletStat = document.createElement("div");
+      walletStat.className = "stat";
+      const walletLabel = document.createElement("span");
+      walletLabel.textContent = "支払い後の枚数";
+      const walletCount = document.createElement("b");
+      walletCount.textContent = `${best.remainingPieces}枚`;
+      walletStat.append(walletLabel, walletCount);
+
+      const changeStat = document.createElement("div");
+      changeStat.className = "stat";
+      const changeLabel = document.createElement("span");
+      changeLabel.textContent = "おつりの枚数";
+      const changeCount = document.createElement("b");
+      changeCount.textContent = `${countChange(best.change)}枚`;
+      changeStat.append(changeLabel, changeCount);
+      stats.append(walletStat, changeStat);
+
+      const tenderHeading = document.createElement("h2");
+      tenderHeading.textContent = "出すお金";
+      result.append(heading, summary, stats, tenderHeading);
+      addCoinList(result, best.tender);
+
+      const changeHeading = document.createElement("h2");
+      changeHeading.style.marginTop = "18px";
+      changeHeading.textContent = "おつり";
+      result.append(changeHeading);
+      let remainingChange = best.change;
+      const changeCoins = denominations.map(({ value }) => {
+        const count = Math.floor(remainingChange / value);
+        remainingChange -= count * value;
+        return count;
+      });
+      addCoinList(result, changeCoins);
+      result.hidden = false;
+    });
+
+    form.addEventListener("reset", () => {
+      result.replaceChildren();
+      result.hidden = true;
+      try {
+        localStorage.removeItem(storageKey);
+      } catch (error) {
+        console.error("保存した入力内容を削除できませんでした。", error);
+      }
+    });
+  </script>
+</body>
+</html>
