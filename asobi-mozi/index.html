@@ -18,6 +18,7 @@
             padding: 0;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -30,6 +31,17 @@
                 linear-gradient(180deg, #f7eaff 0%, #fde2ea 100%);
             background-attachment: fixed;
             color: var(--m3-on-surface);
+        }
+
+        footer {
+            margin: 0 20px 12px;
+            color: rgba(28, 27, 31, 0.7);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        footer a {
+            color: inherit;
         }
 
         .glass-card {
@@ -171,6 +183,11 @@
     </div>
 </div>
 
+<footer>
+    &copy; <span id="year"></span>
+    <a href="https://hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>
+</footer>
+
 <script>
     const VS_START = 0xE0100;
 
@@ -219,6 +236,11 @@
 
     pI.oninput = refreshEnc; sI.oninput = refreshEnc; dI.oninput = refreshDec;
     refreshEnc();
+
+    const baseYear = 2026;
+    const currentYear = new Date().getFullYear();
+    document.getElementById('year').textContent =
+        currentYear > baseYear ? `${baseYear}~${currentYear}` : `${baseYear}`;
 </script>
 
 </body>

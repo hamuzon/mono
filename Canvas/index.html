@@ -97,8 +97,17 @@
         </div>
     </footer>
 
-    
+    <div id="copyright">
+        &copy; <span id="copyright-year"></span>
+        <a href="https://hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>
+    </div>
 
+        <script>
+            const baseYear = 2026;
+            const currentYear = new Date().getFullYear();
+            document.getElementById("copyright-year").textContent =
+                currentYear > baseYear ? `${baseYear}~${currentYear}` : `${baseYear}`;
+        </script>
         <script src="script.js"></script>
 
 </body>

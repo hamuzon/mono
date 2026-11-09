@@ -963,7 +963,7 @@ window.addEventListener('beforeunload', () => {
 });
 
 function updateFooter() {
-  const baseYear = 2025;
+  const baseYear = 2026;
   const currentYear = new Date().getFullYear();
   const yearString = `${baseYear}${currentYear > baseYear ? "–" + currentYear : ""}`;
   const hostname = location.hostname;

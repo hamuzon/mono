@@ -112,6 +112,17 @@ canvas {
     word-break: break-all;
 }
 
+footer {
+    margin: 16px 0;
+    color: #666;
+    font-size: 13px;
+    text-align: center;
+}
+
+footer a {
+    color: inherit;
+}
+
 @media (max-width: 600px) {
     .button-group {
         flex-direction: column;

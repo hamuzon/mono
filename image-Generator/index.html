@@ -130,7 +130,18 @@
 
 <canvas id="canvas"></canvas>
 
+<footer>
+    &copy; <span id="year"></span>
+    <a href="https://hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>
+</footer>
+
 <script src="script.js"></script>
+<script>
+    const baseYear = 2025;
+    const currentYear = new Date().getFullYear();
+    document.getElementById("year").textContent =
+        currentYear > baseYear ? `${baseYear}~${currentYear}` : `${baseYear}`;
+</script>
 
 
 </div>
