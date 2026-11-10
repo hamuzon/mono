@@ -291,7 +291,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
       margin: 12px 0;
     }
@@ -383,6 +383,10 @@
       }
 
       .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -518,18 +522,35 @@
     restoreInputs();
     form.addEventListener("input", saveInputs);
 
-    function countChange(amount) {
-      let pieces = 0;
+    function makeChange(amount) {
       let remaining = amount;
-      for (const { value } of denominations) {
+      return denominations.map(({ value }) => {
+        // 2,000円札はおつりとして使わない。
+        if (value === 2000) return 0;
         const count = Math.floor(remaining / value);
-        pieces += count;
         remaining -= count * value;
-      }
-      return pieces;
+        return count;
+      });
+    }
+
+    function countChange(amount) {
+      return makeChange(amount).reduce((sum, count) => sum + count, 0);
     }
 
     function findBestPayment(price, counts) {
+      const twoThousandIndex = denominations.findIndex(({ value }) => value === 2000);
+      const countsWithoutTwoThousand = counts.map((count, index) =>
+        index === twoThousandIndex ? 0 : count
+      );
+      const preferred = findBestPaymentWithCounts(price, countsWithoutTwoThousand);
+      if (preferred !== null) {
+        preferred.remainingPieces += counts[twoThousandIndex];
+        return preferred;
+      }
+      return findBestPaymentWithCounts(price, counts);
+    }
+
+    function findBestPaymentWithCounts(price, counts) {
       const maxAmount = counts.reduce(
         (sum, count, index) => sum + count * denominations[index].value,
         0
@@ -694,15 +715,37 @@
       change.textContent = `おつり：¥${format.format(best.change)}`;
       summary.append(amountCaption, amount, change);
 
+      const changeCoins = makeChange(best.change);
+      const tenderTotal = best.tender.reduce((sum, count) => sum + count, 0);
+      const tenderBills = best.tender.slice(0, 4)
+        .reduce((sum, count) => sum + count, 0);
+      const tenderCoins = best.tender.slice(4)
+        .reduce((sum, count) => sum + count, 0);
       const stats = document.createElement("div");
       stats.className = "stats";
-      const walletStat = document.createElement("div");
-      walletStat.className = "stat";
-      const walletLabel = document.createElement("span");
-      walletLabel.textContent = "支払い後の枚数";
-      const walletCount = document.createElement("b");
-      walletCount.textContent = `${best.remainingPieces}枚`;
-      walletStat.append(walletLabel, walletCount);
+      const totalStat = document.createElement("div");
+      totalStat.className = "stat";
+      const totalLabel = document.createElement("span");
+      totalLabel.textContent = "支払いに使う合計";
+      const totalCount = document.createElement("b");
+      totalCount.textContent = `${tenderTotal}枚`;
+      totalStat.append(totalLabel, totalCount);
+
+      const billsStat = document.createElement("div");
+      billsStat.className = "stat";
+      const billsLabel = document.createElement("span");
+      billsLabel.textContent = "支払いに使うお札";
+      const billsCount = document.createElement("b");
+      billsCount.textContent = `${tenderBills}枚`;
+      billsStat.append(billsLabel, billsCount);
+
+      const coinsStat = document.createElement("div");
+      coinsStat.className = "stat";
+      const coinsLabel = document.createElement("span");
+      coinsLabel.textContent = "支払いに使う硬貨";
+      const coinsCount = document.createElement("b");
+      coinsCount.textContent = `${tenderCoins}枚`;
+      coinsStat.append(coinsLabel, coinsCount);
 
       const changeStat = document.createElement("div");
       changeStat.className = "stat";
@@ -711,7 +754,7 @@
       const changeCount = document.createElement("b");
       changeCount.textContent = `${countChange(best.change)}枚`;
       changeStat.append(changeLabel, changeCount);
-      stats.append(walletStat, changeStat);
+      stats.append(totalStat, billsStat, coinsStat, changeStat);
 
       const tenderHeading = document.createElement("h2");
       tenderHeading.textContent = "出すお金";
@@ -722,12 +765,6 @@
       changeHeading.style.marginTop = "18px";
       changeHeading.textContent = "おつり";
       result.append(changeHeading);
-      let remainingChange = best.change;
-      const changeCoins = denominations.map(({ value }) => {
-        const count = Math.floor(remainingChange / value);
-        remainingChange -= count * value;
-        return count;
-      });
       addCoinList(result, changeCoins);
       result.hidden = false;
     });
