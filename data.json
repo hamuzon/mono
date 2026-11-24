@@ -59,6 +59,11 @@
       "title": "標準銀河アルファベット変換 / Standard Galactic Alphabet Converter",
       "text": "MC Tools / Minecraftのエンチャントテーブルで使われる標準銀河アルファベット（SGA）と英字を相互変換できるツールです。/ A tool to convert between the Standard Galactic Alphabet (SGA) used on Minecraft enchanting tables and English letters.",
       "url": "/Calculators_Standard_Galactic_Alphabet/"
+    },
+    {
+      "title": "寿司タワー / Sushi Tower",
+      "text": "AIを使って寿司をタワー状に積むゲームを作りました。ぜひ遊んでみてください！ / A sushi tower stacking game created with AI. Please give it a try!",
+      "url": "/AI-Game/sushi-tower/"
     }
   ]
 }
