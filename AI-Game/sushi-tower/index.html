@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>寿司タワー</title>
+  <meta property="og:title" content="寿司タワー - 物理演算スタッキングゲーム">
+  <meta property="og:description" content="揺れる寿司を重ねて、高く積み上げろ！秒数モード＆ライフモード搭載">
+  <meta property="og:image" content="ogp.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="ogp.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="wrap">
+    <div id="stage">
+      <canvas id="c"></canvas>
+
+      <div class="hud">
+        <div>
+          <div class="big"><span id="h">0.0</span><small>cm</small></div>
+          <div class="sub"><span id="n">0</span><span id="unit1">貫</span> ・ <span id="lblBest">ベスト</span> <span id="best">0.0</span>cm / <span id="bestn">0</span><span id="unit2">貫</span></div>
+        </div>
+
+        <div class="hud-right">
+          <div class="lives" id="lives"></div>
+          <div class="tools">
+            <button id="pauseBtn" title="一時停止 (P)">⏸</button>
+            <button id="muteBtn" title="効果音">🔊</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tourhint hide" id="tour">積んだタワーを振り返り中… タップでスキップ</div>
+
+      <div class="overlay hide" id="pause">
+        <h1 id="pauseTitle" class="title-md">一時停止</h1>
+
+        <div class="row row-col">
+          <button id="resumeBtn">再開</button>
+          <button id="restartBtn" class="btn-sub">最初からやり直す</button>
+          <button id="topBtn1" class="btn-sub">トップ画面へ</button>
+        </div>
+      </div>
+
+      <div class="overlay" id="start">
+        <div class="icon-lg">🍣</div>
+        <h1 id="startTitle">寿司タワー</h1>
+
+        <p id="startDesc1">
+          揺れる寿司を<b>タップ / スペースキー</b>で落として、<br>
+          崩れないように高く積み上げよう。
+        </p>
+
+        <p id="startDesc2">
+          <b>秒数モード</b>は制限時間内にどこまで積めるか。<br>
+          <b>ライフモード</b>は残機3つ、崩れるとライフが減るよ。<br>
+          台から落ちるとペナルティ。
+        </p>
+
+        <div class="sec-label" id="lblMode">ゲームモード</div>
+        <div class="md"></div>
+        <div class="mdinfo"></div>
+
+        <div class="sec-label" id="lblLevel">難易度</div>
+        <div class="lv"></div>
+        <div class="lvinfo"></div>
+
+        <div class="sec-label" id="lblCtrl">動作モード</div>
+        <div class="ctrl"></div>
+        <div class="ctrlinfo"></div>
+
+        <div class="recs"></div>
+
+        <button id="startBtn">はじめる</button>
+      </div>
+
+      <div class="overlay hide" id="over">
+        <h1 id="overTitle" class="title-md">リザルト</h1>
+
+        <div class="res">
+          <span id="overResLabel">最高の高さ</span><br>
+          <b id="rh">0.0</b> cm
+        </div>
+
+        <p id="rn"></p>
+        <div class="new" id="rnew"></div>
+
+        <div class="recs"></div>
+
+        <div class="md"></div>
+
+        <div class="lv"></div>
+
+        <div class="row" id="overRow">
+          <a id="shareX" class="xbtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener noreferrer">𝕏 で記録をシェア</a>
+          <button id="saveTowerBtn" class="btn-sub">📷 タワー画像を保存</button>
+          <button id="viewBtn" class="btn-sub">タワーを見る</button>
+          <button id="againBtn">もう一度</button>
+          <button id="topBtn2" class="btn-sub">トップ画面へ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script src="config.js"></script>
+  <script src="audio.js"></script>
+  <script src="render.js"></script>
+  <script src="physics.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
