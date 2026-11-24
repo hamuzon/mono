@@ -5,13 +5,56 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>寿司タワー</title>
+
+  <meta name="title" content="寿司タワー">
+  <meta name="description" content="揺れる寿司をタップやスペースキーで落として、高く積み上げよう！物理演算で動く寿司タワーゲーム。秒数モード・ライフモード搭載。">
+  <meta name="keywords" content="寿司タワー,寿司ゲーム,タワーゲーム,積み上げゲーム,物理演算ゲーム,ブラウザゲーム,無料ゲーム,ミニゲーム,スタッキングゲーム">
+  <meta name="author" content="hamusata">
+  <meta name="creator" content="hamusata">
+  <meta name="publisher" content="hamusata">
+  <meta name="application-name" content="寿司タワー">
+  <meta name="category" content="Game">
+  <meta name="classification" content="Browser Game">
+  <meta name="theme-color" content="#ff7043">
+  <meta name="color-scheme" content="dark light">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="bingbot" content="index,follow,max-image-preview:large">
+
+  <link rel="canonical" href="https://mono.hamusata.f5.si/AI-Game/sushi-tower/">
+
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:site_name" content="mono | hamusata">
   <meta property="og:url" content="https://mono.hamusata.f5.si/AI-Game/sushi-tower/">
   <meta property="og:title" content="寿司タワー - 物理演算スタッキングゲーム">
-  <meta property="og:description" content="揺れる寿司を重ねて、高く積み上げろ！秒数モード＆ライフモード搭載">
+  <meta property="og:description" content="揺れる寿司をタップやスペースキーで落として、高く積み上げよう！秒数モード＆ライフモード搭載。崩れないようにどこまで積めるか挑戦しよう！">
   <meta property="og:image" content="https://mono.hamusata.f5.si/AI-Game/sushi-tower/ogp.png">
+  <meta property="og:image:url" content="https://mono.hamusata.f5.si/AI-Game/sushi-tower/ogp.png">
+  <meta property="og:image:secure_url" content="https://mono.hamusata.f5.si/AI-Game/sushi-tower/ogp.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="寿司タワー - 揺れる寿司を積み上げる物理演算スタッキングゲーム">
+  <meta property="og:updated_time" content="2026-11-24T00:00:00+09:00">
+
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="寿司タワー - 物理演算スタッキングゲーム">
+  <meta name="twitter:description" content="揺れる寿司をタップやスペースキーで落として、高く積み上げよう！秒数モード＆ライフモード搭載。">
   <meta name="twitter:image" content="https://mono.hamusata.f5.si/AI-Game/sushi-tower/ogp.png">
+  <meta name="twitter:image:alt" content="寿司タワー - 揺れる寿司を積み上げるゲーム">
+  <meta name="twitter:url" content="https://mono.hamusata.f5.si/AI-Game/sushi-tower/">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="寿司タワー">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="ogp.png">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -22,8 +65,12 @@
 
       <div class="hud">
         <div>
-          <div class="big"><span id="h">0.0</span><small>cm</small></div>
-          <div class="sub"><span id="n">0</span><span id="unit1">貫</span> ・ <span id="lblBest">ベスト</span> <span id="best">0.0</span>cm / <span id="bestn">0</span><span id="unit2">貫</span></div>
+          <div class="big">
+            <span id="h">0.0</span><small>cm</small>
+          </div>
+          <div class="sub">
+            <span id="n">0</span><span id="unit1">貫</span> ・ <span id="lblBest">ベスト</span> <span id="best">0.0</span>cm / <span id="bestn">0</span><span id="unit2">貫</span>
+          </div>
         </div>
 
         <div class="hud-right">
