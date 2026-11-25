@@ -1,13 +1,26 @@
+
 html,
 body {
   margin: 0;
   height: 100%;
   background: #120d0a;
   overflow: hidden;
-  font-family: "M PLUS Rounded 1c", "Noto Sans JP", "Noto Color Emoji", "Hiragino Sans", system-ui, sans-serif;
+  font-family: "M PLUS Rounded 1c", "Noto Sans JP", "Hiragino Sans", system-ui, sans-serif;
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-variant-emoji: emoji;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-text-fill-color: initial;
+  color: inherit;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 #wrap {
@@ -226,6 +239,10 @@ canvas {
   font-size: 2.2em;
   line-height: 1;
   margin-top: .35em;
+}
+
+.icon-lg .emoji {
+  font-size: inherit;
 }
 
 .overlay p {
