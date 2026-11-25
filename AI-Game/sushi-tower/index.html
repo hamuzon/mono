@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>寿司タワー</title>
+  <title>寿司タワー - @hamusata</title>
 
   <meta name="description" content="揺れる寿司をタップやスペースキーで落として、高く積み上げよう！物理演算で動く寿司タワーゲーム。秒数モード・ライフモード搭載。">
   <meta name="keywords" content="寿司タワー,寿司ゲーム,タワーゲーム,積み上げゲーム,物理演算ゲーム,ブラウザゲーム,無料ゲーム,ミニゲーム,スタッキングゲーム">
@@ -16,7 +16,6 @@
   <meta name="category" content="Game">
   <meta name="classification" content="Browser Game">
 
-  <meta name="theme-color" content="#ff7043">
   <meta name="color-scheme" content="dark light">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
@@ -53,6 +52,10 @@
 
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="ogp.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Color+Emoji&family=Noto+Sans+JP:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,600,0,0">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -74,8 +77,8 @@
         <div class="hud-right">
           <div class="lives" id="lives"></div>
           <div class="tools">
-            <button id="pauseBtn" title="一時停止 (P)">⏸</button>
-            <button id="muteBtn" title="効果音">🔊</button>
+            <button id="pauseBtn" class="tool-btn" title="一時停止 (P)">⏸</button>
+            <button id="muteBtn" class="tool-btn" title="効果音">🔊</button>
           </div>
         </div>
       </div>
@@ -83,6 +86,16 @@
       <div class="tourhint hide" id="tour">積んだタワーを振り返り中… タップでスキップ</div>
 
       <div class="overlay hide" id="pause">
+        <div class="overlay-top-bar">
+          <button class="menu-lang-btn" type="button" aria-label="Language">
+            <span class="material-symbols-outlined lang-icon">translate</span>
+            <div class="lang-text-group">
+              <span class="lang-line1">日本語</span>
+              <span class="lang-line2">Japanese</span>
+            </div>
+          </button>
+        </div>
+
         <h1 id="pauseTitle" class="title-md">一時停止</h1>
 
         <div class="row row-col">
@@ -93,6 +106,16 @@
       </div>
 
       <div class="overlay" id="start">
+        <div class="overlay-top-bar">
+          <button class="menu-lang-btn" type="button" aria-label="Language">
+            <span class="material-symbols-outlined lang-icon">translate</span>
+            <div class="lang-text-group">
+              <span class="lang-line1">日本語</span>
+              <span class="lang-line2">Japanese</span>
+            </div>
+          </button>
+        </div>
+
         <div class="icon-lg">🍣</div>
         <h1 id="startTitle">寿司タワー</h1>
 
@@ -125,6 +148,16 @@
       </div>
 
       <div class="overlay hide" id="over">
+        <div class="overlay-top-bar">
+          <button class="menu-lang-btn" type="button" aria-label="Language">
+            <span class="material-symbols-outlined lang-icon">translate</span>
+            <div class="lang-text-group">
+              <span class="lang-line1">日本語</span>
+              <span class="lang-line2">Japanese</span>
+            </div>
+          </button>
+        </div>
+
         <h1 id="overTitle" class="title-md">リザルト</h1>
 
         <div class="res">
@@ -136,10 +169,6 @@
         <div class="new" id="rnew"></div>
 
         <div class="recs"></div>
-
-        <div class="md"></div>
-
-        <div class="lv"></div>
 
         <div class="row" id="overRow">
           <a id="shareX" class="xbtn" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener noreferrer">𝕏 で記録をシェア</a>

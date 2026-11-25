@@ -1,10 +1,10 @@
 (function () {
   const { Engine, Composite, Body } = Matter;
   const C = window.SushiConfig;
-  const I18N = window.SushiI18N;
-  const LEVELS = window.SushiLevels;
-  const MODES = window.SushiModes;
-  const CTRLS = window.SushiCtrls;
+  let I18N = window.SushiI18N;
+  let LEVELS = window.SushiLevels;
+  let MODES = window.SushiModes;
+  let CTRLS = window.SushiCtrls;
   const Audio = window.SushiAudio;
   const Renderer = window.SushiRenderer;
   const Physics = window.SushiPhysics;
@@ -18,6 +18,21 @@
   let mode = 'time';
   let controlMode = 'auto';
 
+  // URLパラメータまたはlocalStorageから復元
+  const urlParams = new URLSearchParams(window.location.search);
+  const pLang = (urlParams.get('lang') || '').toLowerCase();
+  const pMode = urlParams.get('mode');
+  const pLevel = urlParams.get('level');
+  const pCtrl = urlParams.get('ctrl');
+
+  if (pLang === 'en' || pLang === 'ja') {
+    window.SushiApplyLangData(pLang);
+    I18N = window.SushiI18N;
+    LEVELS = window.SushiLevels;
+    MODES = window.SushiModes;
+    CTRLS = window.SushiCtrls;
+  }
+
   try {
     const savedLevel = localStorage.getItem('sushi-tower-level');
     if (LEVELS[savedLevel]) level = savedLevel;
@@ -27,11 +42,36 @@
     if (CTRLS[savedCtrl]) controlMode = savedCtrl;
   } catch (e) { }
 
+  if (pMode && MODES[pMode]) mode = pMode;
+  if (pLevel && LEVELS[pLevel]) level = pLevel;
+  if (pCtrl && CTRLS[pCtrl]) controlMode = pCtrl;
+  if (!CTRLS[controlMode]) controlMode = 'auto';
+
+  // URLパラメータの同期: lang=en は出す（末尾）。日本語時はクリーンに保つ
+  function syncUrlQuery() {
+    try {
+      const u = new URL(window.location.href);
+      if (C.isEn) {
+        u.search = '?lang=en';
+      } else {
+        u.search = '';
+      }
+      window.history.replaceState(null, '', u.pathname + u.search + u.hash);
+    } catch (e) { }
+  }
+  syncUrlQuery();
+
+  // シェアURL: 英語なら英語版(?lang=en)、日本語なら通常URL
+  function getShareUrl() {
+    return C.isEn
+      ? (C.BASE_URL + '?lang=en')
+      : C.BASE_URL;
+  }
+
   let userX = C.W / 2;
   let keyLeft = false;
   let keyRight = false;
   let isDragging = false;
-  let dragMoved = false;
 
   const stage = document.getElementById('stage');
   const canvas = document.getElementById('c');
@@ -98,6 +138,11 @@
 
   function loadBest() {
     readRecs();
+    if (!recs[mode] || !recs[mode][level]) {
+      best = 0;
+      bestN = 0;
+      return;
+    }
     best = recs[mode][level].h;
     bestN = recs[mode][level].n;
   }
@@ -107,6 +152,7 @@
       localStorage.setItem('sushi-rec-' + mode + '-' + level + '-h', best);
       localStorage.setItem('sushi-rec-' + mode + '-' + level + '-n', bestN);
     } catch (e) { }
+    if (!recs[mode]) recs[mode] = {};
     recs[mode][level] = { h: best, n: bestN };
   }
 
@@ -204,7 +250,7 @@
 
   function renderRecs() {
     const rows = Object.keys(LEVELS).map(lv => {
-      const r = recs[mode][lv];
+      const r = (recs[mode] && recs[mode][lv]) ? recs[mode][lv] : { h: 0, n: 0 };
       const on = lv === level ? ' on' : '';
       return '<div class="rec' + on + '">' +
         '<span>' + LEVELS[lv].label + '</span>' +
@@ -237,6 +283,24 @@
     });
   }
 
+  function updateModeButtons() {
+    document.querySelectorAll('.md button').forEach(b => {
+      const k = b.dataset.md;
+      if (k && MODES[k]) {
+        b.textContent = MODES[k].label;
+      }
+    });
+  }
+
+  function updateControlButtons() {
+    document.querySelectorAll('.ctrl button').forEach(b => {
+      const k = b.dataset.ctrl;
+      if (k && CTRLS[k]) {
+        b.textContent = CTRLS[k].label;
+      }
+    });
+  }
+
   function markLevels() {
     updateLevelButtons();
     document.querySelectorAll('.lv button').forEach(b => {
@@ -248,6 +312,7 @@
   }
 
   function markModes() {
+    updateModeButtons();
     document.querySelectorAll('.md button').forEach(b => {
       b.classList.toggle('on', b.dataset.md === mode);
     });
@@ -257,6 +322,7 @@
   }
 
   function markControls() {
+    updateControlButtons();
     document.querySelectorAll('.ctrl button').forEach(b => {
       b.classList.toggle('on', b.dataset.ctrl === controlMode);
     });
@@ -286,6 +352,8 @@
       resetLimits();
       renderLives();
       updateHud();
+    } else if (state === 'over') {
+      updateOverScreen();
     }
   }
 
@@ -305,6 +373,8 @@
       resetLimits();
       renderLives();
       updateHud();
+    } else if (state === 'over') {
+      updateOverScreen();
     }
   }
 
@@ -314,39 +384,55 @@
       localStorage.setItem('sushi-tower-ctrl', c);
     } catch (e) { }
     markControls();
+    if (state === 'over') {
+      updateOverScreen();
+    }
   }
 
-  document.querySelectorAll('.lv').forEach(box => {
-    Object.keys(LEVELS).forEach(k => {
-      const b = document.createElement('button');
-      b.textContent = getLevelBtnLabel(k);
-      b.dataset.lv = k;
-      b.addEventListener('click', () => setLevel(k));
-      box.appendChild(b);
+  function buildButtons() {
+    document.querySelectorAll('.lv').forEach(box => {
+      box.innerHTML = '';
+      Object.keys(LEVELS).forEach(k => {
+        const b = document.createElement('button');
+        b.textContent = getLevelBtnLabel(k);
+        b.dataset.lv = k;
+        b.addEventListener('click', () => setLevel(k));
+        box.appendChild(b);
+      });
     });
-  });
 
-  document.querySelectorAll('.md').forEach(box => {
-    Object.keys(MODES).forEach(k => {
-      const b = document.createElement('button');
-      b.textContent = MODES[k].label;
-      b.dataset.md = k;
-      b.addEventListener('click', () => setMode(k));
-      box.appendChild(b);
+    document.querySelectorAll('.md').forEach(box => {
+      box.innerHTML = '';
+      Object.keys(MODES).forEach(k => {
+        const b = document.createElement('button');
+        b.textContent = MODES[k].label;
+        b.dataset.md = k;
+        b.addEventListener('click', () => setMode(k));
+        box.appendChild(b);
+      });
     });
-  });
 
-  document.querySelectorAll('.ctrl').forEach(box => {
-    Object.keys(CTRLS).forEach(k => {
-      const b = document.createElement('button');
-      b.textContent = CTRLS[k].label;
-      b.dataset.ctrl = k;
-      b.addEventListener('click', () => setControl(k));
-      box.appendChild(b);
+    document.querySelectorAll('.ctrl').forEach(box => {
+      box.innerHTML = '';
+      Object.keys(CTRLS).forEach(k => {
+        const b = document.createElement('button');
+        b.textContent = CTRLS[k].label;
+        b.dataset.ctrl = k;
+        b.addEventListener('click', () => setControl(k));
+        box.appendChild(b);
+      });
     });
-  });
+  }
 
   function applyLanguage() {
+    document.querySelectorAll('.menu-lang-btn').forEach(btn => {
+      btn.innerHTML = '<span class="material-symbols-outlined lang-icon">translate</span>' +
+        '<div class="lang-text-group">' +
+        '<span class="lang-line1">' + I18N.langLine1 + '</span>' +
+        '<span class="lang-line2">' + I18N.langLine2 + '</span>' +
+        '</div>';
+    });
+
     document.getElementById('pauseTitle').textContent = I18N.pauseTitle;
     document.getElementById('pauseBtn').title = I18N.pauseBtnTitle;
     document.getElementById('muteBtn').title = I18N.muteBtnTitle;
@@ -363,6 +449,7 @@
     document.getElementById('tour').textContent = I18N.tourHint;
     document.getElementById('overResLabel').textContent = I18N.overResLabel;
     document.getElementById('shareX').textContent = I18N.shareXBtn;
+
     const stBtn = document.getElementById('saveTowerBtn');
     if (stBtn) stBtn.textContent = I18N.saveTowerBtn;
     document.getElementById('viewBtn').textContent = I18N.viewBtn;
@@ -371,6 +458,7 @@
     document.getElementById('unit1').textContent = I18N.unit;
     document.getElementById('unit2').textContent = I18N.unit;
     document.getElementById('lblBest').textContent = I18N.bestLbl;
+
     const lm = document.getElementById('lblMode');
     if (lm) lm.textContent = I18N.lblMode;
     const ll = document.getElementById('lblLevel');
@@ -378,7 +466,37 @@
     const lc = document.getElementById('lblCtrl');
     if (lc) lc.textContent = I18N.lblCtrl;
   }
+
+  function switchLanguage(newLang) {
+    window.SushiApplyLangData(newLang);
+    I18N = window.SushiI18N;
+    LEVELS = window.SushiLevels;
+    MODES = window.SushiModes;
+    CTRLS = window.SushiCtrls;
+
+    try {
+      localStorage.setItem('sushi-tower-lang', newLang);
+    } catch (e) { }
+
+    syncUrlQuery();
+    applyLanguage();
+    buildButtons();
+    markModes();
+    markLevels();
+    markControls();
+    renderRecs();
+    renderLives();
+    updateHud();
+
+    if (state === 'over') {
+      updateOverScreen();
+    }
+  }
+
+  buildButtons();
   applyLanguage();
+  markModes();
+  markLevels();
   markControls();
 
   function startGame() {
@@ -424,29 +542,19 @@
     overEl.classList.add('hide');
   }
 
-  function endGame() {
-    state = 'over';
-    held = null;
-
-    setPause(false);
-    Audio.over();
-    overEl.classList.remove('hide');
+  function updateOverScreen() {
+    overTitle.textContent = mode === 'time' ? I18N.overTitleTime : I18N.overTitleLife;
 
     const newH = peakH > best + 1e-9 && peakH > 0;
     const newN = maxN > bestN;
 
-    if (newH) best = peakH;
-    if (newN) bestN = maxN;
-    if (newH || newN) saveBest();
-
-    renderRecs();
-    overTitle.textContent = mode === 'time' ? I18N.overTitleTime : I18N.overTitleLife;
-
     document.getElementById('rh').textContent = peakH.toFixed(1);
+
+    // リザルト画面で動作モードの文字を明記
     document.getElementById('rn').innerHTML = C.isEn
-      ? ('Max <b>' + maxN + ' pcs</b> ・ [' + MODES[mode].label + ' / ' + LEVELS[level].label + ']<br>' +
+      ? ('Max <b>' + maxN + ' pcs</b> ・ [' + MODES[mode].label + ' / ' + LEVELS[level].label + ' / ' + CTRLS[controlMode].label + ']<br>' +
         'Best ' + best.toFixed(1) + ' cm / ' + bestN + ' pcs')
-      : ('最多 <b>' + maxN + ' 貫</b> ・ 【' + MODES[mode].label + ' / ' + LEVELS[level].label + '】<br>' +
+      : ('最多 <b>' + maxN + ' 貫</b> ・ 【' + MODES[mode].label + ' / ' + LEVELS[level].label + ' / ' + CTRLS[controlMode].label + '】<br>' +
         'ベスト ' + best.toFixed(1) + ' cm / ' + bestN + ' 貫');
 
     document.getElementById('rnew').textContent =
@@ -455,8 +563,10 @@
           newN ? I18N.newN :
             '';
 
-    const shareUrl = I18N.shareUrl;
+    const shareUrl = getShareUrl();
     const hashtags = I18N.hashtags;
+
+    // 𝕏 シェア文（動作モードは含めない）
     const tweet = C.isEn
       ? ('🍣 Challenged Sushi Tower [' + MODES[mode].label + ' / ' + LEVELS[level].label + ']!\n' +
         'Height: ' + peakH.toFixed(1) + 'cm\n' +
@@ -471,6 +581,30 @@
 
     document.getElementById('shareX').href =
       'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweet);
+
+    markModes();
+    markLevels();
+    markControls();
+    renderRecs();
+  }
+
+  function endGame() {
+    state = 'over';
+    held = null;
+
+    setPause(false);
+    Audio.over();
+    overEl.classList.remove('hide');
+    overEl.scrollTop = 0;
+
+    const newH = peakH > best + 1e-9 && peakH > 0;
+    const newN = maxN > bestN;
+
+    if (newH) best = peakH;
+    if (newN) bestN = maxN;
+    if (newH || newN) saveBest();
+
+    updateOverScreen();
 
     setTimeout(() => {
       if (state === 'over') startTour();
@@ -594,13 +728,14 @@
     const pad = held.spec.w / 2 + 10;
     const minX = pad;
     const maxX = C.W - pad;
+    const amp = C.W / 2 - pad;
 
     if (controlMode === 'auto') {
       phase += omega() * C.STEP / 1000;
-      const amp = C.W / 2 - pad;
       held.x = C.W / 2 + Math.sin(phase) * amp;
       userX = held.x;
     } else {
+      // 手動操作: キーボード (左右) またはドラッグ
       const moveSpeed = 3.6;
       if (keyLeft) userX = Math.max(minX, userX - moveSpeed);
       if (keyRight) userX = Math.min(maxX, userX + moveSpeed);
@@ -679,9 +814,18 @@
       top = Math.min(top, body.bounds.min.y);
     }
 
+    const count = bodies.length;
+    const towerHeightCm = Math.max(0, (C.PLAT_TOP - top) / C.CM);
+
     tourTopCam = Math.max(0, 120 - top - baseCam);
     tourFrom = cam;
-    tourDur = 2600 + Math.min(5000, (C.PLAT_TOP - top) * 2.2);
+
+    // タワー振り返り時間: 高さや個数に応じて動的に変化
+    // 少ない/低いときはサッと短く (1.8秒〜)、高くたくさん積んだ時はじっくり (最大8.5秒)
+    const heightFactor = Math.min(4500, towerHeightCm * 52);
+    const countFactor = Math.min(3000, count * 160);
+    tourDur = Math.max(1800, Math.min(8500, 1800 + heightFactor + countFactor));
+
     tourT0 = performance.now();
 
     touring = true;
@@ -695,6 +839,7 @@
     cam = tourTopCam;
     tourEl.classList.add('hide');
     overEl.classList.remove('hide');
+    overEl.scrollTop = 0;
   }
 
   function updateCamera() {
@@ -859,8 +1004,8 @@
       if (controlMode === 'auto') {
         dropNow();
       } else {
+        // user モード
         isDragging = true;
-        dragMoved = false;
         const sx = getStageX(e);
         if (held) {
           const pad = held.spec.w / 2 + 10;
@@ -873,7 +1018,6 @@
 
   stage.addEventListener('pointermove', e => {
     if (controlMode === 'user' && isDragging && state === 'play' && !paused && held) {
-      dragMoved = true;
       const sx = getStageX(e);
       const pad = held.spec.w / 2 + 10;
       userX = Math.max(pad, Math.min(C.W - pad, sx));
@@ -894,6 +1038,15 @@
     isDragging = false;
   });
 
+  // メニュー上の言語切り替えボタン
+  document.querySelectorAll('.menu-lang-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      switchLanguage(C.isEn ? 'ja' : 'en');
+    });
+  });
+
   document.getElementById('pauseBtn').addEventListener('click', () => setPause(!paused));
   document.getElementById('resumeBtn').addEventListener('click', () => setPause(false));
   document.getElementById('startBtn').addEventListener('click', startGame);
@@ -902,6 +1055,7 @@
   document.getElementById('topBtn1').addEventListener('click', goTop);
   document.getElementById('topBtn2').addEventListener('click', goTop);
   document.getElementById('viewBtn').addEventListener('click', startTour);
+
   const sBtn = document.getElementById('saveTowerBtn');
   if (sBtn) sBtn.addEventListener('click', saveFullTower);
 
@@ -1116,6 +1270,7 @@
   loadBest();
   markModes();
   markLevels();
+  markControls();
   renderRecs();
   resetLimits();
   renderLives();
